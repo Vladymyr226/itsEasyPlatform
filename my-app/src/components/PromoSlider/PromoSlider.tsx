@@ -1,3 +1,4 @@
+'use client'
 import s from './PromoSlider.module.css'
 
 import loremIpsumPromo from '../../assets/loremipsumPromo.png'
@@ -13,14 +14,10 @@ import mobileBackgroundLines from '../../assets/mobileBackgroundLines.png'
 import Button from '../Button/Button'
 import { SliderComponent } from '../Slider/Slider'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
 
 const PromoSlider = () => {
-  const [width, setWidth] = useState(0)
+  const width = window.innerWidth
 
-  useEffect(() => {
-    setWidth(window.innerWidth)
-  }, [])
   return (
     <div className={s.promoSlider}>
       <SliderComponent outside={width < 1280}>
