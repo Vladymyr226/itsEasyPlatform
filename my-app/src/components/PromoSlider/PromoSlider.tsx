@@ -1,4 +1,3 @@
-'use client'
 import s from './PromoSlider.module.css'
 
 import loremIpsumPromo from '../../assets/loremipsumPromo.png'
@@ -20,7 +19,9 @@ const PromoSlider = () => {
   const [width, setWidth] = useState(0)
 
   useEffect(() => {
-    setWidth(window.innerWidth)
+    if (typeof window !== 'undefined') {
+      setWidth(window.innerWidth)
+    }
   }, [])
 
   return (
