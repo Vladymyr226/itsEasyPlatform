@@ -1,3 +1,4 @@
+'use client'
 import s from './Comments.module.css'
 import { SliderComponent } from '../Slider/Slider'
 import Comment from '../Comment/Comment'
@@ -7,7 +8,9 @@ const Slide = ({ isSingle }: { isSingle?: boolean }) => {
   const [width, setWidth] = useState(0)
 
   useEffect(() => {
-    setWidth(window.innerWidth)
+    if (typeof window !== 'undefined') {
+      setWidth(window.innerWidth)
+    }
   }, [])
 
   return (
@@ -27,7 +30,9 @@ const Comments = () => {
   const [width, setWidth] = useState(0)
 
   useEffect(() => {
-    setWidth(window.innerWidth)
+    if (typeof window !== 'undefined') {
+      setWidth(window.innerWidth)
+    }
   }, [])
 
   return (

@@ -1,3 +1,4 @@
+'use client'
 import Logo from '../../components/Logo/Logo'
 
 import logoTwitter from '../../assets/logo-twitter.svg'
@@ -20,7 +21,9 @@ const Layout = ({ children }: LayoutProps) => {
   const [width, setWidth] = useState(0)
 
   useEffect(() => {
-    setWidth(window.innerWidth)
+    if (typeof window !== 'undefined') {
+      setWidth(window.innerWidth)
+    }
   }, [])
 
   return (

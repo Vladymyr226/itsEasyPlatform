@@ -1,3 +1,4 @@
+'use client'
 import s from './CourseControlls.module.css'
 import heart from '../../assets/heart.svg'
 import emptyHeart from '../../assets/greyHeart.svg'
@@ -13,11 +14,12 @@ import DropModal from '../DropModal/DropModal'
 import Image from 'next/image'
 
 const CourseControlls = () => {
-  // const width = window.innerWidth
   const [width, setWidth] = useState(0)
 
   useEffect(() => {
-    setWidth(window.innerWidth)
+    if (typeof window !== 'undefined') {
+      setWidth(window.innerWidth)
+    }
   }, [])
 
   const [isFavorite, setIsFavorite] = useState(false)
