@@ -1,3 +1,4 @@
+'use client'
 import s from './PromoSlider.module.css'
 
 import loremIpsumPromo from '../../assets/loremipsumPromo.png'
