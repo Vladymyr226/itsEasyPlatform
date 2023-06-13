@@ -1,0 +1,51 @@
+.courseImageWrapper {
+  width: 100%;
+  position: relative;
+}
+
+.courseImage {
+  height: 100%;
+  object-fit: contain;
+}
+
+.shadow {
+  display: none;
+}
+
+.courseImageWrapper:hover .shadow {
+  opacity: 1;
+}
+
+.courseStatsWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 120px;
+
+  position: absolute;
+  left: 4%;
+  top: 65%;
+}
+
+@media screen and (min-width: 1200px) {
+  .courseStatsWrapper {
+    max-width: none;
+    gap: 13px;
+  }
+
+  .shadow {
+    display: block;
+
+    opacity: 0;
+    left: 50%;
+    top: 60%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    z-index: -1;
+    position: absolute;
+    max-width: none;
+    pointer-events: none;
+    user-select: none;
+    transition: opacity 0.3s ease;
+  }
+}

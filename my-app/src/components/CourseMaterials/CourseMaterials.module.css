@@ -1,0 +1,178 @@
+.materialsAccordion {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+
+  background: linear-gradient(
+      287.08deg,
+      rgba(197, 142, 254, 0.07) 0%,
+      rgba(25, 23, 47, 0) 43.83%
+    ),
+    linear-gradient(
+      107.7deg,
+      rgba(197, 142, 254, 0.07) 0%,
+      rgba(25, 23, 47, 0) 32.84%
+    ),
+    #171622;
+  border-radius: 14px;
+  padding-bottom: 40px;
+}
+
+.accordionTitle {
+  cursor: pointer;
+  padding: 11px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  color: var(--text-color);
+}
+
+.accordionTitle.active {
+  background: rgba(197, 142, 254, 0.1);
+}
+
+.titleLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 26px;
+}
+
+.titleRight {
+  display: flex;
+
+  flex-direction: column;
+  gap: 8px;
+
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 140%;
+}
+
+.titleRight div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.accordionContent {
+  display: none;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+  height: auto;
+
+  padding: 23px 20px;
+
+  color: var(--text-color);
+}
+
+.accordionContent.show {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
+}
+
+.materialItem {
+  display: flex;
+  flex-direction: column;
+
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+}
+
+.materialItemTitle {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+}
+
+.materialItemInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.materialItemInfo div {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  margin-top: 10px;
+
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+
+  display: flex;
+  align-items: center;
+  text-decoration-line: underline;
+  color: var(--main-color);
+}
+
+.materialItemInfo img {
+  width: 20px;
+  height: 20px;
+}
+
+.divide {
+  width: 100%;
+  height: 0.5px;
+
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+@media screen and (min-width: 1200px) {
+  .materialsAccordion {
+    margin-top: 50px;
+  }
+
+  .accordionTitle {
+    padding: 19px 40px;
+  }
+
+  .titleRight {
+    align-items: center;
+
+    flex-direction: row;
+    gap: 40px;
+
+    font-size: 16px;
+  }
+
+  .accordionContent {
+    padding: 28px 40px;
+  }
+
+  .accordionContent.show {
+    gap: 30px;
+  }
+
+  .materialItem {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .materialItemTitle {
+    align-items: center;
+  }
+
+  .materialItemInfo {
+    gap: 70px;
+  }
+
+  .materialItemInfo div {
+    gap: 40px;
+    margin-left: 0;
+    margin-top: 0;
+  }
+}

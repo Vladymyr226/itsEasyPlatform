@@ -1,0 +1,99 @@
+.dropModal {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+
+  z-index: 5;
+  position: absolute;
+  top: 50px;
+  right: -50px;
+
+  padding-top: 37px;
+  padding-bottom: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  width: 280px;
+  border-radius: 14px;
+  background: linear-gradient(
+      287.08deg,
+      rgba(197, 142, 254, 0.07) 0%,
+      rgba(25, 23, 47, 0) 43.83%
+    ),
+    linear-gradient(
+      107.7deg,
+      rgba(197, 142, 254, 0.07) 0%,
+      rgba(25, 23, 47, 0) 32.84%
+    ),
+    #171622;
+  user-select: none;
+}
+
+.dropModal::before {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+
+  content: "◥";
+  transform: rotate(-45deg);
+  color: #191825;
+}
+
+.userDropModal.dropModal::before {
+  right: 60px;
+}
+
+.dropModalClose {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+}
+
+.shadow {
+  display: flex;
+  position: absolute;
+  z-index: 4;
+
+  top: -5px;
+
+  right: -20px;
+
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+
+  width: 340px;
+  height: 420px;
+}
+
+.shadow.userShadow {
+  right: -70px;
+  height: 370px;
+}
+
+@media screen and (min-width: 1200px) {
+  .dropModal {
+    width: 367px;
+    right: 0;
+    padding-left: 30px;
+    padding-right: 50px;
+  }
+
+  .userDropModal.dropModal::before {
+    right: 10px;
+  }
+
+  .shadow {
+    top: -20px;
+    right: -60px;
+
+    width: 500px;
+    height: 400px;
+  }
+
+  .shadow.userShadow {
+    right: -70px;
+    height: 370px;
+  }
+}

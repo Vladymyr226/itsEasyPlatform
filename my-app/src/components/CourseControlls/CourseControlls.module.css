@@ -1,0 +1,23 @@
+.iconsWrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconsWrapper img {
+  cursor: pointer;
+}
+
+.shareModalItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+  cursor: pointer;
+
+  color: var(--text-color);
+}

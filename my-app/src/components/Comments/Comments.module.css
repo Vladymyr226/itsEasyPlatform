@@ -1,0 +1,36 @@
+.commentsSlider {
+  position: relative;
+  margin-top: 50px;
+
+  width: 100%;
+
+  /* max-width: 720px; */
+}
+
+.commentsSlide {
+  width: 100%;
+
+  padding-left: 2px;
+  padding-right: 2px;
+  display: flex !important;
+  gap: 20px;
+}
+
+.accentuated {
+  color: var(--main-color);
+}
+
+@media screen and (min-width: 1200px) {
+  .commentsSlider {
+    max-width: 720px;
+  }
+}
+
+@media screen and (min-width: 1480px) {
+  .commentsSlider {
+    position: relative;
+    margin-top: 50px;
+
+    max-width: 900px;
+  }
+}

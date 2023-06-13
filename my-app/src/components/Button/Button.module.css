@@ -1,0 +1,16 @@
+.button {
+  padding: 11px 25px;
+  cursor: pointer;
+  border: none;
+
+  background: var(--main-color);
+  border-radius: 7px;
+  color: var(--text-alt-color);
+
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+@media screen and (min-width: 1200px) {
+}

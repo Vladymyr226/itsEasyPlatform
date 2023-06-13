@@ -1,0 +1,28 @@
+.viewsWrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  font-weight: 400;
+  line-height: 19px;
+  font-size: 12px;
+
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.icon {
+  width: 10px;
+  height: 10px;
+}
+
+@media screen and (min-width: 1200px) {
+  .viewsWrapper {
+    gap: 11px;
+    font-size: 16px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+}

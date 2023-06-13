@@ -1,0 +1,28 @@
+.arrowButton {
+  cursor: pointer;
+
+  background-color: transparent;
+  border: none;
+}
+
+.arrowReverseButton {
+  cursor: pointer;
+
+  background-color: transparent;
+  border: none;
+  transform: rotate(180deg);
+}
+
+.buttonsWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.dotsList {
+  display: flex;
+  gap: 5px;
+}
+
+.dotsList li {
+  height: 4px;
+}

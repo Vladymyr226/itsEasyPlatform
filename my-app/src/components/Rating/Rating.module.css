@@ -1,0 +1,55 @@
+.ratingWrapper {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 19px;
+
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.ratingWrapper.small {
+  line-height: 17px;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ratingWrapper.big {
+  flex-wrap: nowrap;
+  gap: 10px;
+
+  font-size: 13px;
+}
+
+.ratingWrapper.big .starsList {
+  gap: 8px;
+  max-width: 90px;
+}
+
+.starsList {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 60px;
+}
+
+@media screen and (min-width: 1200px) {
+  .starsList {
+    gap: 8px;
+    max-width: none;
+  }
+
+  .ratingWrapper {
+    flex-wrap: nowrap;
+    gap: 10px;
+
+    font-size: 16px;
+  }
+
+  .ratingWrapper.big .starsList {
+    max-width: none;
+  }
+}

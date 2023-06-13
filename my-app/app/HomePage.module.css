@@ -1,0 +1,61 @@
+.homePage {
+  color: var(--text-color);
+
+  font-weight: 700;
+}
+
+.coursesTitle {
+  font-weight: 700;
+
+  font-size: 28px;
+  line-height: 35px;
+
+  text-align: center;
+
+  margin-top: 80px;
+
+  color: var(--main-color);
+}
+
+.loadMoreButton {
+  padding: 11px 45px;
+  cursor: pointer;
+  border: none;
+
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 126px;
+  margin-bottom: 126px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+
+  background: var(--main-color);
+  border-radius: 7px;
+  color: var(--text-alt-color);
+
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+}
+
+.loadMoreImageWrapper {
+  margin-top: 60px;
+  margin-bottom: 180px;
+}
+
+.mobileLoadMoreButton {
+  position: absolute;
+  width: 100%;
+  left: 0;
+}
+
+@media screen and (min-width: 1200px) {
+  .coursesTitle {
+    font-size: 56px;
+    line-height: 69px;
+    margin-top: 159px;
+  }
+}
