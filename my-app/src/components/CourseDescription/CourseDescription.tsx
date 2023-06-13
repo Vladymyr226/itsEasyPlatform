@@ -4,9 +4,19 @@ import Button from '../Button/Button'
 import CourseControlls from '../CourseControlls/CourseControlls'
 import CourseImage from '../CourseImage/CourseImage'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 const CourseDescription = () => {
-  const width = window.innerWidth
+  const [width, setWidth] = useState(0)
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth)
+    setWidth(window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   return (
     <div className={s.courseDescription}>
