@@ -14,9 +14,14 @@ import mobileBackgroundLines from '../../assets/mobileBackgroundLines.png'
 import Button from '../Button/Button'
 import { SliderComponent } from '../Slider/Slider'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
 const PromoSlider = () => {
-  const width = window.innerWidth
+  const [width, setWidth] = useState(0)
+
+  useEffect(() => {
+    setWidth(window.innerWidth)
+  }, [])
 
   return (
     <div className={s.promoSlider}>
