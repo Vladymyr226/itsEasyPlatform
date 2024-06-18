@@ -500,7 +500,7 @@ const CourseCreate = () => {
                     </Button>
                     {modules.map((element, i) => {
                       return (
-                        <Box sx={{ color: '#ffec3e' }}>
+                        <Box key={'mainModuleContainer_' + i} sx={{ color: '#ffec3e' }}>
                           <Accordion
                             expanded={expanded === 'panel' + i}
                             onChange={handleChangeExpanded('panel' + i)}
