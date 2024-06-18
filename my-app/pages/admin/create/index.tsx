@@ -31,6 +31,10 @@ import MenuItem from '@mui/material/MenuItem'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DateField } from '@mui/x-date-pickers/DateField'
+import { InputLabel } from '@mui/material'
+
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 const textFieldColors = {
   '& label.Mui-focused': {
@@ -107,6 +111,38 @@ const CourseCreate = () => {
   const handleChangeStatus = (event: SelectChangeEvent) => {
     setStatus(event.target.value as string)
   }
+
+  interface Lesson {
+    name: string
+    description: string
+    duration: number
+    fields: Array<any>
+    teacher: string
+  }
+
+  const [modules, setModules] = useState<Array<Lesson>>([
+    {
+      name: 'module1',
+      description: 'text',
+      duration: 123,
+      fields: [],
+      teacher: 'string',
+    },
+    {
+      name: 'module2',
+      description: 'text',
+      duration: 123,
+      fields: [],
+      teacher: 'string',
+    },
+  ])
+  const [expanded, setExpanded] = useState<string | false>(false)
+
+  const handleChangeExpanded =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false)
+    }
+
   return (
     <Layout>
       <Box sx={{ minHeight: '80vh' }}>
@@ -121,7 +157,7 @@ const CourseCreate = () => {
         >
           <Box
             sx={{
-              maxWidth: '600px',
+              maxWidth: '900px',
               width: '100%',
               boxShadow: 2,
               borderRadius: '10px',
@@ -252,84 +288,83 @@ const CourseCreate = () => {
                       />
                     </Box>
                     {/* TODO Normal color */}
-                    <Select
-                      fullWidth
-                      labelId='languageSelect'
-                      id='languageSelect'
-                      value={language}
-                      label='Language'
-                      onChange={handleChangeLanguage}
-                      sx={{
-                        marginTop: 2,
-                        color: '#fff',
+                    <Box sx={{ marginTop: 2 }}>
+                      <InputLabel sx={{ color: '#ffec3e' }}>Language</InputLabel>
+                      <Select
+                        fullWidth
+                        id='languageSelect'
+                        value={language}
+                        onChange={handleChangeLanguage}
+                        sx={{
+                          color: '#fff',
+                          '.MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                        }}
+                      >
+                        <MenuItem value={'RU'}>RU</MenuItem>
+                        <MenuItem value={'UA'}>UA</MenuItem>
+                        <MenuItem value={'EN'}>EN</MenuItem>
+                      </Select>
+                    </Box>
+                    <Box sx={{ marginTop: 2 }}>
+                      <InputLabel sx={{ color: '#ffec3e' }}>Level</InputLabel>
+                      <Select
+                        fullWidth
+                        id='levelSelect'
+                        value={level}
+                        onChange={handleChangeLevel}
+                        sx={{
+                          color: '#fff',
 
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                      }}
-                    >
-                      <MenuItem value={'RU'}>RU</MenuItem>
-                      <MenuItem value={'UA'}>UA</MenuItem>
-                      <MenuItem value={'EN'}>EN</MenuItem>
-                    </Select>
-                    <Select
-                      fullWidth
-                      labelId='levelSelect'
-                      id='levelSelect'
-                      value={level}
-                      label='Level'
-                      onChange={handleChangeLevel}
-                      sx={{
-                        marginTop: 2,
-                        color: '#fff',
+                          '.MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                        }}
+                      >
+                        <MenuItem value={'Beginner'}>Beginner</MenuItem>
+                        <MenuItem value={'Junior'}>Junior</MenuItem>
+                        <MenuItem value={'Middle'}>Middle</MenuItem>
+                        <MenuItem value={'Senior'}>Senior</MenuItem>
+                      </Select>
+                    </Box>
+                    <Box sx={{ marginTop: 2 }}>
+                      <InputLabel sx={{ color: '#ffec3e' }}>Type</InputLabel>
+                      <Select
+                        fullWidth
+                        id='typeSelect'
+                        value={type}
+                        onChange={handleChangeType}
+                        sx={{
+                          color: '#fff',
 
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                      }}
-                    >
-                      <MenuItem value={'Beginner'}>Beginner</MenuItem>
-                      <MenuItem value={'Junior'}>Junior</MenuItem>
-                      <MenuItem value={'Middle'}>Middle</MenuItem>
-                      <MenuItem value={'Senior'}>Senior</MenuItem>
-                    </Select>
-                    <Select
-                      fullWidth
-                      labelId='typeSelect'
-                      id='typeSelect'
-                      value={type}
-                      label='Type'
-                      onChange={handleChangeType}
-                      sx={{
-                        marginTop: 2,
-                        color: '#fff',
-
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                      }}
-                    >
-                      <MenuItem value={'self-education'}>Self education</MenuItem>
-                      <MenuItem value={'with-lector'}>With lector</MenuItem>
-                    </Select>
+                          '.MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                        }}
+                      >
+                        <MenuItem value={'self-education'}>Self education</MenuItem>
+                        <MenuItem value={'with-lector'}>With lector</MenuItem>
+                      </Select>
+                    </Box>
                     <DateField
                       label={type === 'with-lector' ? 'Start date' : 'Creation date'}
                       fullWidth
@@ -414,36 +449,102 @@ const CourseCreate = () => {
                       }}
                       sx={{ ...textFieldColors }}
                     />
-                    <Select
-                      fullWidth
-                      labelId='Status'
-                      id='statusSelect'
-                      value={type}
-                      label='Type'
-                      onChange={handleChangeType}
-                      sx={{
-                        marginTop: 2,
-                        color: '#fff',
+                    <Box sx={{ marginTop: 2 }}>
+                      <InputLabel sx={{ color: '#ffec3e' }}>Status</InputLabel>
+                      <Select
+                        fullWidth
+                        id='statusSelect'
+                        value={status}
+                        onChange={handleChangeStatus}
+                        sx={{
+                          color: '#fff',
 
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                      }}
-                    >
-                      <MenuItem value={'active'}>Active</MenuItem>
-                      <MenuItem value={'draft'}>Draft</MenuItem>
-                    </Select>
+                          '.MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffec3e',
+                          },
+                        }}
+                      >
+                        <MenuItem value={'active'}>Active</MenuItem>
+                        <MenuItem value={'draft'}>Draft</MenuItem>
+                      </Select>
+                    </Box>
                   </Box>
                 </LocalizationProvider>
               </CustomTabPanel>
               <CustomTabPanel value={value} index={1}>
-                Item Two
+                <Box sx={{ display: 'flex', width: '100%' }}>
+                  <Box sx={{ width: '30%', border: '2px solid #ffec3e', minHeight: '20rem' }}>
+                    <Button
+                      fullWidth
+                      variant='contained'
+                      sx={{
+                        background: '#ffec3e',
+                        color: '#0f0e16',
+                        fontWeight: 'bold',
+                        borderBottom: '2px solid #ffec3e',
+                        borderRadius: '0px',
+                        '&:hover': {
+                          backgroundColor: '#0f0e16',
+                          borderBottom: '2px solid #ffec3e',
+                          color: '#ffec3e',
+                        },
+                      }}
+                    >
+                      Add Module
+                    </Button>
+                    {modules.map((element, i) => {
+                      return (
+                        <Box sx={{ color: '#ffec3e' }}>
+                          <Accordion
+                            expanded={expanded === 'panel' + i}
+                            onChange={handleChangeExpanded('panel' + i)}
+                            sx={{
+                              borderBottom: '2px solid #ffec3e',
+                              background: '#0f0e16',
+                              color: '#ffec3e',
+                              '& .MuiAccordionSummary-expandIconWrapper .MuiSvgIcon-root': {
+                                color: '#ffec3e',
+                              },
+                            }}
+                          >
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              sx={{ minHeight: '58px' }}
+                            >
+                              <div style={{ display: 'flex', gap: '10px' }}>
+                                <Typography
+                                  sx={{
+                                    fontSize: '18px',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  Module {' ' + (i + 1)}
+                                </Typography>
+                              </div>
+                            </AccordionSummary>
+
+                            <AccordionDetails style={{ padding: '0' }}>
+                              <ul>
+                                <div style={{ display: 'flex' }}>
+                                  <Box>123</Box>
+                                </div>
+                              </ul>
+
+                              <br />
+                            </AccordionDetails>
+                          </Accordion>
+                        </Box>
+                      )
+                    })}
+                  </Box>
+                  <Box sx={{ background: '#fff', width: '70%' }}>2</Box>
+                </Box>
               </CustomTabPanel>
               <CustomTabPanel value={value} index={2}>
                 Item Three
