@@ -36,6 +36,7 @@ const tableElement = {
   fontWeight: 'bold',
   background: '#ffec3e',
 }
+const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/courses'
 
 const TableColumns = () => {
   return (
@@ -60,7 +61,7 @@ const TableColumns = () => {
           ...tableColumn,
         }}
       >
-        Is for group
+        Level
       </Box>
       <Box
         sx={{
@@ -74,7 +75,7 @@ const TableColumns = () => {
           ...tableColumn,
         }}
       >
-        Duration
+        Image
       </Box>
       <Box
         sx={{
@@ -123,7 +124,7 @@ const TableColumns = () => {
           ...tableColumn,
         }}
       >
-        Total time
+        Course type
       </Box>
       <Box
         sx={{
@@ -138,9 +139,24 @@ const TableColumns = () => {
 const AdminTable = () => {
   const [width, setWidth] = useState(0)
 
+  const [data, setData] = useState<Array<any>>()
+  console.log(data)
+  async function getPageData() {
+    if (typeof window !== 'undefined') {
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const result = await response.json()
+      setData(result.getCourses)
+    }
+  }
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
+      getPageData()
     }
   }, [])
 
@@ -193,7 +209,6 @@ const AdminTable = () => {
               border: '1px solid #ffec3e',
               borderTop: '4px solid #ffec3e',
               overflowX: 'auto',
-              scrollbarWidth: 'none',
             }}
           >
             <Box
@@ -210,295 +225,186 @@ const AdminTable = () => {
             >
               <TableColumns />
             </Box>
-            {true ? (
-              <>
-                <div>
-                  <Box
-                    key={'rowDividerWide_'}
-                    sx={{
-                      width: '100%',
-                      background: '#ffec3e',
-                      minWidth: '140rem',
-                      height: '2px',
-                    }}
-                  ></Box>
-                  <Box
-                    key={'rowContainerWide_'}
-                    sx={{
-                      display: 'flex',
-                      paddingTop: '0.5rem',
-                      paddingBottom: '0.5rem',
-                      width: '100%',
-                      color: '#ffec3e',
-                    }}
-                  >
+            {data ? (
+              data.map((element) => {
+                return (
+                  <div key={'MainelementContainer'}>
                     <Box
+                      key={'rowDividerWide_'}
                       sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
+                        width: '100%',
+                        background: '#ffec3e',
+                        minWidth: '140rem',
+                        height: '2px',
+                      }}
+                    ></Box>
+                    <Box
+                      key={'rowContainerWide_'}
+                      sx={{
+                        display: 'flex',
+                        paddingTop: '0.5rem',
+                        paddingBottom: '0.5rem',
+                        width: '100%',
+                        color: '#ffec3e',
                       }}
                     >
-                      info
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.title}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.description}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.language}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.level}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.date}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.imagePreview}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.priceDiscount}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.level}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        -
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.priceCourse}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        -
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.practicAmount}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #ffec3e',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.data.type}
+                      </Box>
+                      <Box
+                        sx={{ display: 'flex', justifyContent: 'space-around', minWidth: '10rem' }}
+                      >
+                        <IconButton key={'editButton_'} aria-label='edit'>
+                          <EditIcon key={'editIcon_'} color='primary' />
+                        </IconButton>
+                        <IconButton key={'deleteButton_'} aria-label='edit'>
+                          <DeleteIcon key={'deleteIcon_'} color='primary' />
+                        </IconButton>
+                      </Box>
                     </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{
-                        borderRight: '2px solid #ffec3e',
-                        minWidth: '10rem',
-                        textAlign: 'center',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    >
-                      info
-                    </Box>
-                    <Box
-                      sx={{ display: 'flex', justifyContent: 'space-around', minWidth: '10rem' }}
-                    >
-                      <IconButton key={'editButton_'} aria-label='edit'>
-                        <EditIcon key={'editIcon_'} color='primary' />
-                      </IconButton>
-                      <IconButton key={'deleteButton_'} aria-label='edit'>
-                        <DeleteIcon key={'deleteIcon_'} color='primary' />
-                      </IconButton>
-                    </Box>
-                  </Box>
-
-                  {/* <div
-                            key={"rowContainerWide_" + i}
-                            className="hidden md:flex py-2  w-full justify-between divide-x-2 divide-yellow"
-                          >
-                            <div
-                              key={"rowNameValueWide_" + i}
-                              className="min-w-[12rem]  w-full py-2 text-center overflow-auto px-1"
-                            >
-                              {worker.name}
-                            </div>
-                            <div
-                              key={"rowCreatorValueWide_" + i}
-                              className="min-w-[12rem]  w-full py-2 text-center overflow-auto px-1"
-                            >
-                              {worker.creator}
-                            </div>
-                            <div
-                              key={"rowIsAvailableValueWide_" + i}
-                              className="min-w-[12rem]  w-full py-2 text-center overflow-auto px-1"
-                            >
-                              {worker.isAvailable ? "true" : "false"}
-                            </div>
-                            <div
-                              key={"rowPermissionsValueWide_" + i}
-                              className="min-w-[24rem] w-full p-2 flex text-center overflow-auto px-1"
-                            >
-                              {worker.permissions
-                                ? worker.permissions.map((perm: any) => {
-                                    return (
-                                      <Chip
-                                        key={
-                                          "workerPermissionWideChip_" +
-                                          i +
-                                          "_" +
-                                          perm
-                                        }
-                                        variant="filled"
-                                        color="primary"
-                                        label={perm}
-                                        sx={{ margin: "2px" }}
-                                      />
-                                    );
-                                  })
-                                : "-"}
-                            </div>
-                            <div
-                              key={"rowLastLoginValueWide_" + i}
-                              className="min-w-[12rem]  w-full py-2 text-center overflow-auto px-1"
-                            >
-                              {worker.lastLogin
-                                ? new Date(worker.lastLogin).toLocaleString()
-                                : "-"}
-                            </div>
-
-                            <div
-                              key={"rowButtonsContainerWide_" + i}
-                              className="min-w-24 flex justify-end"
-                            >
-                              <IconButton
-                                key={"deleteButtonWide_" + i}
-                                aria-label="delete"
-                                onClick={async (e: any) => {
-                                  e.preventDefault();
-                                  try {
-                                    const res = await fetch(
-                                      process.env.NEXT_PUBLIC_API_HOST +
-                                        `/Worker?id=${worker._id}`,
-                                      {
-                                        method: "DELETE",
-                                        headers: {
-                                          "Content-Type": "application/json",
-                                        },
-                                      }
-                                    );
-                                    if (res.ok) {
-                                      setWorkers(
-                                        workers.filter(
-                                          (data: any) => data._id !== worker._id
-                                        )
-                                      );
-                                    } else {
-                                      console.log("Worker update failed.");
-                                    }
-                                  } catch (error) {
-                                    console.log(
-                                      "Error during data update: ",
-                                      error
-                                    );
-                                  }
-                                }}
-                              >
-                                <DeleteIcon
-                                  key={"deleteIconWide_" + i}
-                                  color="error"
-                                />
-                              </IconButton>
-                              <IconButton
-                                key={"editButtonWide_" + i}
-                                aria-label="edit"
-                                onClick={() => {
-                                  router.push("/admin/Worker/" + worker._id);
-                                }}
-                              >
-                                <EditIcon
-                                  key={"editIconWide_" + i}
-                                  color="primary"
-                                />
-                              </IconButton>
-                            </div>
-                          </div> */}
-                </div>
-              </>
+                  </div>
+                )
+              })
             ) : (
               <div>
                 <LinearProgress
