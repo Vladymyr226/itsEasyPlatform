@@ -9,6 +9,9 @@ import Typography from '@mui/material/Typography'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { signIn } from 'next-auth/react'
+import { useState } from 'react'
+import axios from 'axios'
 const textFieldColors = {
   '& label.Mui-focused': {
     color: '#ffec3e',
@@ -34,17 +37,23 @@ function cleanInputs() {
   const tmp = (document.getElementById('formSignIn') as HTMLFormElement).reset()
 }
 
-const url = `${
-  process.env.NEXT_PUBLIC_DEV !== 'dev'
-    ? process.env.NEXT_PUBLIC_HEROKU_URL
-    : process.env.NEXT_PUBLIC_LOCALHOST
-}/api/auth/login?`
+const url = 'https://its-easy-platform-back-end.vercel.app/api/auth/login?'
 
 const Login = () => {
   const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    try {
+      const response = await axios.post(url + 'email=' + email + '&password=' + password)
+      const resultResponse = response.data
+      if (resultResponse) {
+        router.push('/admin')
+        localStorage.setItem('jwt', resultResponse.token)
+      }
+    } catch (error) {}
   }
 
   return (
@@ -63,6 +72,7 @@ const Login = () => {
           name='email'
           autoComplete='email'
           autoFocus
+          onChange={(e) => setEmail(e.target.value)}
           InputLabelProps={{
             sx: {
               color: '#ffec3e',
@@ -79,6 +89,7 @@ const Login = () => {
           type='password'
           id='password'
           autoComplete='current-password'
+          onChange={(e) => setPassword(e.target.value)}
           InputLabelProps={{
             sx: {
               color: '#ffec3e',

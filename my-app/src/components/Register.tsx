@@ -9,6 +9,10 @@ import Typography from '@mui/material/Typography'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useState } from 'react'
+import axios from 'axios'
+const url = 'https://its-easy-platform-back-end.vercel.app/api/auth/register'
+
 const textFieldColors = {
   '& label.Mui-focused': {
     color: '#ffec3e',
@@ -34,17 +38,31 @@ function cleanInputs() {
   const tmp = (document.getElementById('formSignIn') as HTMLFormElement).reset()
 }
 
-const url = `${
-  process.env.NEXT_PUBLIC_DEV !== 'dev'
-    ? process.env.NEXT_PUBLIC_HEROKU_URL
-    : process.env.NEXT_PUBLIC_LOCALHOST
-}/api/auth/login?`
-
 const Registration = () => {
   const router = useRouter()
+  const [form, setForm] = useState({
+    userName: '',
+    email: '',
+    password: '',
+  })
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    try {
+      const response = await axios.post(
+        url + '?userName=' + form.userName + '&email=' + form.email + '&password=' + form.password,
+        {}
+      )
+      const resultResponse = response.data
+      if (resultResponse) {
+        localStorage.setItem('jwt', resultResponse.token)
+        router.push('/admin')
+      }
+    } catch (error) {
+      alert(error)
+      console.error(error)
+      return
+    }
   }
 
   return (
@@ -57,10 +75,10 @@ const Registration = () => {
           margin='normal'
           required
           fullWidth
-          id='login'
+          id='username'
           type='text'
-          label='Login'
-          name='login'
+          label='Username'
+          name='username'
           autoComplete='login'
           autoFocus
           InputLabelProps={{
@@ -68,6 +86,7 @@ const Registration = () => {
               color: '#ffec3e',
             },
           }}
+          onChange={(e) => setForm({ ...form, userName: e.target.value })}
           sx={{ ...textFieldColors }}
         />
         <TextField
@@ -85,6 +104,7 @@ const Registration = () => {
               color: '#ffec3e',
             },
           }}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
           sx={{ ...textFieldColors }}
         />
         <TextField
@@ -101,6 +121,7 @@ const Registration = () => {
               color: '#ffec3e',
             },
           }}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
           sx={{ ...textFieldColors }}
         />
         <Button

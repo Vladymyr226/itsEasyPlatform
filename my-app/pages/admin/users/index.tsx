@@ -1,7 +1,5 @@
 'use client'
 
-import courseImage from '../../src/assets/courseImage.png'
-import skillsImage from '../../src/assets/skillsImage.png'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Comments from '@/components/Comments/Comments'
@@ -14,7 +12,7 @@ import Rating from '@/components/Rating/Rating'
 import SkillsList from '@/components/SkillsList/SkillsList'
 import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
-import '../../app/globals.css'
+import '../../../app/globals.css'
 import { Box, Button, Typography } from '@mui/material'
 import LinearProgress from '@mui/material/LinearProgress'
 
@@ -36,83 +34,31 @@ const tableElement = {
   fontWeight: 'bold',
   background: '#ffec3e',
 }
-const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/courses'
+const url = 'https://its-easy-platform-back-end.vercel.app/api/auth/users'
 
 const TableColumns = () => {
   return (
     <>
-      <Box sx={{ ...tableColumn }}>Title</Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Description
+        Username
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Rating
-      </Box>
-      {/* //123 */}
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Language
+        Email
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Lector
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Level
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Type
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Start date
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Duration
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Price
-      </Box>
-
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Control buttons
+        Created at
       </Box>
     </>
   )
@@ -130,7 +76,7 @@ const AdminTable = () => {
         },
       })
       const result = await response.json()
-      setData(result.getCourses)
+      setData(result.getLessons)
     }
   }
 
@@ -162,21 +108,21 @@ const AdminTable = () => {
                   fontWeight: 'bold',
                   paddingLeft: 2,
                   paddingRight: 2,
-                  color: '#ffec3e',
-                  borderLeft: '2px solid #ffec3e',
+                  color: '#fff',
                   fontSize: 20,
                 }}
               >
                 Courses
               </Box>
             </Link>
-            <Link href={'/admin/users'}>
+            <Link href={'/users'}>
               <Box
                 sx={{
                   fontWeight: 'bold',
                   paddingLeft: 2,
                   paddingRight: 2,
-                  color: '#fff',
+                  color: '#ffec3e',
+                  borderLeft: '2px solid #ffec3e',
                   fontSize: 20,
                 }}
               >
@@ -192,30 +138,6 @@ const AdminTable = () => {
               flexDirection: 'column',
             }}
           >
-            <Box sx={{ display: 'flex', justifyContent: 'end', marginBottom: 2 }}>
-              <Link href={'./admin/create'}>
-                <Button
-                  sx={{
-                    background: '#ffec3e',
-                    padding: 1,
-                    borderRadius: '10px',
-                    paddingLeft: 2,
-                    paddingRight: 2,
-                    fontWeight: 'bold',
-                    color: '#0f0e16',
-                    border: '2px solid #ffec3e',
-                    '&:hover': {
-                      backgroundColor: '#0f0e16',
-                      border: '2px solid #ffec3e',
-                      color: '#ffec3e',
-                      boxShadow: 'none',
-                    },
-                  }}
-                >
-                  Add
-                </Button>
-              </Link>
-            </Box>
             <Box
               sx={{
                 width: '100%',
@@ -237,7 +159,7 @@ const AdminTable = () => {
                   paddingTop: 1,
                   paddingBottom: 1,
                   width: '100%',
-                  minWidth: '110rem',
+                  minWidth: '30rem',
                 }}
               >
                 <TableColumns />
@@ -251,7 +173,7 @@ const AdminTable = () => {
                         sx={{
                           width: '100%',
                           background: '#ffec3e',
-                          minWidth: '110rem',
+                          minWidth: '30rem',
                           height: '2px',
                         }}
                       ></Box>
@@ -269,128 +191,37 @@ const AdminTable = () => {
                           sx={{
                             borderRight: '2px solid #ffec3e',
                             minWidth: '10rem',
+                            width: '100%',
                             textAlign: 'center',
                             paddingTop: 1,
                             paddingBottom: 1,
                           }}
                         >
-                          {element.data.title}
+                          {element.user_name}
                         </Box>
                         <Box
                           sx={{
                             borderRight: '2px solid #ffec3e',
                             minWidth: '10rem',
+                            width: '100%',
                             textAlign: 'center',
                             paddingTop: 1,
                             paddingBottom: 1,
                           }}
                         >
-                          {element.data.description}
+                          {element.email}
                         </Box>
                         <Box
                           sx={{
                             borderRight: '2px solid #ffec3e',
                             minWidth: '10rem',
+                            width: '100%',
                             textAlign: 'center',
                             paddingTop: 1,
                             paddingBottom: 1,
                           }}
                         >
-                          {element.data.rating}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.language}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.lector}
-                        </Box>
-
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.level}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.type}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.date}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.duration}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.price}
-                        </Box>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-around',
-                            minWidth: '10rem',
-                          }}
-                        >
-                          <Link href={'./admin/create?_id=' + element.id}>
-                            <IconButton key={'editButton_'} aria-label='edit'>
-                              <EditIcon key={'editIcon_'} color='primary' />
-                            </IconButton>
-                          </Link>
-                          <IconButton key={'deleteButton_'} aria-label='edit'>
-                            <DeleteIcon key={'deleteIcon_'} color='primary' />
-                          </IconButton>
+                          {element.created_at}
                         </Box>
                       </Box>
                     </div>

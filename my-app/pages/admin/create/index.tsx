@@ -10,7 +10,7 @@ import CourseMaterials from '@/components/CourseMaterials/CourseMaterials'
 import CourseSidebar from '@/components/CourseSidebar/CourseSidebar'
 import PlayButton from '@/components/PlayButton/PlayButton'
 import PopularCourses from '@/components/PopularCourses/PopularCourses'
-import Rating from '@/components/Rating/Rating'
+
 import SkillsList from '@/components/SkillsList/SkillsList'
 import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
@@ -37,9 +37,11 @@ import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import dayjs from 'dayjs'
 import axios from 'axios'
-// import Tiptap from '@/components/Tiptap'
+import Rating from '@mui/material/Rating'
+import { useRouter } from 'next/navigation'
 
-const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/courses'
+const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
+const urlLesson = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/lesson'
 
 const textFieldColors = {
   '& label.Mui-focused': {
@@ -93,6 +95,7 @@ const CourseCreate = () => {
 
   //  bg-dark shadow-lg p-5 rounded-lg border-t-4 border-yellow w-full max-w-[30rem]')
   //   dropModal
+  const [id, setId] = useState()
   const [value, setValue] = useState(0)
   const [imageUrl, setImageUrl] = useState('')
 
@@ -118,31 +121,35 @@ const CourseCreate = () => {
   }
 
   interface Lesson {
-    name: string
+    id?: string
+    title: string
     description: string
-    duration: number
-    fields: Array<any>
+    link: string
+  }
+  interface Module {
+    title: string
+    lessons: Array<Lesson>
   }
 
-  const [modules, setModules] = useState<Array<Array<Lesson>>>([])
+  const [modules, setModules] = useState<Array<Module>>([])
   const [allModules, setAllModules] = useState<Array<Lesson>>([])
   const [expanded, setExpanded] = useState<string | false>(false)
   const [reDropBlock, setReDropBlock] = useState(false)
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<any>({
     title: '',
     description: '',
     richtext: '',
-    imagePreview: '',
     date: '',
-    lecturesAmount: 0,
-    practicAmount: 0,
-    priceCourse: 0,
-    priceDiscount: 0,
+    duration: null,
+    lector: '',
+    price: null,
   })
+
+  const [rating, setRating] = useState(0.0)
   const [lessonForm, setLessonForm] = useState({
-    name: '',
+    title: '',
     description: '',
-    duration: 0,
+    link: '',
     fields: [{}, {}],
   })
 
@@ -160,12 +167,15 @@ const CourseCreate = () => {
     setModules(
       modules.map((elem, index) => {
         if (delField.moduleI === index) {
-          return elem.filter((lesson, lessonIndex) => {
-            if (lessonIndex !== delField._i) {
-              return lesson
-            }
-            setAllModules([...allModules, lesson])
-          })
+          return {
+            title: elem.title,
+            lessons: elem.lessons.filter((lesson, lessonIndex) => {
+              if (lessonIndex !== delField._i) {
+                return lesson
+              }
+              setAllModules([...allModules, lesson])
+            }),
+          }
         }
         return elem
       })
@@ -182,15 +192,19 @@ const CourseCreate = () => {
                   modulesIndex != JSON.parse(e.dataTransfer.getData('ID'))._i
               )
             )
-            return [
-              ...modulesElem,
-              {
-                name: JSON.parse(e.dataTransfer.getData('ID')).name,
-                description: JSON.parse(e.dataTransfer.getData('ID')).description,
-                duration: JSON.parse(e.dataTransfer.getData('ID')).duration,
-                fields: JSON.parse(e.dataTransfer.getData('ID')).fields,
-              },
-            ]
+            return {
+              title: modulesElem.title,
+              lessons: [
+                ...modulesElem.lessons,
+                {
+                  id: JSON.parse(e.dataTransfer.getData('ID')).id,
+                  title: JSON.parse(e.dataTransfer.getData('ID')).title,
+                  description: JSON.parse(e.dataTransfer.getData('ID')).description,
+                  link: JSON.parse(e.dataTransfer.getData('ID')).link,
+                  fields: JSON.parse(e.dataTransfer.getData('ID')).fields,
+                },
+              ],
+            }
           }
           return modulesElem
         })
@@ -199,22 +213,48 @@ const CourseCreate = () => {
 
     setReDropBlock(false)
   }
+  const router = useRouter()
   const handleSubmit = async (e: any) => {
-    console.log(modules.toString())
+    console.log(
+      modules.map((module) => {
+        return module.lessons.map((lesson) => {
+          return lesson.id
+        })
+      })
+    )
     const json = {
       ...form,
       language: language,
       level: level,
       type: type,
-      modules: modules,
+      modules: modules.map((module) => {
+        return {
+          title: module.title,
+          lessons: module.lessons.map((lesson) => {
+            return lesson.id
+          }),
+        }
+      }),
+      rating: rating,
     }
     console.log(json)
 
     try {
-      const response = await axios.post(url + '?isActive=' + status, json)
-      const resultResponse = response.data
-      if (resultResponse) {
-        console.log('Success')
+      if (id) {
+        const response = await axios.put(url + '?id=' + id, json)
+        const resultResponse = response.data
+        if (resultResponse) {
+          router.push('/admin')
+        }
+      } else {
+        const response = await axios.post(
+          url + '?isActive=' + (status == 'active' ? true : false),
+          json
+        )
+        const resultResponse = response.data
+        if (resultResponse) {
+          router.push('/admin')
+        }
       }
     } catch (error) {
       alert(error)
@@ -229,29 +269,58 @@ const CourseCreate = () => {
 
       if (fullUrl.split('_id=')[1]) {
         console.log(fullUrl.split('_id=')[1])
-        const response = await fetch(url + '?_id=' + fullUrl.split('_id=')[1], {
+        const response = await fetch(url + 's?_id=' + fullUrl.split('_id=')[1], {
           headers: {
             'Content-Type': 'application/json',
           },
         })
-        console.log(response)
-      }
-      // const response = await fetch(urlGet, {
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // })
+        const result = await response.json()
+        console.log(result.getCourses[0])
+        setId(result.getCourses[0].id)
+        setImageUrl(result.getCourses[0].data.imageUrl)
+        setLanguage(result.getCourses[0].data.language)
+        setLevel(result.getCourses[0].data.level)
 
-      // const result = await response.json()
-      // if (result.myIndustrialHubTools.length) {
-      //   const fetchedData = result?.myIndustrialHubTools?.at(-1)
-      // }
+        setType(result.getCourses[0].data.type)
+        setStatus(result.getCourses[0].data.status)
+        setRating(result.getCourses[0].data.rating)
+        // setModules(result.getCourses[0].data.modules)
+        setForm({
+          title: result.getCourses[0].data.title,
+          description: result.getCourses[0].data.description,
+          richtext: result.getCourses[0].data.richtext,
+          date: result.getCourses[0].data.date,
+          duration: result.getCourses[0].data.duration,
+          lector: result.getCourses[0].data.lector,
+          price: result.getCourses[0].data.price,
+        })
+      } else {
+        const response = await fetch(urlLesson + 's', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        const result = await response.json()
+        setAllModules(
+          result.getLessons.map((lesson: any) => {
+            return {
+              id: lesson.id,
+              title: lesson.data.title,
+              description: lesson.data.description,
+              link: lesson.data.link,
+            }
+          })
+        )
+        console.log(result.getLessons)
+      }
     }
   }
   useEffect(() => {
     getPageData()
   }, [])
 
+  console.log(allModules)
+  console.log(modules)
   return (
     <Layout>
       <Box sx={{ minHeight: '80vh' }}>
@@ -264,6 +333,35 @@ const CourseCreate = () => {
             justifyContent: 'center',
           }}
         >
+          <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Link href={'/admin'}>
+              <Box
+                sx={{
+                  fontWeight: 'bold',
+                  paddingLeft: 2,
+                  paddingRight: 2,
+                  color: '#ffec3e',
+                  borderLeft: '2px solid #ffec3e',
+                  fontSize: 20,
+                }}
+              >
+                Courses
+              </Box>
+            </Link>
+            <Link href={'/admin/users'}>
+              <Box
+                sx={{
+                  fontWeight: 'bold',
+                  paddingLeft: 2,
+                  paddingRight: 2,
+                  color: '#fff',
+                  fontSize: 20,
+                }}
+              >
+                Users
+              </Box>
+            </Link>
+          </Box>
           <Box
             sx={{
               maxWidth: '900px',
@@ -330,68 +428,67 @@ const CourseCreate = () => {
                 />
               </Tabs>
               <CustomTabPanel value={value} index={0}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Box sx={{ color: '#fff' }}>
-                    <TextField
-                      margin='normal'
-                      required
-                      fullWidth
-                      id='title'
-                      type='text'
-                      label='Title'
-                      name='title'
-                      autoFocus
-                      InputLabelProps={{
-                        sx: {
-                          color: '#ffec3e',
-                        },
-                      }}
-                      onChange={(e) => {
-                        setForm({ ...form, title: e.target.value })
-                      }}
-                      value={form.title}
-                      sx={{ ...textFieldColors }}
-                    />
-                    <TextField
-                      margin='normal'
-                      required
-                      fullWidth
-                      id='description'
-                      type='text'
-                      label='Description'
-                      name='description'
-                      InputLabelProps={{
-                        sx: {
-                          color: '#ffec3e',
-                        },
-                      }}
-                      onChange={(e) => {
-                        setForm({ ...form, description: e.target.value })
-                      }}
-                      value={form.description}
-                      sx={{ ...textFieldColors }}
-                    />
-                    {/* <Tiptap /> */}
-                    <TextField
-                      margin='normal'
-                      required
-                      fullWidth
-                      id='richtext'
-                      type='text'
-                      label='Rich-text'
-                      name='richtext'
-                      InputLabelProps={{
-                        sx: {
-                          color: '#ffec3e',
-                        },
-                      }}
-                      onChange={(e) => {
-                        setForm({ ...form, richtext: e.target.value })
-                      }}
-                      value={form.richtext}
-                      sx={{ ...textFieldColors }}
-                    />
-                    <Box>
+                <Box sx={{ color: '#fff' }}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='title'
+                    type='text'
+                    label='Title'
+                    name='title'
+                    autoFocus
+                    InputLabelProps={{
+                      sx: {
+                        color: '#ffec3e',
+                      },
+                    }}
+                    onChange={(e) => {
+                      setForm({ ...form, title: e.target.value })
+                    }}
+                    value={form.title}
+                    sx={{ ...textFieldColors }}
+                  />
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='description'
+                    type='text'
+                    label='Description'
+                    name='description'
+                    InputLabelProps={{
+                      sx: {
+                        color: '#ffec3e',
+                      },
+                    }}
+                    onChange={(e) => {
+                      setForm({ ...form, description: e.target.value })
+                    }}
+                    value={form.description}
+                    sx={{ ...textFieldColors }}
+                  />
+
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='richtext'
+                    type='text'
+                    label='Rich-text'
+                    name='richtext'
+                    InputLabelProps={{
+                      sx: {
+                        color: '#ffec3e',
+                      },
+                    }}
+                    onChange={(e) => {
+                      setForm({ ...form, richtext: e.target.value })
+                    }}
+                    value={form.richtext}
+                    sx={{ ...textFieldColors }}
+                  />
+                  {/* <Box>
                       {imageUrl && <Image src={imageUrl} fill alt={'Preview image'} />}
                       <TextField
                         onChange={(e) => {
@@ -412,233 +509,262 @@ const CourseCreate = () => {
                         }}
                         sx={{ ...textFieldColors }}
                       />
-                    </Box>
-                    {/* TODO Normal color */}
-                    <Box sx={{ marginTop: 2 }}>
-                      <InputLabel sx={{ color: '#ffec3e' }}>Language</InputLabel>
-                      <Select
-                        fullWidth
-                        id='languageSelect'
-                        value={language}
-                        onChange={handleChangeLanguage}
-                        sx={{
-                          color: '#fff',
-                          '.MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                        }}
-                      >
-                        <MenuItem value={'RU'}>RU</MenuItem>
-                        <MenuItem value={'UA'}>UA</MenuItem>
-                        <MenuItem value={'EN'}>EN</MenuItem>
-                      </Select>
-                    </Box>
-                    <Box sx={{ marginTop: 2 }}>
-                      <InputLabel sx={{ color: '#ffec3e' }}>Level</InputLabel>
-                      <Select
-                        fullWidth
-                        id='levelSelect'
-                        value={level}
-                        onChange={handleChangeLevel}
-                        sx={{
-                          color: '#fff',
+                    </Box> */}
+                  {/* TODO Normal color */}
 
-                          '.MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                        }}
-                      >
-                        <MenuItem value={'Beginner'}>Beginner</MenuItem>
-                        <MenuItem value={'Junior'}>Junior</MenuItem>
-                        <MenuItem value={'Middle'}>Middle</MenuItem>
-                        <MenuItem value={'Senior'}>Senior</MenuItem>
-                      </Select>
-                    </Box>
-                    <Box sx={{ marginTop: 2 }}>
-                      <InputLabel sx={{ color: '#ffec3e' }}>Type</InputLabel>
-                      <Select
-                        fullWidth
-                        id='typeSelect'
-                        value={type}
-                        onChange={handleChangeType}
-                        sx={{
-                          color: '#fff',
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='lector'
+                    type='text'
+                    label='Lector'
+                    name='lector'
+                    InputLabelProps={{
+                      sx: {
+                        color: '#ffec3e',
+                      },
+                    }}
+                    onChange={(e) => {
+                      setForm({ ...form, lector: e.target.value })
+                    }}
+                    value={form.lector}
+                    sx={{ ...textFieldColors }}
+                  />
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='date'
+                    type='date'
+                    label='Date'
+                    name='date'
+                    InputLabelProps={{
+                      sx: {
+                        color: '#ffec3e',
+                      },
+                    }}
+                    onChange={(e) => {
+                      setForm({ ...form, date: e.target.value })
+                    }}
+                    value={form.date || '2024-01-01'}
+                    sx={{
+                      ...textFieldColors,
+                      marginTop: 3,
+                    }}
+                  />
 
-                          '.MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                        }}
-                      >
-                        <MenuItem value={'self-education'}>Self education</MenuItem>
-                        <MenuItem value={'with-lector'}>With lector</MenuItem>
-                      </Select>
-                    </Box>
-                    <DateField
-                      label={type === 'with-lector' ? 'Start date' : 'Creation date'}
-                      fullWidth
-                      InputLabelProps={{
-                        sx: {
-                          color: '#ffec3e',
-                        },
-                      }}
-                      onChange={(newValue) =>
-                        setForm({ ...form, date: newValue?.toString() ?? '' })
-                      }
-                      sx={{ ...textFieldColors, marginTop: 2 }}
-                    />
-                    <TextField
-                      margin='normal'
-                      required
-                      fullWidth
-                      id='lectures-amount'
-                      type='number'
-                      label='Lectures amount'
-                      name='lecturesAmount'
-                      InputLabelProps={{
-                        sx: {
-                          color: '#ffec3e',
-                        },
-                      }}
-                      InputProps={{
-                        inputProps: { min: 1 },
-                      }}
-                      onChange={(e) => {
-                        setForm({ ...form, lecturesAmount: Number(e.target.value) })
-                      }}
-                      value={form.lecturesAmount}
-                      sx={{ ...textFieldColors, marginTop: 3 }}
-                    />
-                    <TextField
-                      margin='normal'
-                      required
-                      fullWidth
-                      id='practic-amount'
-                      type='number'
-                      label='Practic amount'
-                      name='practicAmount'
-                      InputLabelProps={{
-                        sx: {
-                          color: '#ffec3e',
-                        },
-                      }}
-                      InputProps={{
-                        inputProps: { min: 1 },
-                      }}
-                      onChange={(e) => {
-                        setForm({ ...form, practicAmount: Number(e.target.value) })
-                      }}
-                      value={form.practicAmount}
-                      sx={{ ...textFieldColors }}
-                    />
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='duration'
+                    type='number'
+                    label='Duration'
+                    name='duration'
+                    InputLabelProps={{
+                      sx: {
+                        color: '#ffec3e',
+                      },
+                    }}
+                    InputProps={{
+                      inputProps: { min: 1 },
+                    }}
+                    onChange={(e) => {
+                      setForm({ ...form, duration: Number(e.target.value) })
+                    }}
+                    value={form.duration || ''}
+                    sx={{ ...textFieldColors, marginTop: 3 }}
+                  />
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    id='price'
+                    type='number'
+                    label='Price'
+                    name='price'
+                    InputLabelProps={{
+                      sx: {
+                        color: '#ffec3e',
+                      },
+                    }}
+                    InputProps={{
+                      inputProps: { min: 1 },
+                    }}
+                    onChange={(e) => {
+                      setForm({ ...form, price: Number(e.target.value) })
+                    }}
+                    value={form.price || ''}
+                    sx={{ ...textFieldColors }}
+                  />
 
-                    <TextField
-                      margin='normal'
-                      required
+                  <Box sx={{ marginTop: 2 }}>
+                    <InputLabel sx={{ color: '#ffec3e' }}>Language</InputLabel>
+                    <Select
                       fullWidth
-                      id='price-course'
-                      type='number'
-                      label='Price for course'
-                      name='priceCourse'
-                      InputLabelProps={{
-                        sx: {
-                          color: '#ffec3e',
-                        },
-                      }}
-                      InputProps={{
-                        inputProps: { min: 1 },
-                      }}
-                      onChange={(e) => {
-                        setForm({ ...form, priceCourse: Number(e.target.value) })
-                      }}
-                      value={form.priceCourse}
-                      sx={{ ...textFieldColors }}
-                    />
-
-                    <TextField
-                      margin='normal'
-                      required
-                      fullWidth
-                      id='price-discount'
-                      type='number'
-                      label='Price for course with discount'
-                      name='priceDiscount'
-                      InputLabelProps={{
-                        sx: {
-                          color: '#ffec3e',
-                        },
-                      }}
-                      InputProps={{
-                        inputProps: { min: 1 },
-                      }}
-                      onChange={(e) => {
-                        setForm({ ...form, priceDiscount: Number(e.target.value) })
-                      }}
-                      value={form.priceDiscount}
-                      sx={{ ...textFieldColors }}
-                    />
-                    <Box sx={{ marginTop: 2 }}>
-                      <InputLabel sx={{ color: '#ffec3e' }}>Status</InputLabel>
-                      <Select
-                        fullWidth
-                        id='statusSelect'
-                        value={status}
-                        onChange={handleChangeStatus}
-                        sx={{
-                          color: '#fff',
-
-                          '.MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#ffec3e',
-                          },
-                        }}
-                      >
-                        <MenuItem value={'active'}>Active</MenuItem>
-                        <MenuItem value={'draft'}>Draft</MenuItem>
-                      </Select>
-                    </Box>
-                    <Button
-                      variant='contained'
-                      fullWidth
+                      id='languageSelect'
+                      value={language}
+                      onChange={handleChangeLanguage}
                       sx={{
-                        marginTop: 2,
+                        color: '#fff',
+                        '.MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                      }}
+                    >
+                      <MenuItem value={'RU'}>RU</MenuItem>
+                      <MenuItem value={'UA'}>UA</MenuItem>
+                      <MenuItem value={'EN'}>EN</MenuItem>
+                    </Select>
+                  </Box>
+                  <Box sx={{ marginTop: 2 }}>
+                    <InputLabel sx={{ color: '#ffec3e' }}>Level</InputLabel>
+                    <Select
+                      fullWidth
+                      id='levelSelect'
+                      value={level}
+                      onChange={handleChangeLevel}
+                      sx={{
+                        color: '#fff',
+
+                        '.MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                      }}
+                    >
+                      <MenuItem value={'Beginner'}>Beginner</MenuItem>
+                      <MenuItem value={'Junior'}>Junior</MenuItem>
+                      <MenuItem value={'Middle'}>Middle</MenuItem>
+                      <MenuItem value={'Senior'}>Senior</MenuItem>
+                    </Select>
+                  </Box>
+                  <Box sx={{ marginTop: 2 }}>
+                    <InputLabel sx={{ color: '#ffec3e' }}>Type</InputLabel>
+                    <Select
+                      fullWidth
+                      id='typeSelect'
+                      value={type}
+                      onChange={handleChangeType}
+                      sx={{
+                        color: '#fff',
+
+                        '.MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                      }}
+                    >
+                      <MenuItem value={'self-education'}>Self education</MenuItem>
+                      <MenuItem value={'with-lector'}>With lector</MenuItem>
+                    </Select>
+                  </Box>
+                  <Box sx={{ marginTop: 2 }}>
+                    <InputLabel sx={{ color: '#ffec3e' }}>Status</InputLabel>
+                    <Select
+                      fullWidth
+                      id='statusSelect'
+                      value={status}
+                      onChange={handleChangeStatus}
+                      sx={{
+                        color: '#fff',
+
+                        '.MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#ffec3e',
+                        },
+                      }}
+                    >
+                      <MenuItem value={'active'}>Active</MenuItem>
+                      <MenuItem value={'draft'}>Draft</MenuItem>
+                    </Select>
+                  </Box>
+                  <Box sx={{ display: 'flex', marginTop: 1 }}>
+                    <Box sx={{ marginTop: 1, fontWeight: 'bold', color: '#ffec3e' }}>Rating</Box>
+                    <Rating
+                      name='rating'
+                      precision={0.1}
+                      onChange={(event, newValue) => {
+                        setRating(newValue ?? 5.0)
+                      }}
+                      value={rating || 0}
+                      sx={{
+                        marginLeft: 4,
                         background: '#ffec3e',
                         color: '#0f0e16',
-                        fontWeight: 'bold',
-                        border: '2px solid #ffec3e',
-                        '&:hover': {
-                          backgroundColor: '#0f0e16',
-                          color: '#ffec3e',
-                        },
+                        borderRadius: '10px',
+                        paddingLeft: '16px',
+                        paddingRight: '16px',
+                        paddingTop: 1,
+                        paddingBottom: 1,
                       }}
-                      onClick={handleSubmit}
-                    >
-                      Create
-                    </Button>
+                    />
                   </Box>
-                </LocalizationProvider>
+                  <Button
+                    variant='contained'
+                    fullWidth
+                    sx={{
+                      marginTop: 2,
+                      background: '#ffec3e',
+                      color: '#0f0e16',
+                      fontWeight: 'bold',
+                      border: '2px solid #ffec3e',
+                      '&:hover': {
+                        backgroundColor: '#0f0e16',
+                        color: '#ffec3e',
+                      },
+                    }}
+                    onClick={handleSubmit}
+                  >
+                    Create
+                  </Button>
+                  <Button
+                    variant='contained'
+                    fullWidth
+                    sx={{
+                      marginTop: 2,
+                      background: '#D2042D',
+                      color: '#0f0e16',
+                      fontWeight: 'bold',
+                      border: '2px solid #D2042D',
+                      '&:hover': {
+                        backgroundColor: '#0f0e16',
+                        color: '#D2042D',
+                      },
+                    }}
+                    onClick={async (e) => {
+                      const response = await axios.delete(url + '?id=' + id)
+                      const resultResponse = response.data
+                      if (resultResponse) {
+                        console.log('Success')
+                      }
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Box>
               </CustomTabPanel>
               <CustomTabPanel value={value} index={1}>
                 <Box sx={{ display: 'flex', width: '100%' }}>
@@ -647,7 +773,7 @@ const CourseCreate = () => {
                       fullWidth
                       variant='contained'
                       onClick={(e) => {
-                        setModules([...modules, []])
+                        setModules([...modules, { title: '', lessons: [] }])
                       }}
                       sx={{
                         background: '#ffec3e',
@@ -691,24 +817,51 @@ const CourseCreate = () => {
                             <AccordionSummary
                               expandIcon={<ExpandMoreIcon />}
                               sx={{
-                                minHeight: '58px',
                                 borderBottom: expanded === 'panel' + i ? '2px solid' : '',
                               }}
                             >
                               <div style={{ display: 'flex', gap: '10px' }}>
-                                <Typography
+                                <TextField
+                                  margin='normal'
+                                  required
+                                  fullWidth
+                                  id={'module' + i}
+                                  type='text'
+                                  label='Module'
+                                  name={'module' + i}
+                                  autoFocus
+                                  InputLabelProps={{
+                                    sx: {
+                                      color: '#ffec3e',
+                                    },
+                                  }}
+                                  onChange={(e) => {
+                                    setModules(
+                                      modules.map((module, moduleIndex) => {
+                                        if (i == moduleIndex) {
+                                          return { ...module, title: e.target.value }
+                                        } else {
+                                          return module
+                                        }
+                                      })
+                                    )
+                                  }}
+                                  value={element.title}
+                                  sx={{ ...textFieldColors }}
+                                />
+                                {/* <Typography
                                   sx={{
                                     fontSize: '18px',
                                     fontWeight: 'bold',
                                   }}
                                 >
                                   Module {' ' + (i + 1)}
-                                </Typography>
+                                </Typography> */}
                               </div>
                             </AccordionSummary>
 
                             <AccordionDetails style={{ paddingLeft: '8px', paddingRight: '8px' }}>
-                              {element.map((lesson, index) => {
+                              {element.lessons.map((lesson, index) => {
                                 return (
                                   <div
                                     key={'lessonElement_' + i + '_' + index}
@@ -735,9 +888,9 @@ const CourseCreate = () => {
                                       }}
                                       draggable
                                     >
-                                      <Box sx={{ fontWeight: 'bold' }}>{lesson.name}</Box>
+                                      <Box sx={{ fontWeight: 'bold' }}>{lesson.title}</Box>
                                       <Box sx={{ paddingLeft: '16px' }}>{lesson.description}</Box>
-                                      <Box sx={{}}>{lesson.duration}</Box>
+                                      <Box sx={{}}>{lesson.link}</Box>
                                     </Box>
                                   </div>
                                 )
@@ -753,7 +906,7 @@ const CourseCreate = () => {
                                       if (i !== index) {
                                         return moduleElem
                                       }
-                                      setAllModules([...allModules, ...moduleElem])
+                                      setAllModules([...allModules, ...moduleElem.lessons])
                                       setExpanded('')
                                     })
                                   )
@@ -796,9 +949,9 @@ const CourseCreate = () => {
                           }}
                           draggable
                         >
-                          <Box sx={{ fontWeight: 'bold' }}>{element.name}</Box>
+                          <Box sx={{ fontWeight: 'bold' }}>{element.title}</Box>
                           <Box sx={{ paddingLeft: '16px' }}>{element.description}</Box>
-                          <Box sx={{}}>{element.duration}</Box>
+                          <Box sx={{}}>{element.link}</Box>
                         </Grid>
                       )
                     })}
@@ -811,10 +964,10 @@ const CourseCreate = () => {
                     margin='normal'
                     required
                     fullWidth
-                    id='lessonName'
-                    type='text'
-                    label='Name'
-                    name='name'
+                    id='lessonTitle'
+                    type='title'
+                    label='Title'
+                    name='title'
                     autoFocus
                     InputLabelProps={{
                       sx: {
@@ -822,9 +975,9 @@ const CourseCreate = () => {
                       },
                     }}
                     onChange={(e) => {
-                      setLessonForm({ ...lessonForm, name: e.target.value })
+                      setLessonForm({ ...lessonForm, title: e.target.value })
                     }}
-                    value={lessonForm.name}
+                    value={lessonForm.title}
                     sx={{ ...textFieldColors }}
                   />
                   <TextField
@@ -850,10 +1003,10 @@ const CourseCreate = () => {
                     margin='normal'
                     required
                     fullWidth
-                    id='lessonDuration'
-                    type='number'
-                    label='Duration'
-                    name='duration'
+                    id='lessonLink'
+                    type='text'
+                    label='Link'
+                    name='link'
                     InputLabelProps={{
                       sx: {
                         color: '#ffec3e',
@@ -863,9 +1016,9 @@ const CourseCreate = () => {
                       inputProps: { min: 1 },
                     }}
                     onChange={(e) => {
-                      setLessonForm({ ...lessonForm, duration: Number(e.target.value) })
+                      setLessonForm({ ...lessonForm, link: e.target.value })
                     }}
-                    value={lessonForm.duration}
+                    value={lessonForm.link}
                     sx={{ ...textFieldColors }}
                   />
                   <Button
@@ -882,15 +1035,33 @@ const CourseCreate = () => {
                         color: '#ffec3e',
                       },
                     }}
-                    onClick={(e) => {
-                      setAllModules([...allModules, { ...lessonForm }])
-                      setLessonForm({
-                        name: '',
-                        description: '',
-                        duration: 0,
-                        fields: [{}, {}],
-                      })
-                      setValue(1)
+                    onClick={async (e) => {
+                      try {
+                        const response = await axios.post(urlLesson, {
+                          title: lessonForm.title,
+                          description: lessonForm.description,
+                          link: lessonForm.link,
+                        })
+                        const resultResponse = response.data
+                        if (resultResponse) {
+                          console.log(resultResponse)
+                          setAllModules([
+                            ...allModules,
+                            { ...lessonForm, id: resultResponse.lessonId },
+                          ])
+                          setLessonForm({
+                            title: '',
+                            description: '',
+                            link: '',
+                            fields: [{}, {}],
+                          })
+                          setValue(1)
+                        }
+                      } catch (error) {
+                        alert(error)
+                        console.error(error)
+                        return
+                      }
                     }}
                   >
                     Create
