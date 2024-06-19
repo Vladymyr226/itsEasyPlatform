@@ -36,9 +36,11 @@ import { InputLabel } from '@mui/material'
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import dayjs from 'dayjs'
-import axios from 'axios'
+import axios, { all } from 'axios'
 import Rating from '@mui/material/Rating'
 import { useRouter } from 'next/navigation'
+import MyEditor from '@/components/SlateEditor/Editor'
+import { Slate, Editable, withReact } from 'slate-react'
 
 const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
 const urlLesson = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/lesson'
@@ -123,7 +125,7 @@ const CourseCreate = () => {
   interface Lesson {
     id?: string
     title: string
-    description: string
+    description: any
     link: string
   }
   interface Module {
@@ -146,11 +148,21 @@ const CourseCreate = () => {
   })
 
   const [rating, setRating] = useState(0.0)
+  const [richValue, setRichValue] = useState([
+    {
+      type: 'paragaph',
+      children: [{ text: '' }],
+    },
+  ])
+  const [richValueLesson, setRichValueLesson] = useState([
+    {
+      type: 'paragaph',
+      children: [{ text: '' }],
+    },
+  ])
   const [lessonForm, setLessonForm] = useState({
     title: '',
-    description: '',
     link: '',
-    fields: [{}, {}],
   })
 
   const handleChangeExpanded =
@@ -269,30 +281,33 @@ const CourseCreate = () => {
 
       if (fullUrl.split('_id=')[1]) {
         console.log(fullUrl.split('_id=')[1])
-        const response = await fetch(url + 's?_id=' + fullUrl.split('_id=')[1], {
+        const response = await fetch(url + 's?id=' + fullUrl.split('_id=')[1], {
           headers: {
             'Content-Type': 'application/json',
           },
         })
         const result = await response.json()
-        console.log(result.getCourses[0])
-        setId(result.getCourses[0].id)
-        setImageUrl(result.getCourses[0].data.imageUrl)
-        setLanguage(result.getCourses[0].data.language)
-        setLevel(result.getCourses[0].data.level)
+        const resultData = result.getCourses.filter(
+          (course: any) => course.id == fullUrl.split('_id=')[1]
+        )
+        console.log(resultData[0])
+        setId(resultData[0].id)
+        setImageUrl(resultData[0].data.imageUrl)
+        setLanguage(resultData[0].data.language)
+        setLevel(resultData[0].data.level)
 
-        setType(result.getCourses[0].data.type)
-        setStatus(result.getCourses[0].data.status)
-        setRating(result.getCourses[0].data.rating)
+        setType(resultData[0].data.type)
+        setStatus(resultData[0].data.status)
+        setRating(resultData[0].data.rating)
         // setModules(result.getCourses[0].data.modules)
         setForm({
-          title: result.getCourses[0].data.title,
-          description: result.getCourses[0].data.description,
-          richtext: result.getCourses[0].data.richtext,
-          date: result.getCourses[0].data.date,
-          duration: result.getCourses[0].data.duration,
-          lector: result.getCourses[0].data.lector,
-          price: result.getCourses[0].data.price,
+          title: resultData[0].data.title,
+          description: resultData[0].data.description,
+          richtext: resultData[0].data.richtext,
+          date: resultData[0].data.date,
+          duration: resultData[0].data.duration,
+          lector: resultData[0].data.lector,
+          price: resultData[0].data.price,
         })
       } else {
         const response = await fetch(urlLesson + 's', {
@@ -449,6 +464,10 @@ const CourseCreate = () => {
                     value={form.title}
                     sx={{ ...textFieldColors }}
                   />
+                  <Box sx={{ color: '#000000' }}>
+                    <MyEditor value={richValue} setValue={setRichValue} />
+                  </Box>
+
                   <TextField
                     margin='normal'
                     required
@@ -950,8 +969,35 @@ const CourseCreate = () => {
                           draggable
                         >
                           <Box sx={{ fontWeight: 'bold' }}>{element.title}</Box>
-                          <Box sx={{ paddingLeft: '16px' }}>{element.description}</Box>
+                          <Box sx={{ paddingLeft: '16px' }}></Box>
                           <Box sx={{}}>{element.link}</Box>
+                          <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                            <Button
+                              variant='contained'
+                              sx={{
+                                background: '#D2042D',
+                                color: '#0f0e16',
+                                fontWeight: 'bold',
+                                border: '2px solid #D2042D',
+                                '&:hover': {
+                                  backgroundColor: '#0f0e16',
+                                  color: '#D2042D',
+                                },
+                                fontSize: 10,
+                              }}
+                              onClick={async (e) => {
+                                const response = await axios.delete(urlLesson + '?id=' + element.id)
+                                const resultResponse = response.data
+                                if (resultResponse) {
+                                  setAllModules(
+                                    allModules.filter((lesson) => lesson.id != element.id)
+                                  )
+                                }
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </Box>
                         </Grid>
                       )
                     })}
@@ -980,25 +1026,9 @@ const CourseCreate = () => {
                     value={lessonForm.title}
                     sx={{ ...textFieldColors }}
                   />
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='lessonDescription'
-                    type='text'
-                    label='Description'
-                    name='description'
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    onChange={(e) => {
-                      setLessonForm({ ...lessonForm, description: e.target.value })
-                    }}
-                    value={lessonForm.description}
-                    sx={{ ...textFieldColors }}
-                  />
+                  <Box sx={{ color: '#000000' }}>
+                    <MyEditor value={richValueLesson} setValue={setRichValueLesson} />
+                  </Box>
                   <TextField
                     margin='normal'
                     required
@@ -1039,7 +1069,7 @@ const CourseCreate = () => {
                       try {
                         const response = await axios.post(urlLesson, {
                           title: lessonForm.title,
-                          description: lessonForm.description,
+                          description: richValueLesson,
                           link: lessonForm.link,
                         })
                         const resultResponse = response.data
@@ -1047,13 +1077,15 @@ const CourseCreate = () => {
                           console.log(resultResponse)
                           setAllModules([
                             ...allModules,
-                            { ...lessonForm, id: resultResponse.lessonId },
+                            {
+                              ...lessonForm,
+                              description: richValueLesson,
+                              id: resultResponse.lessonId,
+                            },
                           ])
                           setLessonForm({
                             title: '',
-                            description: '',
                             link: '',
-                            fields: [{}, {}],
                           })
                           setValue(1)
                         }
