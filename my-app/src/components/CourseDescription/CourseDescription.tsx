@@ -2,12 +2,21 @@ import s from './CourseDescription.module.css'
 
 import Button from '../Button/Button'
 import CourseControlls from '../CourseControlls/CourseControlls'
+import SlateView from '../../components/SlateEditor/View'
 import CourseImage from '../CourseImage/CourseImage'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-
-const CourseDescription = () => {
+interface CourseDescriptionProps {
+  title: string
+  language: string
+  level: string
+  date: string
+  type: string
+  description: any
+}
+const CourseDescription = (props: CourseDescriptionProps) => {
   const [width, setWidth] = useState(0)
+  console.log(props)
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth)
@@ -22,18 +31,19 @@ const CourseDescription = () => {
     <div className={s.courseDescription}>
       <div className={s.descHeader}>
         <h2 className={s.descTitle}>
-          <span className={s.accentuated}>Backend</span> разработчик
+          {props.title}
+          {/* <span className={s.accentuated}>Backend</span> разработчик */}
         </h2>
         <CourseControlls />
       </div>
       <ul className={s.descInfo}>
         <li className={s.infoItem}>
           <p className={s.infoItemTitle}>Язык</p>
-          <p className={s.infoItemContent}>RU, ENG</p>
+          <p className={s.infoItemContent}> {props.language}</p>
         </li>
         <li className={s.infoItem}>
           <p className={s.infoItemTitle}>Уровень</p>
-          <p className={s.infoItemContent}>Средний</p>
+          <p className={s.infoItemContent}>{props.level}</p>
         </li>
         <li className={s.infoItem}>
           <p className={s.infoItemTitle}>Создан</p>
@@ -41,21 +51,27 @@ const CourseDescription = () => {
         </li>
         <li className={s.infoItem}>
           <p className={s.infoItemTitle}>Старт группы</p>
-          <p className={s.infoItemContent}>12.05.2023</p>
+          <p className={s.infoItemContent}>{props.date}</p>
         </li>
         <li className={s.infoItem}>
           <p className={s.infoItemTitle}>Тип</p>
-          <p className={s.infoItemContent}>Самообучение</p>
+          <p className={s.infoItemContent}>{props.type}</p>
         </li>
       </ul>
 
       {width < 1200 && <CourseImage />}
 
-      <p className={s.descText}>
-        Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в
-        электронный дизайн. <br />
-        <br /> Его популяризации в новое время послужили публикация листов Letraset с образцами
-        Lorem Ipsum в 60-х годах и, в более недавнее время.
+      <p
+        className={s.descText}
+        style={{
+          minWidth: '50rem',
+          maxWidth: '90rem',
+          maxHeight: '20rem',
+          overflowY: 'auto',
+          scrollbarWidth: 'none',
+        }}
+      >
+        <SlateView value={props.description} />
       </p>
 
       <Link href='/course-details'>

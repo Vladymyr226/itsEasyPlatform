@@ -10,13 +10,46 @@ import plus from '../src/assets/plus.svg'
 import loadMoreButton from '../src/assets/loadMoreButton.png'
 import Layout from '@/components/Layout/Layout'
 import './globals.css'
-
+const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
+interface CourseData {
+  title: string
+  language: string
+  level: string
+  date: string
+  type: string
+  description: any
+  rating: number
+  duration: number
+  lector: string
+  modules: any
+  price: number
+}
+interface Course {
+  id: number
+  data: CourseData
+  is_active: boolean
+}
 export default function HomePage() {
   const [width, setWidth] = useState(0)
+  const [data, setData] = useState<Array<Course>>()
+
+  console.log(data)
+  async function getPageData() {
+    if (typeof window !== 'undefined') {
+      const response = await fetch(url + 's', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const result = await response.json()
+      setData(result.getCourses)
+    }
+  }
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
+      getPageData()
     }
   }, [])
 
@@ -26,10 +59,38 @@ export default function HomePage() {
         <PromoSlider />
 
         <h1 className={s.coursesTitle}>Курсы</h1>
+        {/* 
+        <CourseCard
+                  title={course.data.title}
+                  language={course.data.language}
+                  level={course.data.level}
+                  date={course.data.date}
+                  type={course.data.type}
+                  description={course.data.description}
+                  rating={course.data.rating}
+                  toLeft={index % 2 ? true : false}
+                /> */}
+        {data &&
+          data.map((course: Course, index: number) => {
+            return (
+              <>
+                <CourseCard
+                  title={course.data.title}
+                  language={course.data.language}
+                  level={course.data.level}
+                  date={course.data.date}
+                  type={course.data.type}
+                  description={course.data.description}
+                  rating={course.data.rating}
+                  toLeft={index % 2 == 1 ? true : false}
+                />
+              </>
+            )
+          })}
 
-        <CourseCard />
+        {/* <CourseCard />
         <CourseCard toLeft={true} />
-        <CourseCard />
+        <CourseCard /> */}
 
         {width >= 1200 ? (
           <button className={s.loadMoreButton}>

@@ -45,8 +45,11 @@ import { Slate, Editable, withReact } from 'slate-react'
 import { title } from 'process'
 import Video from '@/components/video/Video'
 
+import Swal from 'sweetalert2'
 import React from 'react'
 import YouTube, { YouTubeProps } from 'react-youtube'
+import Autocomplete from '@mui/material/Autocomplete'
+import withReactContent from 'sweetalert2-react-content'
 
 interface YouTubeProp {
   url: string
@@ -71,6 +74,7 @@ function Example(props: YouTubeProp) {
 
 const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
 const urlLesson = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/lesson'
+const urlTag = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/tag'
 
 const textFieldColors = {
   // '& label.Mui-focused': {
@@ -159,12 +163,18 @@ const CourseCreate = () => {
     title: string
     lessons: Array<Lesson>
   }
+  interface Tag {
+    name_of_tag: string
+    id: string
+  }
 
   const [modules, setModules] = useState<Array<Module>>([])
   const [allModules, setAllModules] = useState<Array<Lesson>>([])
   const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
   const [expanded, setExpanded] = useState<string | false>(false)
   const [reDropBlock, setReDropBlock] = useState(false)
+  const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
+  const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
   const [form, setForm] = useState<any>({
     title: '',
     date: '2024-01-01',
@@ -308,6 +318,9 @@ const CourseCreate = () => {
         }
       }),
       rating: rating,
+      category: categorySelect.map((tag) => {
+        return tag.id
+      }),
     }
     console.log(json)
 
@@ -316,6 +329,7 @@ const CourseCreate = () => {
         const response = await axios.put(url + '?id=' + id, json)
         const resultResponse = response.data
         if (resultResponse) {
+          Swal.fire('Created!', '', 'success')
           router.push('/admin')
         }
       } else {
@@ -325,6 +339,7 @@ const CourseCreate = () => {
         )
         const resultResponse = response.data
         if (resultResponse) {
+          Swal.fire('Changed!', '', 'success')
           router.push('/admin')
         }
       }
@@ -334,10 +349,22 @@ const CourseCreate = () => {
       return
     }
   }
-  console.log(richValue)
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
+
+      const responseTag = await fetch(urlTag + 's', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultTag = await responseTag.json()
+      setAllCategorySelect(
+        resultTag.getTags.map((tag: any) => {
+          return tag
+        })
+      )
 
       if (fullUrl.split('_id=')[1]) {
         const response = await fetch(url + 's?id=' + fullUrl.split('_id=')[1], {
@@ -364,6 +391,14 @@ const CourseCreate = () => {
             link: lesson.data.link,
           }
         })
+
+        setCategorySelect(
+          resultTag.getTags.filter((tag: any) => {
+            if (resultData[0].data.category.indexOf(tag.id) != -1) {
+              return tag
+            }
+          })
+        )
         setId(resultData[0].id)
         setLanguage(resultData[0].data.language)
         setLevel(resultData[0].data.level)
@@ -428,10 +463,49 @@ const CourseCreate = () => {
       }
     }
   }
+  function showDeleteAlert() {
+    Swal.fire({
+      title: 'Do you want to delete the course?',
+
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      confirmButtonColor: '#d8342c',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const response = await axios.delete(url + '?id=' + id)
+        const resultResponse = response.data
+        if (resultResponse) {
+          Swal.fire('Deleted!', '', 'success')
+          router.push('/admin')
+        }
+      }
+    })
+  }
+  const [inputValue, setInputValue] = useState('')
+  const showSwal = () => {
+    withReactContent(Swal).fire({
+      title: 'Create tag',
+      input: 'text',
+      inputValue,
+      preConfirm: async () => {
+        const val = Swal.getInput()?.value || ''
+        const response = await axios.post(urlTag + '?title=' + val)
+        const resultResponse = response.data
+        if (resultResponse) {
+          Swal.fire('Created!', '', 'success')
+          setAllCategorySelect([
+            ...allCategorySelect,
+            { name_of_tag: val, id: resultResponse.tagId },
+          ])
+        }
+      },
+    })
+  }
+
   useEffect(() => {
     getPageData()
   }, [])
-  console.log(modules)
+  console.log(allCategorySelect)
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
       <Box
@@ -681,6 +755,45 @@ const CourseCreate = () => {
                     }}
                   />
                 </Box>
+                <Button onClick={showSwal}>Create Tag</Button>
+                <Autocomplete
+                  disablePortal
+                  multiple
+                  id='combo-box-demo'
+                  value={categorySelect}
+                  onChange={(event, value: any) => setCategorySelect(value)}
+                  getOptionLabel={(option: any) => option.name_of_tag}
+                  options={allCategorySelect}
+                  fullWidth
+                  renderInput={(params) => <TextField {...params} label='Category' />}
+                  renderOption={(props: object, option: any, state: object) => (
+                    <div {...props} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div>{option.name_of_tag}</div>
+                      <IconButton
+                        key={'deleteButton_' + option.id}
+                        aria-label='delete'
+                        onClick={async (e) => {
+                          const deletingOption = option
+                          const response = await axios.delete(urlTag + '?id=' + option.id)
+                          const resultResponse = response.data
+                          if (resultResponse) {
+                            setAllCategorySelect(
+                              allCategorySelect.filter(
+                                (category) => category.id !== deletingOption.id
+                              )
+                            )
+                            setCategorySelect(
+                              categorySelect.filter((category) => category.id !== deletingOption.id)
+                            )
+                            Swal.fire('Deleted!', '', 'success')
+                          }
+                        }}
+                      >
+                        <DeleteIcon key={'deleteIcon_'} color='primary' />
+                      </IconButton>
+                    </div>
+                  )}
+                />
                 <Button
                   variant='contained'
                   fullWidth
@@ -690,26 +803,22 @@ const CourseCreate = () => {
                   }}
                   onClick={handleSubmit}
                 >
-                  {id ? 'Add Course' : 'Edit Course'}
+                  {id ? 'Edit Course' : 'Add Course'}
                 </Button>
-                <Button
-                  variant='contained'
-                  fullWidth
-                  color='error'
-                  sx={{
-                    marginTop: 2,
-                    fontWeight: 'bold',
-                  }}
-                  onClick={async (e) => {
-                    const response = await axios.delete(url + '?id=' + id)
-                    const resultResponse = response.data
-                    if (resultResponse) {
-                      console.log('Success')
-                    }
-                  }}
-                >
-                  Delete
-                </Button>
+                {id && (
+                  <Button
+                    variant='contained'
+                    fullWidth
+                    color='error'
+                    sx={{
+                      marginTop: 2,
+                      fontWeight: 'bold',
+                    }}
+                    onClick={showDeleteAlert}
+                  >
+                    Delete
+                  </Button>
+                )}
               </Box>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>

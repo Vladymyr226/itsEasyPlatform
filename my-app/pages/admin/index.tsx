@@ -23,6 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Link from 'next/link'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 const tableColumn = {
   minWidth: '10rem',
   width: '100%',
@@ -106,8 +107,25 @@ const AdminTable = () => {
     }
   }, [])
 
-  //  bg-dark shadow-lg p-5 rounded-lg border-t-4 border-yellow w-full max-w-[30rem]')
-  //   dropModal
+  function showDeleteAlert(id: number) {
+    Swal.fire({
+      title: 'Do you want to delete the course?',
+
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      confirmButtonColor: '#d8342c',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const response = await axios.delete(url + '?id=' + id)
+        const resultResponse = response.data
+        if (resultResponse) {
+          setData(data?.filter((course) => course.id != id))
+          Swal.fire('Deleted!', '', 'success')
+        }
+      }
+    })
+  }
+
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
       <Box
@@ -296,14 +314,8 @@ const AdminTable = () => {
                         </Link>
                         <IconButton
                           key={'deleteButton_'}
-                          aria-label='edit'
-                          onClick={async (e) => {
-                            const response = await axios.delete(url + '?id=' + element.id)
-                            const resultResponse = response.data
-                            if (resultResponse) {
-                              setData(data.filter((course) => course.id != element.id))
-                            }
-                          }}
+                          aria-label='delete'
+                          onClick={(e) => showDeleteAlert(element.id)}
                         >
                           <DeleteIcon key={'deleteIcon_'} color='primary' />
                         </IconButton>

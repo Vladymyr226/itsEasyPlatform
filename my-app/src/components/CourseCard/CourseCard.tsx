@@ -3,9 +3,18 @@ import CourseDescription from '../CourseDescription/CourseDescription'
 import CourseImage from '../CourseImage/CourseImage'
 import s from './CourseCard.module.css'
 
-const CourseCard = ({ toLeft = false }: { toLeft?: boolean }) => {
+interface CourseCardProps {
+  title: string
+  language: string
+  level: string
+  date: string
+  type: string
+  description: any
+  rating: number
+  toLeft: boolean
+}
+const CourseCard = (props: CourseCardProps) => {
   const [width, setWidth] = useState(0)
-
   useEffect(() => {
     setWidth(window.innerWidth)
     const handleResize = () => setWidth(window.innerWidth)
@@ -16,8 +25,15 @@ const CourseCard = ({ toLeft = false }: { toLeft?: boolean }) => {
   }, [])
 
   return (
-    <div className={`${s.courseCard} ${toLeft ? s.reverse : ''}`}>
-      <CourseDescription />
+    <div className={`${s.courseCard} ${props.toLeft ? s.reverse : ''}`}>
+      <CourseDescription
+        title={props.title}
+        language={props.language}
+        level={props.level}
+        date={props.date}
+        type={props.type}
+        description={props.description}
+      />
 
       {width >= 1200 && <CourseImage />}
     </div>
