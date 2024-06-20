@@ -7,14 +7,14 @@ import Rating from '../Rating/Rating'
 import ViewsCount from '../ViewsCount/ViewsCount'
 import Image from 'next/image'
 
-const CourseImage = () => {
+const CourseImage = ({ rating }: { rating: number }) => {
   return (
     <div className={s.courseImageWrapper}>
       <Image className={s.courseImage} src={courseImage} alt='course' />
 
       <PlayButton />
       <div className={s.courseStatsWrapper}>
-        <Rating />
+        <Rating rating={rating} />
         <ViewsCount />
       </div>
 

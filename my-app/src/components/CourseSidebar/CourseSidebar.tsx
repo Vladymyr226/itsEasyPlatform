@@ -14,29 +14,40 @@ import ViewsCount from '../ViewsCount/ViewsCount'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
-const Prices = () => {
+const Prices = ({ price, groupPrice }: { price: number; groupPrice?: number }) => {
   return (
     <>
       <h3 className={s.sidebarTitle}>Самообучение</h3>
       <div className={s.priceWrapper}>
-        <span className={s.prevPrice}>$250</span>
-        <span className={s.currentPrice}>$199</span>
+        <span className={s.prevPrice}>${price + 100}</span>
+        <span className={s.currentPrice}>${price}</span>
       </div>
       <button className={s.sidebarFillButton}>Купить сейчас</button>
+      {groupPrice && (
+        <div>
+          <div className={s.divide}></div>
 
-      <div className={s.divide}></div>
+          <h3 className={s.sidebarTitle}>Групповые занятия</h3>
+          <span className={s.currentPrice}>от $99/мес</span>
 
-      <h3 className={s.sidebarTitle}>Групповые занятия</h3>
-      <span className={s.currentPrice}>от $99/мес</span>
-
-      <button className={s.sidebarOutlinedButton}>Записаться</button>
+          <button className={s.sidebarOutlinedButton}>Записаться</button>
+        </div>
+      )}
 
       <div className={s.divide}></div>
     </>
   )
 }
 
-const CourseSidebar = () => {
+const CourseSidebar = ({
+  price,
+  groupPrice,
+  rating,
+}: {
+  price: number
+  groupPrice?: number
+  rating: number
+}) => {
   const [width, setWidth] = useState(0)
 
   useEffect(() => {
@@ -47,7 +58,7 @@ const CourseSidebar = () => {
 
   return (
     <div className={s.sidebar}>
-      {width >= 1200 && <Prices />}
+      {width >= 1200 && <Prices price={price} />}
       <p className={s.sidebarSubTitle}>Этот курс включает</p>
       <div className={s.courseContent}>
         <Image src={video} alt='video' /> 22 часа видео лекций
@@ -78,13 +89,13 @@ const CourseSidebar = () => {
       </div>
 
       <div className={s.courseStatsWrapper}>
-        <Rating isBig={true} />
+        <Rating rating={rating} isBig={true} />
         <ViewsCount />
       </div>
 
       <div className={s.divide}></div>
 
-      {width < 1200 && <Prices />}
+      {width < 1200 && <Prices price={price} />}
 
       <p className={s.footerTitle}>Планируете обучение 5 или более человек?</p>
       <p className={s.footerText}>

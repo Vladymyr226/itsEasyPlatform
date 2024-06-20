@@ -322,14 +322,13 @@ const CourseCreate = () => {
         return tag.id
       }),
     }
-    console.log(json)
 
     try {
       if (id) {
         const response = await axios.put(url + '?id=' + id, json)
         const resultResponse = response.data
         if (resultResponse) {
-          Swal.fire('Created!', '', 'success')
+          Swal.fire('Changed!', '', 'success')
           router.push('/admin')
         }
       } else {
@@ -339,7 +338,7 @@ const CourseCreate = () => {
         )
         const resultResponse = response.data
         if (resultResponse) {
-          Swal.fire('Changed!', '', 'success')
+          Swal.fire('Created!', '', 'success')
           router.push('/admin')
         }
       }

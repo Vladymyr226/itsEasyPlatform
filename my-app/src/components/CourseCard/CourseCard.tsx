@@ -12,6 +12,7 @@ interface CourseCardProps {
   description: any
   rating: number
   toLeft: boolean
+  id: string
 }
 const CourseCard = (props: CourseCardProps) => {
   const [width, setWidth] = useState(0)
@@ -33,9 +34,11 @@ const CourseCard = (props: CourseCardProps) => {
         date={props.date}
         type={props.type}
         description={props.description}
+        rating={props.rating}
+        id={props.id}
       />
 
-      {width >= 1200 && <CourseImage />}
+      {width >= 1200 && <CourseImage rating={props.rating} />}
     </div>
   )
 }

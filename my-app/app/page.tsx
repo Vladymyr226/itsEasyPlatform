@@ -25,7 +25,7 @@ interface CourseData {
   price: number
 }
 interface Course {
-  id: number
+  id: string
   data: CourseData
   is_active: boolean
 }
@@ -83,6 +83,7 @@ export default function HomePage() {
                   description={course.data.description}
                   rating={course.data.rating}
                   toLeft={index % 2 == 1 ? true : false}
+                  id={course.id}
                 />
               </>
             )

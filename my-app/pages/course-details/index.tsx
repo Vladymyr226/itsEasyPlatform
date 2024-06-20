@@ -15,13 +15,71 @@ import SkillsList from '@/components/SkillsList/SkillsList'
 import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../app/globals.css'
+import SlateView from '@/components/SlateEditor/View'
 
+const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
+const urlLesson = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/lesson'
+interface CourseData {
+  title: string
+  language: string
+  level: string
+  date: string
+  type: string
+  description: any
+  rating: number
+  duration: number
+  lector: string
+  modules: any
+  price: number
+}
+interface Course {
+  id: string
+  data: CourseData
+  is_active: boolean
+}
 const CourseDetails = () => {
   const [width, setWidth] = useState(0)
+  const [data, setData] = useState<Course>()
+  console.log(data)
+  async function getPageData() {
+    if (typeof window !== 'undefined') {
+      const fullUrl = window.location.href
 
+      if (fullUrl.split('id=')[1]) {
+        const response = await fetch(url + '/' + fullUrl.split('id=')[1], {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        const result = await response.json()
+        const modules = await Promise.all(
+          result.data.modules.map(async (module: any) => {
+            const lessons = await Promise.all(
+              module.lessons.map(async (lessonId: string) => {
+                const responseLesson = await fetch(urlLesson + '/' + lessonId, {
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                })
+                const resultLesson = await responseLesson.json()
+                return { id: resultLesson.id, data: resultLesson.data }
+              })
+            )
+            return {
+              title: module.title,
+              lessons: lessons,
+            }
+          })
+        )
+        setData({ ...result, data: { ...result.data, modules: modules } })
+      } else {
+      }
+    }
+  }
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
+      getPageData()
     }
   }, [])
 
@@ -31,7 +89,8 @@ const CourseDetails = () => {
         <div className={s.leftSide}>
           <div className={s.courseTitle}>
             <h1>
-              <span className={s.accentuated}>Frontend</span> разработчик
+              {data && data.data.title}
+              {/* <span className={s.accentuated}>Frontend</span> разработчик */}
             </h1>
             <CourseControlls />
           </div>
@@ -40,12 +99,14 @@ const CourseDetails = () => {
             <Image className={s.courseImage} src={courseImage} alt='course' />
             <PlayButton />
             <div className={s.courseStatsWrapper}>
-              <Rating />
+              {data && <Rating rating={data?.data.rating} />}
               <ViewsCount />
             </div>
           </div>
 
-          {width < 1200 && <CourseSidebar />}
+          {width < 1200 && (
+            <CourseSidebar price={data?.data.price ?? 0} rating={data?.data.price ?? 0} />
+          )}
 
           <p className={s.courseSubTitle}>
             <span className={s.accentuated}>Описание</span> курса
@@ -54,28 +115,22 @@ const CourseDetails = () => {
           <ul className={s.descInfo}>
             <li className={s.infoItem}>
               <p className={s.infoItemTitle}>Язык</p>
-              <p className={s.infoItemContent}>ru, eng</p>
+              <p className={s.infoItemContent}>{data && data.data.language}</p>
             </li>
             <li className={s.infoItem}>
               <p className={s.infoItemTitle}>Уровень</p>
-              <p className={s.infoItemContent}>средний</p>
+              <p className={s.infoItemContent}>{data && data.data.level}</p>
             </li>
             <li className={s.infoItem}>
               <p className={s.infoItemTitle}>Дата начала курса</p>
-              <p className={s.infoItemContent}>01.02.2023</p>
+              <p className={s.infoItemContent}>{data && data.data.date}</p>
             </li>
           </ul>
-          <p className={s.descText}>
-            Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул
-            в электронный дизайн. <br />
-            <br /> Его популяризации в новое время послужили публикация листов Letraset с образцами
-            Lorem Ipsum в 60-х годах и, в более недавнее время. <br />
-            <br /> Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet
-            orci. Aenean dignissim pellentesque felis.
-            <br />
-            <br /> Morbi in sem quis dui placerat ornare. Pellentesque odio nisi, euismod in,
-            pharetra a, ultricies in, diam. Sed arcu. Cras consequat.
-          </p>
+          {data && (
+            <p className={s.descText}>
+              <SlateView value={data && data.data.description} />
+            </p>
+          )}
 
           <p
             style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}
@@ -83,7 +138,7 @@ const CourseDetails = () => {
           >
             <span className={s.accentuated}>Материалы</span> курса
           </p>
-          <CourseMaterials />
+          {data && <CourseMaterials modules={data.data.modules} />}
 
           <p className={s.courseSubTitle}>
             <span className={s.accentuated}>Набор</span> навыков
@@ -127,7 +182,7 @@ const CourseDetails = () => {
 
         {width >= 1200 && (
           <div className={s.rightSide}>
-            <CourseSidebar />
+            <CourseSidebar price={data?.data.price ?? 0} rating={data?.data.price ?? 0} />
           </div>
         )}
       </div>

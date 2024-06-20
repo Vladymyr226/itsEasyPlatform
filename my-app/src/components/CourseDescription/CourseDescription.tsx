@@ -13,6 +13,8 @@ interface CourseDescriptionProps {
   date: string
   type: string
   description: any
+  rating: number
+  id: string
 }
 const CourseDescription = (props: CourseDescriptionProps) => {
   const [width, setWidth] = useState(0)
@@ -59,7 +61,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
         </li>
       </ul>
 
-      {width < 1200 && <CourseImage />}
+      {width < 1200 && <CourseImage rating={props.rating} />}
 
       <p
         className={s.descText}
@@ -74,7 +76,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
         <SlateView value={props.description} />
       </p>
 
-      <Link href='/course-details'>
+      <Link href={'/course-details?id=' + props.id}>
         <Button text='Узнать больше' />
       </Link>
     </div>

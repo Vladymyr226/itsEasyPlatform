@@ -109,7 +109,7 @@ const data = [
   },
 ]
 
-const CourseMaterials = () => {
+const CourseMaterials = ({ modules }: { modules: any }) => {
   const [selected, setSelected] = useState<number | null>(null)
 
   const toggle = (i: number) => {
@@ -119,10 +119,11 @@ const CourseMaterials = () => {
 
     setSelected(i)
   }
+  console.log(modules)
 
   return (
     <div className={s.materialsAccordion}>
-      {data.map((item, index, arr) => (
+      {modules.map((module: any, index: number) => (
         <div key={index}>
           <div className={s.accordoinItem}>
             <div
@@ -132,12 +133,13 @@ const CourseMaterials = () => {
               <div className={s.titleLeft}>
                 <Image src={selected === index ? arrowTop : arrowBottom} alt='arrow' />
 
-                {item.chapteer}
+                {module.title}
               </div>
 
               <div className={s.titleRight}>
                 <div>
-                  <Image src={notebook} alt='notebook' />6 лекций
+                  <Image src={notebook} alt='notebook' />
+                  {module.lessons.length} лекций
                 </div>
                 <div>
                   <Image src={clock} alt='clock' />
@@ -147,11 +149,11 @@ const CourseMaterials = () => {
             </div>
 
             <ul className={`${s.accordionContent} ${selected === index ? s.show : ''}`}>
-              {item.materials.map((material, idx) => (
+              {module.lessons.map((lesson: any, idx: number) => (
                 <li className={s.materialItem} key={idx}>
                   <div className={s.materialItemTitle}>
                     <Image src={video} alt='video' />
-                    <span>{material}</span>
+                    <span>{lesson && lesson.data.title}</span>
                   </div>
 
                   <div className={s.materialItemInfo}>

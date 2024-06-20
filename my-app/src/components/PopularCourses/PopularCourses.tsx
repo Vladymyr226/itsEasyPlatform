@@ -27,7 +27,7 @@ const PopularCourses = () => {
               <span className={s.accentuated}>Преподаёт</span> Артем Лаврентев
             </li>
           </ul>
-          <Rating isBig={true} isSmall={true} />
+          <Rating isBig={true} isSmall={true} rating={4.7} />
           <ul className={s.courseDetails}>
             <li>
               <Image src={clock} alt='clock' /> 16 ч
@@ -58,7 +58,7 @@ const PopularCourses = () => {
               <span className={s.accentuated}>Преподаёт</span> Артем Лаврентев
             </li>
           </ul>
-          <Rating isBig={true} isSmall={true} />
+          <Rating isBig={true} isSmall={true} rating={4.7} />
           <ul className={s.courseDetails}>
             <li>
               <Image src={clock} alt='clock' /> 16 ч
@@ -89,7 +89,7 @@ const PopularCourses = () => {
               <span className={s.accentuated}>Преподаёт</span> Артем Лаврентев
             </li>
           </ul>
-          <Rating isBig={true} isSmall={true} />
+          <Rating isBig={true} isSmall={true} rating={4.7} />
 
           <ul className={s.courseDetails}>
             <li>
