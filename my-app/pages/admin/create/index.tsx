@@ -40,29 +40,56 @@ import axios, { all } from 'axios'
 import Rating from '@mui/material/Rating'
 import { useRouter } from 'next/navigation'
 import MyEditor from '@/components/SlateEditor/Editor'
+import SlateView from '@/components/SlateEditor/View'
 import { Slate, Editable, withReact } from 'slate-react'
+import { title } from 'process'
+import Video from '@/components/video/Video'
+
+import React from 'react'
+import YouTube, { YouTubeProps } from 'react-youtube'
+
+interface YouTubeProp {
+  url: string
+}
+function Example(props: YouTubeProp) {
+  const onPlayerReady: YouTubeProps['onReady'] = (event) => {
+    // access to player in all event handlers via event.target
+    event.target.pauseVideo()
+  }
+
+  const opts: YouTubeProps['opts'] = {
+    height: '390',
+    width: '100%',
+    playerVars: {
+      // https://developers.google.com/youtube/player_parameters
+      autoplay: 1,
+    },
+  }
+
+  return <YouTube videoId={props.url} opts={opts} onReady={onPlayerReady} />
+}
 
 const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
 const urlLesson = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/lesson'
 
 const textFieldColors = {
-  '& label.Mui-focused': {
-    color: '#ffec3e',
-  },
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': { borderColor: '#ffec3e' },
-    '&:hover fieldset': {
-      borderColor: '#ffec3e',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#ffec3e',
-    },
-  },
-  color: '#fff',
-  input: {
-    color: '#fff',
-    borderColor: '#fff',
-  },
+  // '& label.Mui-focused': {
+  //   color: '#ffec3e',
+  // },
+  // '& .MuiOutlinedInput-root': {
+  //   '& fieldset': { borderColor: '#ffec3e' },
+  //   '&:hover fieldset': {
+  //     borderColor: '#ffec3e',
+  //   },
+  //   '&.Mui-focused fieldset': {
+  //     borderColor: '#ffec3e',
+  //   },
+  // },
+  // color: '#fff',
+  // input: {
+  //   color: '#fff',
+  //   borderColor: '#fff',
+  // },
 }
 
 interface TabPanelProps {
@@ -135,25 +162,19 @@ const CourseCreate = () => {
 
   const [modules, setModules] = useState<Array<Module>>([])
   const [allModules, setAllModules] = useState<Array<Lesson>>([])
+  const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
   const [expanded, setExpanded] = useState<string | false>(false)
   const [reDropBlock, setReDropBlock] = useState(false)
   const [form, setForm] = useState<any>({
     title: '',
-    description: '',
-    richtext: '',
-    date: '',
+    date: '2024-01-01',
     duration: null,
     lector: '',
     price: null,
   })
 
   const [rating, setRating] = useState(0.0)
-  const [richValue, setRichValue] = useState([
-    {
-      type: 'paragaph',
-      children: [{ text: '' }],
-    },
-  ])
+  const [richValue, setRichValue] = useState<Array<any>>()
   const [richValueLesson, setRichValueLesson] = useState([
     {
       type: 'paragaph',
@@ -176,66 +197,105 @@ const CourseCreate = () => {
   }
   const handleOnDropDel = (e: any) => {
     const delField = JSON.parse(e.dataTransfer.getData('ID'))
-    setModules(
-      modules.map((elem, index) => {
-        if (delField.moduleI === index) {
-          return {
-            title: elem.title,
-            lessons: elem.lessons.filter((lesson, lessonIndex) => {
-              if (lessonIndex !== delField._i) {
-                return lesson
-              }
-              setAllModules([...allModules, lesson])
-            }),
+    if (!delField.stored) {
+      setModules(
+        modules.map((elem, index) => {
+          if (delField.moduleI === index) {
+            return {
+              title: elem.title,
+              lessons: elem.lessons.filter((lesson, lessonIndex) => {
+                if (lessonIndex !== delField._i) {
+                  return lesson
+                }
+                setAllModules([...allModules, lesson])
+              }),
+            }
           }
-        }
-        return elem
-      })
-    )
+          return elem
+        })
+      )
+    } else {
+      setStoredModules(
+        storedModules.filter((elem, index) => {
+          if (delField._i !== index) {
+            return elem
+          }
+          setAllModules([...allModules, elem])
+        })
+      )
+    }
   }
   const handleOnDrop = (e: any, i: number) => {
     if (!reDropBlock) {
-      setModules(
-        modules.map((modulesElem, index) => {
-          if (index == i) {
-            setAllModules(
-              allModules.filter(
-                (allModulesElem, modulesIndex) =>
-                  modulesIndex != JSON.parse(e.dataTransfer.getData('ID'))._i
+      if (!JSON.parse(e.dataTransfer.getData('ID')).stored) {
+        setModules(
+          modules.map((modulesElem, index) => {
+            if (
+              index == i &&
+              modulesElem.lessons.filter(
+                (reDropElem) => reDropElem.id === JSON.parse(e.dataTransfer.getData('ID')).id
+              ).length === 0
+            ) {
+              setAllModules(
+                allModules.filter(
+                  (allModulesElem, modulesIndex) =>
+                    modulesIndex != JSON.parse(e.dataTransfer.getData('ID'))._i
+                )
               )
-            )
-            return {
-              title: modulesElem.title,
-              lessons: [
-                ...modulesElem.lessons,
-                {
-                  id: JSON.parse(e.dataTransfer.getData('ID')).id,
-                  title: JSON.parse(e.dataTransfer.getData('ID')).title,
-                  description: JSON.parse(e.dataTransfer.getData('ID')).description,
-                  link: JSON.parse(e.dataTransfer.getData('ID')).link,
-                  fields: JSON.parse(e.dataTransfer.getData('ID')).fields,
-                },
-              ],
+              return {
+                title: modulesElem.title,
+                lessons: [
+                  ...modulesElem.lessons,
+                  {
+                    id: JSON.parse(e.dataTransfer.getData('ID')).id,
+                    title: JSON.parse(e.dataTransfer.getData('ID')).title,
+                    description: JSON.parse(e.dataTransfer.getData('ID')).description,
+                    link: JSON.parse(e.dataTransfer.getData('ID')).link,
+                    fields: JSON.parse(e.dataTransfer.getData('ID')).fields,
+                  },
+                ],
+              }
             }
-          }
-          return modulesElem
-        })
-      )
+            return modulesElem
+          })
+        )
+      } else {
+        setModules(
+          modules.map((modulesElem, index) => {
+            if (index == i) {
+              setStoredModules(
+                storedModules.filter(
+                  (allModulesElem, modulesIndex) =>
+                    modulesIndex != JSON.parse(e.dataTransfer.getData('ID'))._i
+                )
+              )
+              return {
+                title: modulesElem.title,
+                lessons: [
+                  ...modulesElem.lessons,
+                  {
+                    id: JSON.parse(e.dataTransfer.getData('ID')).id,
+                    title: JSON.parse(e.dataTransfer.getData('ID')).title,
+                    description: JSON.parse(e.dataTransfer.getData('ID')).description,
+                    link: JSON.parse(e.dataTransfer.getData('ID')).link,
+                    fields: JSON.parse(e.dataTransfer.getData('ID')).fields,
+                  },
+                ],
+              }
+            }
+            return modulesElem
+          })
+        )
+      }
     }
 
     setReDropBlock(false)
   }
   const router = useRouter()
   const handleSubmit = async (e: any) => {
-    console.log(
-      modules.map((module) => {
-        return module.lessons.map((lesson) => {
-          return lesson.id
-        })
-      })
-    )
     const json = {
       ...form,
+      description: richValue,
       language: language,
       level: level,
       type: type,
@@ -274,32 +334,64 @@ const CourseCreate = () => {
       return
     }
   }
-
+  console.log(richValue)
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
 
       if (fullUrl.split('_id=')[1]) {
-        console.log(fullUrl.split('_id=')[1])
         const response = await fetch(url + 's?id=' + fullUrl.split('_id=')[1], {
           headers: {
             'Content-Type': 'application/json',
           },
         })
         const result = await response.json()
+        const responseLesson = await fetch(urlLesson + 's', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        const resultLesson = await responseLesson.json()
         const resultData = result.getCourses.filter(
           (course: any) => course.id == fullUrl.split('_id=')[1]
         )
-        console.log(resultData[0])
+
+        let allLessons = resultLesson.getLessons.map((lesson: any) => {
+          return {
+            id: lesson.id,
+            title: lesson.data.title,
+            description: lesson.data.description,
+            link: lesson.data.link,
+          }
+        })
         setId(resultData[0].id)
-        setImageUrl(resultData[0].data.imageUrl)
         setLanguage(resultData[0].data.language)
         setLevel(resultData[0].data.level)
-
+        setRichValue(resultData[0].data.description)
         setType(resultData[0].data.type)
         setStatus(resultData[0].data.status)
         setRating(resultData[0].data.rating)
-        // setModules(result.getCourses[0].data.modules)
+        setModules(
+          result.getCourses[0].data.modules.map((module: any) => {
+            return {
+              title: module.title,
+              lessons: module.lessons.map((lessonId: string) => {
+                const found = allLessons.filter(
+                  (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId
+                )
+                return found[0]
+              }),
+            }
+          })
+        )
+        result.getCourses[0].data.modules.map((module: any) => {
+          module.lessons.map((lessonId: string) => {
+            allLessons = allLessons.filter(
+              (moduleElemFilter: Lesson) => moduleElemFilter.id != lessonId
+            )
+          })
+        })
+        setStoredModules(allLessons)
         setForm({
           title: resultData[0].data.title,
           description: resultData[0].data.description,
@@ -310,13 +402,19 @@ const CourseCreate = () => {
           price: resultData[0].data.price,
         })
       } else {
+        setRichValue([
+          {
+            type: 'paragaph',
+            children: [{ text: '' }],
+          },
+        ])
         const response = await fetch(urlLesson + 's', {
           headers: {
             'Content-Type': 'application/json',
           },
         })
         const result = await response.json()
-        setAllModules(
+        setStoredModules(
           result.getLessons.map((lesson: any) => {
             return {
               id: lesson.id,
@@ -333,542 +431,348 @@ const CourseCreate = () => {
   useEffect(() => {
     getPageData()
   }, [])
-
-  console.log(allModules)
   console.log(modules)
   return (
-    <Layout>
-      <Box sx={{ minHeight: '80vh' }}>
+    <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
+      <Box
+        sx={{
+          paddingLeft: '2rem',
+          paddingRight: '2rem',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Link href={'/admin'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+                borderLeft: '2px solid #000',
+                fontSize: 20,
+              }}
+            >
+              Courses
+            </Box>
+          </Link>
+          <Link href={'/admin/users'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+                fontSize: 20,
+              }}
+            >
+              Users
+            </Box>
+          </Link>
+        </Box>
         <Box
           sx={{
-            paddingLeft: '2rem',
-            paddingRight: '2rem',
+            maxWidth: '900px',
             width: '100%',
-            display: 'flex',
-            justifyContent: 'center',
+            boxShadow: 2,
+            borderRadius: '10px',
+
+            border: '1px solid #000',
+            borderTop: '4px solid #000',
           }}
         >
-          <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Link href={'/admin'}>
-              <Box
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              aria-label='basic tabs example'
+              sx={{
+                maxWidth: '100%',
+              }}
+              TabIndicatorProps={{
+                style: {
+                  backgroundColor: '#000',
+                },
+              }}
+            >
+              <Tab
+                value={0}
+                label='General'
                 sx={{
-                  fontWeight: 'bold',
-                  paddingLeft: 2,
-                  paddingRight: 2,
-                  color: '#ffec3e',
-                  borderLeft: '2px solid #ffec3e',
-                  fontSize: 20,
-                }}
-              >
-                Courses
-              </Box>
-            </Link>
-            <Link href={'/admin/users'}>
-              <Box
-                sx={{
-                  fontWeight: 'bold',
-                  paddingLeft: 2,
-                  paddingRight: 2,
-                  color: '#fff',
-                  fontSize: 20,
-                }}
-              >
-                Users
-              </Box>
-            </Link>
-          </Box>
-          <Box
-            sx={{
-              maxWidth: '900px',
-              width: '100%',
-              boxShadow: 2,
-              borderRadius: '10px',
-
-              border: '1px solid #ffec3e',
-              borderTop: '4px solid #ffec3e',
-              overflowX: 'auto',
-              scrollbarWidth: 'none',
-            }}
-          >
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label='basic tabs example'
-                textColor={'primary'}
-                sx={{
-                  maxWidth: '100%',
-                }}
-                TabIndicatorProps={{
-                  style: {
-                    backgroundColor: '#ffec3e',
+                  width: '33%',
+                  color: '#000',
+                  '&.Mui-selected': {
+                    color: '#000',
+                    fontWeight: 'bold',
                   },
                 }}
-              >
-                <Tab
-                  value={0}
-                  label='General'
+              />
+              <Tab
+                value={1}
+                label='Structure'
+                sx={{
+                  width: '34%',
+                  color: '#000',
+                  '&.Mui-selected': {
+                    color: '#000',
+                    fontWeight: 'bold',
+                  },
+                }}
+              />
+              <Tab
+                value={2}
+                label='Create lesson'
+                sx={{
+                  width: '33%',
+                  color: '#000',
+                  '&.Mui-selected': {
+                    color: '#000',
+                    fontWeight: 'bold',
+                  },
+                }}
+              />
+            </Tabs>
+            <CustomTabPanel value={value} index={0}>
+              <Box sx={{ color: '#fff' }}>
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  id='title'
+                  type='text'
+                  label='Title'
+                  name='title'
+                  autoFocus
+                  onChange={(e) => {
+                    setForm({ ...form, title: e.target.value })
+                  }}
+                  value={form.title}
+                  sx={{ ...textFieldColors }}
+                />
+                <Box sx={{ color: '#000000' }}>
+                  <MyEditor value={richValue} setValue={setRichValue} />
+                </Box>
+
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  id='lector'
+                  type='text'
+                  label='Lector'
+                  name='lector'
+                  onChange={(e) => {
+                    setForm({ ...form, lector: e.target.value })
+                  }}
+                  value={form.lector}
+                  sx={{ ...textFieldColors }}
+                />
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  id='date'
+                  type='date'
+                  label='Date'
+                  name='date'
+                  onChange={(e) => {
+                    setForm({ ...form, date: e.target.value })
+                  }}
+                  value={form.date || '2024-01-01'}
                   sx={{
-                    width: '33%',
-                    color: '#ffec3e',
-                    '&.Mui-selected': {
-                      color: '#ffec3e',
-                      fontWeight: 'bold',
-                    },
+                    ...textFieldColors,
+                    marginTop: 3,
                   }}
                 />
-                <Tab
-                  value={1}
-                  label='Structure'
-                  sx={{
-                    width: '34%',
-                    color: '#ffec3e',
-                    '&.Mui-selected': {
-                      color: '#ffec3e',
-                      fontWeight: 'bold',
-                    },
+
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  id='duration'
+                  type='number'
+                  label='Duration'
+                  name='duration'
+                  InputProps={{
+                    inputProps: { min: 1 },
                   }}
-                />
-                <Tab
-                  value={2}
-                  label='Create lesson'
-                  sx={{
-                    width: '33%',
-                    color: '#ffec3e',
-                    '&.Mui-selected': {
-                      color: '#ffec3e',
-                      fontWeight: 'bold',
-                    },
+                  onChange={(e) => {
+                    setForm({ ...form, duration: Number(e.target.value) })
                   }}
+                  value={form.duration || ''}
+                  sx={{ ...textFieldColors, marginTop: 3 }}
                 />
-              </Tabs>
-              <CustomTabPanel value={value} index={0}>
-                <Box sx={{ color: '#fff' }}>
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='title'
-                    type='text'
-                    label='Title'
-                    name='title'
-                    autoFocus
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, title: e.target.value })
-                    }}
-                    value={form.title}
-                    sx={{ ...textFieldColors }}
-                  />
-                  <Box sx={{ color: '#000000' }}>
-                    <MyEditor value={richValue} setValue={setRichValue} />
-                  </Box>
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  id='price'
+                  type='number'
+                  label='Price'
+                  name='price'
+                  InputProps={{
+                    inputProps: { min: 1 },
+                  }}
+                  onChange={(e) => {
+                    setForm({ ...form, price: Number(e.target.value) })
+                  }}
+                  value={form.price || ''}
+                  sx={{ ...textFieldColors }}
+                />
 
-                  <TextField
-                    margin='normal'
-                    required
+                <Box sx={{ marginTop: 2 }}>
+                  <InputLabel>Language</InputLabel>
+                  <Select
                     fullWidth
-                    id='description'
-                    type='text'
-                    label='Description'
-                    name='description'
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, description: e.target.value })
-                    }}
-                    value={form.description}
-                    sx={{ ...textFieldColors }}
-                  />
-
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='richtext'
-                    type='text'
-                    label='Rich-text'
-                    name='richtext'
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, richtext: e.target.value })
-                    }}
-                    value={form.richtext}
-                    sx={{ ...textFieldColors }}
-                  />
-                  {/* <Box>
-                      {imageUrl && <Image src={imageUrl} fill alt={'Preview image'} />}
-                      <TextField
-                        onChange={(e) => {
-                          setForm({ ...form, imagePreview: e.target.value })
-                        }}
-                        value={form.imagePreview}
-                        margin='normal'
-                        required
-                        fullWidth
-                        id='imagePreview'
-                        type='text'
-                        label='Image preview'
-                        name='imagePreview'
-                        InputLabelProps={{
-                          sx: {
-                            color: '#ffec3e',
-                          },
-                        }}
-                        sx={{ ...textFieldColors }}
-                      />
-                    </Box> */}
-                  {/* TODO Normal color */}
-
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='lector'
-                    type='text'
-                    label='Lector'
-                    name='lector'
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, lector: e.target.value })
-                    }}
-                    value={form.lector}
-                    sx={{ ...textFieldColors }}
-                  />
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='date'
-                    type='date'
-                    label='Date'
-                    name='date'
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, date: e.target.value })
-                    }}
-                    value={form.date || '2024-01-01'}
-                    sx={{
-                      ...textFieldColors,
-                      marginTop: 3,
-                    }}
-                  />
-
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='duration'
-                    type='number'
-                    label='Duration'
-                    name='duration'
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    InputProps={{
-                      inputProps: { min: 1 },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, duration: Number(e.target.value) })
-                    }}
-                    value={form.duration || ''}
-                    sx={{ ...textFieldColors, marginTop: 3 }}
-                  />
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='price'
-                    type='number'
-                    label='Price'
-                    name='price'
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    InputProps={{
-                      inputProps: { min: 1 },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, price: Number(e.target.value) })
-                    }}
-                    value={form.price || ''}
-                    sx={{ ...textFieldColors }}
-                  />
-
+                    id='languageSelect'
+                    value={language}
+                    onChange={handleChangeLanguage}
+                  >
+                    <MenuItem value={'RU'}>RU</MenuItem>
+                    <MenuItem value={'UA'}>UA</MenuItem>
+                    <MenuItem value={'EN'}>EN</MenuItem>
+                  </Select>
+                </Box>
+                <Box sx={{ marginTop: 2 }}>
+                  <InputLabel>Level</InputLabel>
+                  <Select fullWidth id='levelSelect' value={level} onChange={handleChangeLevel}>
+                    <MenuItem value={'Beginner'}>Beginner</MenuItem>
+                    <MenuItem value={'Junior'}>Junior</MenuItem>
+                    <MenuItem value={'Middle'}>Middle</MenuItem>
+                    <MenuItem value={'Senior'}>Senior</MenuItem>
+                  </Select>
+                </Box>
+                <Box sx={{ marginTop: 2 }}>
+                  <InputLabel>Type</InputLabel>
+                  <Select fullWidth id='typeSelect' value={type} onChange={handleChangeType}>
+                    <MenuItem value={'self-education'}>Self education</MenuItem>
+                    <MenuItem value={'with-lector'}>With lector</MenuItem>
+                  </Select>
+                </Box>
+                {!id && (
                   <Box sx={{ marginTop: 2 }}>
-                    <InputLabel sx={{ color: '#ffec3e' }}>Language</InputLabel>
-                    <Select
-                      fullWidth
-                      id='languageSelect'
-                      value={language}
-                      onChange={handleChangeLanguage}
-                      sx={{
-                        color: '#fff',
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                      }}
-                    >
-                      <MenuItem value={'RU'}>RU</MenuItem>
-                      <MenuItem value={'UA'}>UA</MenuItem>
-                      <MenuItem value={'EN'}>EN</MenuItem>
-                    </Select>
-                  </Box>
-                  <Box sx={{ marginTop: 2 }}>
-                    <InputLabel sx={{ color: '#ffec3e' }}>Level</InputLabel>
-                    <Select
-                      fullWidth
-                      id='levelSelect'
-                      value={level}
-                      onChange={handleChangeLevel}
-                      sx={{
-                        color: '#fff',
-
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                      }}
-                    >
-                      <MenuItem value={'Beginner'}>Beginner</MenuItem>
-                      <MenuItem value={'Junior'}>Junior</MenuItem>
-                      <MenuItem value={'Middle'}>Middle</MenuItem>
-                      <MenuItem value={'Senior'}>Senior</MenuItem>
-                    </Select>
-                  </Box>
-                  <Box sx={{ marginTop: 2 }}>
-                    <InputLabel sx={{ color: '#ffec3e' }}>Type</InputLabel>
-                    <Select
-                      fullWidth
-                      id='typeSelect'
-                      value={type}
-                      onChange={handleChangeType}
-                      sx={{
-                        color: '#fff',
-
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                      }}
-                    >
-                      <MenuItem value={'self-education'}>Self education</MenuItem>
-                      <MenuItem value={'with-lector'}>With lector</MenuItem>
-                    </Select>
-                  </Box>
-                  <Box sx={{ marginTop: 2 }}>
-                    <InputLabel sx={{ color: '#ffec3e' }}>Status</InputLabel>
+                    <InputLabel>Status</InputLabel>
                     <Select
                       fullWidth
                       id='statusSelect'
                       value={status}
                       onChange={handleChangeStatus}
-                      sx={{
-                        color: '#fff',
-
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#ffec3e',
-                        },
-                      }}
                     >
                       <MenuItem value={'active'}>Active</MenuItem>
                       <MenuItem value={'draft'}>Draft</MenuItem>
                     </Select>
                   </Box>
-                  <Box sx={{ display: 'flex', marginTop: 1 }}>
-                    <Box sx={{ marginTop: 1, fontWeight: 'bold', color: '#ffec3e' }}>Rating</Box>
-                    <Rating
-                      name='rating'
-                      precision={0.1}
-                      onChange={(event, newValue) => {
-                        setRating(newValue ?? 5.0)
-                      }}
-                      value={rating || 0}
-                      sx={{
-                        marginLeft: 4,
-                        background: '#ffec3e',
-                        color: '#0f0e16',
-                        borderRadius: '10px',
-                        paddingLeft: '16px',
-                        paddingRight: '16px',
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    />
-                  </Box>
-                  <Button
-                    variant='contained'
-                    fullWidth
+                )}
+                <Box sx={{ display: 'flex', marginTop: 1 }}>
+                  <Box sx={{ marginTop: 1, fontWeight: 'bold', color: '#000' }}>Rating</Box>
+                  <Rating
+                    name='rating'
+                    precision={0.1}
+                    onChange={(event, newValue) => {
+                      setRating(newValue ?? 5.0)
+                    }}
+                    value={rating || 0}
                     sx={{
-                      marginTop: 2,
-                      background: '#ffec3e',
-                      color: '#0f0e16',
-                      fontWeight: 'bold',
-                      border: '2px solid #ffec3e',
-                      '&:hover': {
-                        backgroundColor: '#0f0e16',
-                        color: '#ffec3e',
-                      },
+                      marginLeft: 4,
+                      paddingTop: 1,
+                      paddingBottom: 1,
                     }}
-                    onClick={handleSubmit}
-                  >
-                    Create
-                  </Button>
-                  <Button
-                    variant='contained'
-                    fullWidth
-                    sx={{
-                      marginTop: 2,
-                      background: '#D2042D',
-                      color: '#0f0e16',
-                      fontWeight: 'bold',
-                      border: '2px solid #D2042D',
-                      '&:hover': {
-                        backgroundColor: '#0f0e16',
-                        color: '#D2042D',
-                      },
-                    }}
-                    onClick={async (e) => {
-                      const response = await axios.delete(url + '?id=' + id)
-                      const resultResponse = response.data
-                      if (resultResponse) {
-                        console.log('Success')
-                      }
-                    }}
-                  >
-                    Delete
-                  </Button>
+                  />
                 </Box>
-              </CustomTabPanel>
-              <CustomTabPanel value={value} index={1}>
-                <Box sx={{ display: 'flex', width: '100%' }}>
-                  <Box sx={{ width: '30%', border: '2px solid #ffec3e', minHeight: '20rem' }}>
-                    <Button
-                      fullWidth
-                      variant='contained'
-                      onClick={(e) => {
-                        setModules([...modules, { title: '', lessons: [] }])
-                      }}
-                      sx={{
-                        background: '#ffec3e',
-                        color: '#0f0e16',
-                        fontWeight: 'bold',
-                        borderBottom: '2px solid #ffec3e',
-                        borderRadius: '0px',
-                        '&:hover': {
-                          backgroundColor: '#0f0e16',
-                          borderBottom: '2px solid #ffec3e',
-                          color: '#ffec3e',
-                        },
-                      }}
-                    >
-                      Add Module
-                    </Button>
+                <Button
+                  variant='contained'
+                  fullWidth
+                  sx={{
+                    marginTop: 2,
+                    fontWeight: 'bold',
+                  }}
+                  onClick={handleSubmit}
+                >
+                  {id ? 'Add Course' : 'Edit Course'}
+                </Button>
+                <Button
+                  variant='contained'
+                  fullWidth
+                  color='error'
+                  sx={{
+                    marginTop: 2,
+                    fontWeight: 'bold',
+                  }}
+                  onClick={async (e) => {
+                    const response = await axios.delete(url + '?id=' + id)
+                    const resultResponse = response.data
+                    if (resultResponse) {
+                      console.log('Success')
+                    }
+                  }}
+                >
+                  Delete
+                </Button>
+              </Box>
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={1}>
+              <Box sx={{ display: 'flex', width: '100%' }}>
+                <Box sx={{ width: '30%', boxShadow: 2, minHeight: '20rem' }}>
+                  <Button
+                    fullWidth
+                    variant='contained'
+                    onClick={(e) => {
+                      setModules([...modules, { title: '', lessons: [] }])
+                    }}
+                    sx={{
+                      fontWeight: 'bold',
+                      borderRadius: '0px',
+                    }}
+                  >
+                    Add Module
+                  </Button>
 
-                    {modules.map((element, i) => {
-                      return (
-                        <Box
-                          onDragOver={handleOnDragOver}
-                          onDrop={(e) => handleOnDrop(e, i)}
-                          onDragStart={() => {
-                            setReDropBlock(true)
-                          }}
-                          key={'mainModuleContainer_' + i}
-                          sx={{ color: '#ffec3e' }}
+                  {modules.map((element, i) => {
+                    return (
+                      <Box
+                        onDragOver={handleOnDragOver}
+                        onDrop={(e) => handleOnDrop(e, i)}
+                        key={'mainModuleContainer_' + i}
+                        sx={{}}
+                      >
+                        <Accordion
+                          expanded={expanded === 'panel' + i}
+                          onChange={handleChangeExpanded('panel' + i)}
+                          sx={{}}
                         >
-                          <Accordion
-                            expanded={expanded === 'panel' + i}
-                            onChange={handleChangeExpanded('panel' + i)}
+                          <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
                             sx={{
-                              borderBottom: '2px solid #ffec3e',
-                              background: '#0f0e16',
-                              color: '#ffec3e',
-                              '& .MuiAccordionSummary-expandIconWrapper .MuiSvgIcon-root': {
-                                color: '#ffec3e',
-                              },
+                              borderBottom: expanded === 'panel' + i ? '2px solid' : '',
                             }}
                           >
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              sx={{
-                                borderBottom: expanded === 'panel' + i ? '2px solid' : '',
-                              }}
-                            >
-                              <div style={{ display: 'flex', gap: '10px' }}>
-                                <TextField
-                                  margin='normal'
-                                  required
-                                  fullWidth
-                                  id={'module' + i}
-                                  type='text'
-                                  label='Module'
-                                  name={'module' + i}
-                                  autoFocus
-                                  InputLabelProps={{
-                                    sx: {
-                                      color: '#ffec3e',
-                                    },
-                                  }}
-                                  onChange={(e) => {
-                                    setModules(
-                                      modules.map((module, moduleIndex) => {
-                                        if (i == moduleIndex) {
-                                          return { ...module, title: e.target.value }
-                                        } else {
-                                          return module
-                                        }
-                                      })
-                                    )
-                                  }}
-                                  value={element.title}
-                                  sx={{ ...textFieldColors }}
-                                />
-                                {/* <Typography
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <TextField
+                                margin='normal'
+                                required
+                                fullWidth
+                                id={'module' + i}
+                                type='text'
+                                label='Module'
+                                name={'module' + i}
+                                autoFocus
+                                onChange={(e) => {
+                                  setModules(
+                                    modules.map((module, moduleIndex) => {
+                                      if (i == moduleIndex) {
+                                        return { ...module, title: e.target.value }
+                                      } else {
+                                        return module
+                                      }
+                                    })
+                                  )
+                                }}
+                                value={element.title}
+                                sx={{ ...textFieldColors }}
+                              />
+                              {/* <Typography
                                   sx={{
                                     fontSize: '18px',
                                     fontWeight: 'bold',
@@ -876,235 +780,278 @@ const CourseCreate = () => {
                                 >
                                   Module {' ' + (i + 1)}
                                 </Typography> */}
-                              </div>
-                            </AccordionSummary>
+                            </div>
+                          </AccordionSummary>
 
-                            <AccordionDetails style={{ paddingLeft: '8px', paddingRight: '8px' }}>
-                              {element.lessons.map((lesson, index) => {
-                                return (
-                                  <div
-                                    key={'lessonElement_' + i + '_' + index}
-                                    style={{ display: 'flex', marginTop: '8px' }}
+                          <AccordionDetails style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+                            {element.lessons.map((lesson, index) => {
+                              return (
+                                <div
+                                  key={'lessonElement_' + i + '_' + index}
+                                  style={{
+                                    display: 'flex',
+                                    marginTop: '8px',
+                                    background: '#cccccc',
+                                  }}
+                                >
+                                  <Box
+                                    key={'mainModuleContainer_' + i}
+                                    sx={{
+                                      width: '15rem',
+                                      height: '10rem',
+                                      padding: '16px',
+                                    }}
+                                    onDragStart={(e) => {
+                                      setReDropBlock(true)
+                                      e.dataTransfer.setData(
+                                        'ID',
+                                        JSON.stringify({
+                                          ...lesson,
+                                          _i: index,
+                                          moduleI: i,
+                                        })
+                                      )
+                                    }}
+                                    draggable
                                   >
+                                    <Box sx={{ fontWeight: 'bold' }}>{lesson.title}</Box>
                                     <Box
-                                      key={'mainModuleContainer_' + i}
                                       sx={{
-                                        color: '#0f0e16',
-                                        width: '15rem',
-                                        background: '#ffec3e',
-                                        height: '7rem',
-                                        padding: '16px',
+                                        paddingLeft: '16px',
+                                        maxHeight: '50px',
+                                        overflow: 'auto',
                                       }}
-                                      onDragStart={(e) => {
-                                        e.dataTransfer.setData(
-                                          'ID',
-                                          JSON.stringify({
-                                            ...lesson,
-                                            _i: index,
-                                            moduleI: i,
-                                          })
-                                        )
-                                      }}
-                                      draggable
                                     >
-                                      <Box sx={{ fontWeight: 'bold' }}>{lesson.title}</Box>
-                                      <Box sx={{ paddingLeft: '16px' }}>{lesson.description}</Box>
-                                      <Box sx={{}}>{lesson.link}</Box>
+                                      <SlateView value={lesson.description} />
                                     </Box>
-                                  </div>
-                                )
-                              })}
-                              <Button
-                                fullWidth
-                                variant='contained'
-                                color='error'
-                                sx={{ marginTop: 2 }}
-                                onClick={(e) => {
-                                  setModules(
-                                    modules.filter((moduleElem, index) => {
-                                      if (i !== index) {
-                                        return moduleElem
-                                      }
-                                      setAllModules([...allModules, ...moduleElem.lessons])
-                                      setExpanded('')
-                                    })
-                                  )
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </AccordionDetails>
-                          </Accordion>
-                        </Box>
-                      )
-                    })}
-                  </Box>
-                  <Grid
-                    onDragOver={handleOnDragOver}
-                    onDrop={handleOnDropDel}
-                    container
-                    sx={{ width: '70%', gap: 2, justifyContent: 'center' }}
-                  >
-                    {allModules.map((element, i) => {
-                      return (
-                        <Grid
-                          item
-                          key={'mainModuleContainer_' + i}
-                          sx={{
-                            color: '#0f0e16',
-                            width: '15rem',
-                            background: '#ffec3e',
-                            height: '7rem',
-                            padding: '16px',
-                          }}
-                          onDragStart={(e) => {
-                            e.dataTransfer.setData(
-                              'ID',
-                              JSON.stringify({
-                                ...element,
-                                _i: i,
-                              })
-                            )
-                          }}
-                          draggable
-                        >
-                          <Box sx={{ fontWeight: 'bold' }}>{element.title}</Box>
-                          <Box sx={{ paddingLeft: '16px' }}></Box>
-                          <Box sx={{}}>{element.link}</Box>
-                          <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                                    <Box
+                                      sx={{
+                                        overflow: 'auto',
+                                        scrollbarWidth: 'none',
+                                        marginTop: 2,
+                                      }}
+                                    >
+                                      {lesson.link}
+                                    </Box>
+                                  </Box>
+                                </div>
+                              )
+                            })}
                             <Button
+                              fullWidth
                               variant='contained'
-                              sx={{
-                                background: '#D2042D',
-                                color: '#0f0e16',
-                                fontWeight: 'bold',
-                                border: '2px solid #D2042D',
-                                '&:hover': {
-                                  backgroundColor: '#0f0e16',
-                                  color: '#D2042D',
-                                },
-                                fontSize: 10,
-                              }}
-                              onClick={async (e) => {
-                                const response = await axios.delete(urlLesson + '?id=' + element.id)
-                                const resultResponse = response.data
-                                if (resultResponse) {
-                                  setAllModules(
-                                    allModules.filter((lesson) => lesson.id != element.id)
-                                  )
-                                }
+                              color='error'
+                              sx={{ marginTop: 2 }}
+                              onClick={(e) => {
+                                setModules(
+                                  modules.filter((moduleElem, index) => {
+                                    if (i !== index) {
+                                      return moduleElem
+                                    }
+                                    setAllModules([...allModules, ...moduleElem.lessons])
+                                    setExpanded('')
+                                  })
+                                )
                               }}
                             >
                               Delete
                             </Button>
-                          </Box>
-                        </Grid>
-                      )
-                    })}
-                  </Grid>
+                          </AccordionDetails>
+                        </Accordion>
+                      </Box>
+                    )
+                  })}
                 </Box>
-              </CustomTabPanel>
-              <CustomTabPanel value={value} index={2}>
-                <Box sx={{ color: '#fff' }}>
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='lessonTitle'
-                    type='title'
-                    label='Title'
-                    name='title'
-                    autoFocus
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    onChange={(e) => {
-                      setLessonForm({ ...lessonForm, title: e.target.value })
-                    }}
-                    value={lessonForm.title}
-                    sx={{ ...textFieldColors }}
-                  />
-                  <Box sx={{ color: '#000000' }}>
-                    <MyEditor value={richValueLesson} setValue={setRichValueLesson} />
-                  </Box>
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='lessonLink'
-                    type='text'
-                    label='Link'
-                    name='link'
-                    InputLabelProps={{
-                      sx: {
-                        color: '#ffec3e',
-                      },
-                    }}
-                    InputProps={{
-                      inputProps: { min: 1 },
-                    }}
-                    onChange={(e) => {
-                      setLessonForm({ ...lessonForm, link: e.target.value })
-                    }}
-                    value={lessonForm.link}
-                    sx={{ ...textFieldColors }}
-                  />
-                  <Button
-                    variant='contained'
-                    fullWidth
-                    sx={{
-                      marginTop: 2,
-                      background: '#ffec3e',
-                      color: '#0f0e16',
-                      fontWeight: 'bold',
-                      border: '2px solid #ffec3e',
-                      '&:hover': {
-                        backgroundColor: '#0f0e16',
-                        color: '#ffec3e',
-                      },
-                    }}
-                    onClick={async (e) => {
-                      try {
-                        const response = await axios.post(urlLesson, {
-                          title: lessonForm.title,
-                          description: richValueLesson,
-                          link: lessonForm.link,
+                <Grid
+                  onDragOver={handleOnDragOver}
+                  onDrop={handleOnDropDel}
+                  container
+                  sx={{ width: '50%', gap: 2, justifyContent: 'center' }}
+                >
+                  {allModules.map((element, i) => {
+                    return (
+                      <Grid
+                        item
+                        key={'mainModuleContainer_' + i}
+                        sx={{
+                          color: '#0f0e16',
+                          width: '15rem',
+                          background: '#cccccc',
+                          maxHeight: '13rem',
+                          padding: '16px',
+                        }}
+                        onDragStart={(e) => {
+                          setReDropBlock(true)
+                          e.dataTransfer.setData(
+                            'ID',
+                            JSON.stringify({
+                              ...element,
+                              _i: i,
+                            })
+                          )
+                        }}
+                        draggable
+                      >
+                        <Box sx={{ fontWeight: 'bold' }}>{element.title}</Box>
+                        <Box
+                          sx={{
+                            paddingLeft: '16px',
+                            maxHeight: '50px',
+                            overflow: 'auto',
+                            scrollbarWidth: 'none',
+                          }}
+                        >
+                          <SlateView value={element.description} />
+                        </Box>
+                        <Box sx={{ overflow: 'auto', scrollbarWidth: 'none', marginTop: 2 }}>
+                          {element.link}
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                          <Button
+                            variant='contained'
+                            color='error'
+                            sx={{
+                              fontWeight: 'bold',
+
+                              fontSize: 10,
+                            }}
+                            onClick={async (e) => {
+                              const response = await axios.delete(urlLesson + '?id=' + element.id)
+                              const resultResponse = response.data
+                              if (resultResponse) {
+                                setAllModules(
+                                  allModules.filter((lesson) => lesson.id != element.id)
+                                )
+                              }
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </Box>
+                      </Grid>
+                    )
+                  })}
+                </Grid>
+                <Box sx={{ width: '20%', boxShadow: 2, minHeight: '20rem' }}>
+                  {storedModules.map((element, i) => {
+                    return (
+                      <Grid
+                        item
+                        key={'mainModuleContainer_' + i}
+                        sx={{
+                          color: '#0f0e16',
+                          width: '100%',
+                          background: '#cccccc',
+                          padding: '16px',
+                        }}
+                        onDragStart={(e) => {
+                          setReDropBlock(true)
+                          e.dataTransfer.setData(
+                            'ID',
+                            JSON.stringify({
+                              ...element,
+                              _i: i,
+                              stored: true,
+                            })
+                          )
+                        }}
+                        draggable
+                      >
+                        <Box sx={{ fontWeight: 'bold' }}>{element.title}</Box>
+                      </Grid>
+                    )
+                  })}
+                </Box>
+              </Box>
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={2}>
+              <Box sx={{ color: '#fff' }}>
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  id='lessonTitle'
+                  type='title'
+                  label='Title'
+                  name='title'
+                  autoFocus
+                  onChange={(e) => {
+                    setLessonForm({ ...lessonForm, title: e.target.value })
+                  }}
+                  value={lessonForm.title}
+                  sx={{ ...textFieldColors }}
+                />
+                <Box sx={{ color: '#000000' }}>
+                  <MyEditor value={richValueLesson} setValue={setRichValueLesson} />
+                </Box>
+
+                <Box sx={{ width: '100%', marginTop: 2 }}>
+                  <Example url={lessonForm.link.split('?v=')[1]} />
+                </Box>
+
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  id='lessonLink'
+                  type='text'
+                  label='Link'
+                  name='link'
+                  InputProps={{
+                    inputProps: { min: 1 },
+                  }}
+                  onChange={(e) => {
+                    setLessonForm({ ...lessonForm, link: e.target.value })
+                  }}
+                  value={lessonForm.link}
+                  sx={{ ...textFieldColors }}
+                />
+                <Button
+                  variant='contained'
+                  fullWidth
+                  sx={{
+                    marginTop: 2,
+                    fontWeight: 'bold',
+                  }}
+                  onClick={async (e) => {
+                    try {
+                      const response = await axios.post(urlLesson, {
+                        title: lessonForm.title,
+                        description: richValueLesson,
+                        link: lessonForm.link,
+                      })
+                      const resultResponse = response.data
+                      if (resultResponse) {
+                        console.log(resultResponse)
+                        setAllModules([
+                          ...allModules,
+                          {
+                            ...lessonForm,
+                            description: richValueLesson,
+                            id: resultResponse.lessonId,
+                          },
+                        ])
+                        setLessonForm({
+                          title: '',
+                          link: '',
                         })
-                        const resultResponse = response.data
-                        if (resultResponse) {
-                          console.log(resultResponse)
-                          setAllModules([
-                            ...allModules,
-                            {
-                              ...lessonForm,
-                              description: richValueLesson,
-                              id: resultResponse.lessonId,
-                            },
-                          ])
-                          setLessonForm({
-                            title: '',
-                            link: '',
-                          })
-                          setValue(1)
-                        }
-                      } catch (error) {
-                        alert(error)
-                        console.error(error)
-                        return
+                        setValue(1)
                       }
-                    }}
-                  >
-                    Create
-                  </Button>
-                </Box>
-              </CustomTabPanel>
-            </Box>
+                    } catch (error) {
+                      alert(error)
+                      console.error(error)
+                      return
+                    }
+                  }}
+                >
+                  Create
+                </Button>
+              </Box>
+            </CustomTabPanel>
           </Box>
         </Box>
       </Box>
-    </Layout>
+    </Box>
   )
 }
 

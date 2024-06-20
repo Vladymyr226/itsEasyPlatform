@@ -22,12 +22,13 @@ import IconButton from '@mui/material/IconButton'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Link from 'next/link'
+import axios from 'axios'
 const tableColumn = {
   minWidth: '10rem',
   width: '100%',
   textAlign: 'center',
   fontWeight: 'bold',
-  background: '#ffec3e',
+  background: '#cccccc',
 }
 const tableElement = {
   minWidth: '10rem',
@@ -36,40 +37,19 @@ const tableElement = {
   fontWeight: 'bold',
   background: '#ffec3e',
 }
-const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/courses'
+const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
 
 const TableColumns = () => {
   return (
     <>
       <Box sx={{ ...tableColumn }}>Title</Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Description
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Rating
-      </Box>
-      {/* //123 */}
+
       <Box
         sx={{
           ...tableColumn,
         }}
       >
         Language
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Lector
       </Box>
       <Box
         sx={{
@@ -90,23 +70,8 @@ const TableColumns = () => {
           ...tableColumn,
         }}
       >
-        Start date
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Duration
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
         Price
       </Box>
-
       <Box
         sx={{
           ...tableColumn,
@@ -124,7 +89,7 @@ const AdminTable = () => {
   console.log(data)
   async function getPageData() {
     if (typeof window !== 'undefined') {
-      const response = await fetch(url, {
+      const response = await fetch(url + 's', {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -144,281 +109,231 @@ const AdminTable = () => {
   //  bg-dark shadow-lg p-5 rounded-lg border-t-4 border-yellow w-full max-w-[30rem]')
   //   dropModal
   return (
-    <Layout>
-      <Box sx={{ minHeight: '80vh' }}>
+    <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
+      <Box
+        sx={{
+          paddingLeft: '2rem',
+          paddingRight: '2rem',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Link href={'/admin'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+                borderLeft: '2px solid #000',
+                fontSize: 20,
+              }}
+            >
+              Courses
+            </Box>
+          </Link>
+          <Link href={'/admin/users'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+                fontSize: 20,
+              }}
+            >
+              Users
+            </Box>
+          </Link>
+        </Box>
         <Box
           sx={{
-            paddingLeft: '2rem',
-            paddingRight: '2rem',
             width: '100%',
             display: 'flex',
             justifyContent: 'center',
+            flexDirection: 'column',
           }}
         >
-          <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Link href={'/admin'}>
-              <Box
+          <Box sx={{ display: 'flex', justifyContent: 'end', marginBottom: 2 }}>
+            <Link href={'./admin/create'}>
+              <Button
+                variant='contained'
                 sx={{
-                  fontWeight: 'bold',
+                  padding: 1,
+                  borderRadius: '10px',
                   paddingLeft: 2,
                   paddingRight: 2,
-                  color: '#ffec3e',
-                  borderLeft: '2px solid #ffec3e',
-                  fontSize: 20,
-                }}
-              >
-                Courses
-              </Box>
-            </Link>
-            <Link href={'/admin/users'}>
-              <Box
-                sx={{
                   fontWeight: 'bold',
-                  paddingLeft: 2,
-                  paddingRight: 2,
-                  color: '#fff',
-                  fontSize: 20,
                 }}
               >
-                Users
-              </Box>
+                Add
+              </Button>
             </Link>
           </Box>
           <Box
             sx={{
               width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              flexDirection: 'column',
+
+              boxShadow: 2,
+              borderRadius: '10px',
+
+              border: '1px solid #000',
+              borderTop: '4px solid #000',
             }}
           >
-            <Box sx={{ display: 'flex', justifyContent: 'end', marginBottom: 2 }}>
-              <Link href={'./admin/create'}>
-                <Button
-                  sx={{
-                    background: '#ffec3e',
-                    padding: 1,
-                    borderRadius: '10px',
-                    paddingLeft: 2,
-                    paddingRight: 2,
-                    fontWeight: 'bold',
-                    color: '#0f0e16',
-                    border: '2px solid #ffec3e',
-                    '&:hover': {
-                      backgroundColor: '#0f0e16',
-                      border: '2px solid #ffec3e',
-                      color: '#ffec3e',
-                      boxShadow: 'none',
-                    },
-                  }}
-                >
-                  Add
-                </Button>
-              </Link>
-            </Box>
             <Box
               sx={{
+                display: 'flex',
+                background: '#cccccc',
+                borderTopLeftRadius: '5px',
+                borderTopRightRadius: '5px',
+                paddingTop: 1,
+                paddingBottom: 1,
                 width: '100%',
-
-                boxShadow: 2,
-                borderRadius: '10px',
-
-                border: '1px solid #ffec3e',
-                borderTop: '4px solid #ffec3e',
-                overflowX: 'auto',
+                minWidth: '60rem',
               }}
             >
-              <Box
-                sx={{
-                  display: 'flex',
-                  background: '#ffec3e',
-                  borderTopLeftRadius: '5px',
-                  borderTopRightRadius: '5px',
-                  paddingTop: 1,
-                  paddingBottom: 1,
-                  width: '100%',
-                  minWidth: '110rem',
-                }}
-              >
-                <TableColumns />
-              </Box>
-              {data ? (
-                data.map((element) => {
-                  return (
-                    <div key={'MainelementContainer'}>
+              <TableColumns />
+            </Box>
+            {data ? (
+              data.map((element) => {
+                return (
+                  <div key={'MainelementContainer'}>
+                    <Box
+                      key={'rowDividerWide_'}
+                      sx={{
+                        width: '100%',
+                        background: '#000',
+                        minWidth: '60rem',
+                        height: '2px',
+                      }}
+                    ></Box>
+                    <Box
+                      key={'rowContainerWide_'}
+                      sx={{
+                        display: 'flex',
+                        paddingTop: '0.5rem',
+                        paddingBottom: '0.5rem',
+                        width: '100%',
+                        color: '#000',
+                      }}
+                    >
                       <Box
-                        key={'rowDividerWide_'}
                         sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
                           width: '100%',
-                          background: '#ffec3e',
-                          minWidth: '110rem',
-                          height: '2px',
-                        }}
-                      ></Box>
-                      <Box
-                        key={'rowContainerWide_'}
-                        sx={{
-                          display: 'flex',
-                          paddingTop: '0.5rem',
-                          paddingBottom: '0.5rem',
-                          width: '100%',
-                          color: '#ffec3e',
                         }}
                       >
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.title}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.description}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.rating}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.language}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.lector}
-                        </Box>
-
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.level}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.type}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.date}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.duration}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.data.price}
-                        </Box>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-around',
-                            minWidth: '10rem',
-                          }}
-                        >
-                          <Link href={'./admin/create?_id=' + element.id}>
-                            <IconButton key={'editButton_'} aria-label='edit'>
-                              <EditIcon key={'editIcon_'} color='primary' />
-                            </IconButton>
-                          </Link>
-                          <IconButton key={'deleteButton_'} aria-label='edit'>
-                            <DeleteIcon key={'deleteIcon_'} color='primary' />
-                          </IconButton>
-                        </Box>
+                        {element.data.title}
                       </Box>
-                    </div>
-                  )
-                })
-              ) : (
-                <div>
-                  <LinearProgress
-                    sx={{
-                      minWidth: '110rem',
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      color: '#ffec3e',
-                      marginTop: 2,
-                      width: '100%',
-                      textAlign: 'center',
-                      fontWeight: 'bold',
-                    }}
-                  ></Box>
-                </div>
-              )}
-            </Box>
+
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {element.data.language}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {element.data.level}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {element.data.type}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {element.data.price}
+                      </Box>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-around',
+                          minWidth: '10rem',
+                          width: '100%',
+                        }}
+                      >
+                        <Link href={'./admin/create?_id=' + element.id}>
+                          <IconButton key={'editButton_'} aria-label='edit'>
+                            <EditIcon key={'editIcon_'} color='primary' />
+                          </IconButton>
+                        </Link>
+                        <IconButton
+                          key={'deleteButton_'}
+                          aria-label='edit'
+                          onClick={async (e) => {
+                            const response = await axios.delete(url + '?id=' + element.id)
+                            const resultResponse = response.data
+                            if (resultResponse) {
+                              setData(data.filter((course) => course.id != element.id))
+                            }
+                          }}
+                        >
+                          <DeleteIcon key={'deleteIcon_'} color='primary' />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </div>
+                )
+              })
+            ) : (
+              <div>
+                <LinearProgress
+                  sx={{
+                    minWidth: '60rem',
+                  }}
+                />
+                <Box
+                  sx={{
+                    color: '#ffec3e',
+                    marginTop: 2,
+                    width: '100%',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                  }}
+                ></Box>
+              </div>
+            )}
           </Box>
         </Box>
       </Box>
-    </Layout>
+    </Box>
   )
 }
 

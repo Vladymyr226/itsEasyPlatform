@@ -25,7 +25,7 @@ const tableColumn = {
   width: '100%',
   textAlign: 'center',
   fontWeight: 'bold',
-  background: '#ffec3e',
+  background: '#cccccc',
 }
 const tableElement = {
   minWidth: '10rem',
@@ -67,7 +67,6 @@ const AdminTable = () => {
   const [width, setWidth] = useState(0)
 
   const [data, setData] = useState<Array<any>>()
-  console.log(data)
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const response = await fetch(url, {
@@ -87,169 +86,165 @@ const AdminTable = () => {
     }
   }, [])
 
-  //  bg-dark shadow-lg p-5 rounded-lg border-t-4 border-yellow w-full max-w-[30rem]')
-  //   dropModal
   return (
-    <Layout>
-      <Box sx={{ minHeight: '80vh' }}>
+    <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
+      <Box
+        sx={{
+          paddingLeft: '2rem',
+          paddingRight: '2rem',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Link href={'/admin'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+
+                fontSize: 20,
+              }}
+            >
+              Courses
+            </Box>
+          </Link>
+          <Link href={'/users'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+                borderLeft: '2px solid #000',
+                fontSize: 20,
+              }}
+            >
+              Users
+            </Box>
+          </Link>
+        </Box>
         <Box
           sx={{
-            paddingLeft: '2rem',
-            paddingRight: '2rem',
             width: '100%',
             display: 'flex',
             justifyContent: 'center',
+            flexDirection: 'column',
           }}
         >
-          <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Link href={'/admin'}>
-              <Box
-                sx={{
-                  fontWeight: 'bold',
-                  paddingLeft: 2,
-                  paddingRight: 2,
-                  color: '#fff',
-                  fontSize: 20,
-                }}
-              >
-                Courses
-              </Box>
-            </Link>
-            <Link href={'/users'}>
-              <Box
-                sx={{
-                  fontWeight: 'bold',
-                  paddingLeft: 2,
-                  paddingRight: 2,
-                  color: '#ffec3e',
-                  borderLeft: '2px solid #ffec3e',
-                  fontSize: 20,
-                }}
-              >
-                Users
-              </Box>
-            </Link>
-          </Box>
           <Box
             sx={{
               width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              flexDirection: 'column',
+
+              boxShadow: 2,
+              borderRadius: '10px',
+
+              border: '1px solid #000',
+              borderTop: '4px solid #000',
+              overflowX: 'auto',
             }}
           >
             <Box
               sx={{
+                display: 'flex',
+                background: '#cccccc',
+                borderTopLeftRadius: '5px',
+                borderTopRightRadius: '5px',
+                paddingTop: 1,
+                paddingBottom: 1,
                 width: '100%',
-
-                boxShadow: 2,
-                borderRadius: '10px',
-
-                border: '1px solid #ffec3e',
-                borderTop: '4px solid #ffec3e',
-                overflowX: 'auto',
+                minWidth: '30rem',
               }}
             >
-              <Box
-                sx={{
-                  display: 'flex',
-                  background: '#ffec3e',
-                  borderTopLeftRadius: '5px',
-                  borderTopRightRadius: '5px',
-                  paddingTop: 1,
-                  paddingBottom: 1,
-                  width: '100%',
-                  minWidth: '30rem',
-                }}
-              >
-                <TableColumns />
-              </Box>
-              {data ? (
-                data.map((element) => {
-                  return (
-                    <div key={'MainelementContainer'}>
+              <TableColumns />
+            </Box>
+            {data ? (
+              data.map((element) => {
+                return (
+                  <div key={'MainelementContainer'}>
+                    <Box
+                      key={'rowDividerWide_'}
+                      sx={{
+                        width: '100%',
+                        background: '#000',
+                        minWidth: '30rem',
+                        height: '2px',
+                      }}
+                    ></Box>
+                    <Box
+                      key={'rowContainerWide_'}
+                      sx={{
+                        display: 'flex',
+                        paddingTop: '0.5rem',
+                        paddingBottom: '0.5rem',
+                        width: '100%',
+                      }}
+                    >
                       <Box
-                        key={'rowDividerWide_'}
                         sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
                           width: '100%',
-                          background: '#ffec3e',
-                          minWidth: '30rem',
-                          height: '2px',
-                        }}
-                      ></Box>
-                      <Box
-                        key={'rowContainerWide_'}
-                        sx={{
-                          display: 'flex',
-                          paddingTop: '0.5rem',
-                          paddingBottom: '0.5rem',
-                          width: '100%',
-                          color: '#ffec3e',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
                         }}
                       >
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            width: '100%',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.user_name}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            width: '100%',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.email}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid #ffec3e',
-                            minWidth: '10rem',
-                            width: '100%',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        >
-                          {element.created_at}
-                        </Box>
+                        {element.user_name}
                       </Box>
-                    </div>
-                  )
-                })
-              ) : (
-                <div>
-                  <LinearProgress
-                    sx={{
-                      minWidth: '110rem',
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      color: '#ffec3e',
-                      marginTop: 2,
-                      width: '100%',
-                      textAlign: 'center',
-                      fontWeight: 'bold',
-                    }}
-                  ></Box>
-                </div>
-              )}
-            </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          width: '100%',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.email}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          width: '100%',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.created_at}
+                      </Box>
+                    </Box>
+                  </div>
+                )
+              })
+            ) : (
+              <div>
+                <LinearProgress
+                  sx={{
+                    minWidth: '110rem',
+                  }}
+                />
+                <Box
+                  sx={{
+                    color: '#ffec3e',
+                    marginTop: 2,
+                    width: '100%',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                  }}
+                ></Box>
+              </div>
+            )}
           </Box>
         </Box>
       </Box>
-    </Layout>
+    </Box>
   )
 }
 
