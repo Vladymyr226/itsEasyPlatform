@@ -19,6 +19,7 @@ import { Box, Grid, Button, Typography } from '@mui/material'
 import LinearProgress from '@mui/material/LinearProgress'
 
 import IconButton from '@mui/material/IconButton'
+import PreviewIcon from '@mui/icons-material/Preview'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Link from 'next/link'
@@ -39,6 +40,7 @@ import dayjs from 'dayjs'
 import axios, { all } from 'axios'
 import Rating from '@mui/material/Rating'
 import { useRouter } from 'next/navigation'
+import { useRouter as useRouterNext } from 'next/router'
 import MyEditor from '@/components/SlateEditor/Editor'
 import SlateView from '@/components/SlateEditor/View'
 import { Slate, Editable, withReact } from 'slate-react'
@@ -54,7 +56,7 @@ import withReactContent from 'sweetalert2-react-content'
 interface YouTubeProp {
   url: string
 }
-function Example(props: YouTubeProp) {
+function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
     // access to player in all event handlers via event.target
     event.target.pauseVideo()
@@ -101,6 +103,20 @@ interface TabPanelProps {
   index: number
   value: number
 }
+interface Lesson {
+  id?: string
+  title: string
+  description: any
+  link: string
+}
+interface Module {
+  title: string
+  lessons: Array<Lesson>
+}
+interface Tag {
+  name_of_tag: string
+  id: string
+}
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props
 
@@ -129,6 +145,7 @@ const CourseCreate = () => {
   //  bg-dark shadow-lg p-5 rounded-lg border-t-4 border-yellow w-full max-w-[30rem]')
   //   dropModal
   const [id, setId] = useState()
+  const [idLessonEdit, setIdLessonEdit] = useState<string | null>(null)
   const [value, setValue] = useState(0)
   const [imageUrl, setImageUrl] = useState('')
 
@@ -138,6 +155,17 @@ const CourseCreate = () => {
   const [status, setStatus] = useState('')
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setIdLessonEdit(null)
+    setLessonForm({
+      title: '',
+      link: '',
+    })
+    setRichValueLesson([
+      {
+        type: 'paragaph',
+        children: [{ text: '' }],
+      },
+    ])
     setValue(newValue)
   }
   const handleChangeLanguage = (event: SelectChangeEvent) => {
@@ -153,25 +181,11 @@ const CourseCreate = () => {
     setStatus(event.target.value as string)
   }
 
-  interface Lesson {
-    id?: string
-    title: string
-    description: any
-    link: string
-  }
-  interface Module {
-    title: string
-    lessons: Array<Lesson>
-  }
-  interface Tag {
-    name_of_tag: string
-    id: string
-  }
-
   const [modules, setModules] = useState<Array<Module>>([])
   const [allModules, setAllModules] = useState<Array<Lesson>>([])
   const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
   const [expanded, setExpanded] = useState<string | false>(false)
+  const [expandedStored, setExpandedStored] = useState<string | false>(false)
   const [reDropBlock, setReDropBlock] = useState(false)
   const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
@@ -195,10 +209,16 @@ const CourseCreate = () => {
     title: '',
     link: '',
   })
+  const [preview, setPreview] = useState('-1')
 
   const handleChangeExpanded =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false)
+    }
+
+  const handleChangeExpandedStored =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpandedStored(isExpanded ? panel : false)
     }
 
   const handleOnDragOver = (e: any) => {
@@ -207,7 +227,9 @@ const CourseCreate = () => {
   }
   const handleOnDropDel = (e: any) => {
     const delField = JSON.parse(e.dataTransfer.getData('ID'))
+
     if (!delField.stored) {
+      console.log(delField)
       setModules(
         modules.map((elem, index) => {
           if (delField.moduleI === index) {
@@ -436,20 +458,26 @@ const CourseCreate = () => {
           price: resultData[0].data.price,
         })
       } else {
-        setRichValue([
-          {
-            type: 'paragaph',
-            children: [{ text: '' }],
-          },
-        ])
-        const response = await fetch(urlLesson + 's', {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        const result = await response.json()
-        setStoredModules(
-          result.getLessons.map((lesson: any) => {
+        const draftedData = localStorage.getItem('CourseCreateForm')
+        if (draftedData) {
+          const parsedData = JSON.parse(draftedData)
+          console.log(parsedData)
+          setForm(parsedData.form)
+          setRichValue(parsedData.description)
+          setModules(parsedData.modules)
+          setLanguage(parsedData.language)
+          setLevel(parsedData.level)
+          setType(parsedData.type)
+          setStatus(parsedData.status)
+          setRating(parsedData.rating)
+          setCategorySelect(parsedData.categorySelect)
+          const response = await fetch(urlLesson + 's', {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          const result = await response.json()
+          let allLessons = result.getLessons.map((lesson: any) => {
             return {
               id: lesson.id,
               title: lesson.data.title,
@@ -457,8 +485,39 @@ const CourseCreate = () => {
               link: lesson.data.link,
             }
           })
-        )
-        console.log(result.getLessons)
+
+          parsedData.modules.map((module: any) => {
+            module.lessons.map((lesson: Lesson) => {
+              allLessons = allLessons.filter(
+                (moduleElemFilter: Lesson) => moduleElemFilter.id != lesson.id
+              )
+            })
+          })
+          setStoredModules(allLessons)
+        } else {
+          setRichValue([
+            {
+              type: 'paragaph',
+              children: [{ text: '' }],
+            },
+          ])
+          const response = await fetch(urlLesson + 's', {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          const result = await response.json()
+          setStoredModules(
+            result.getLessons.map((lesson: any) => {
+              return {
+                id: lesson.id,
+                title: lesson.data.title,
+                description: lesson.data.description,
+                link: lesson.data.link,
+              }
+            })
+          )
+        }
       }
     }
   }
@@ -480,6 +539,27 @@ const CourseCreate = () => {
       }
     })
   }
+  function showPushAction(url: string) {
+    if (isEdited()) {
+      Swal.fire({
+        title: 'Do you want to save draft?',
+        showCancelButton: true,
+        confirmButtonText: 'Save and leave',
+        cancelButtonText: 'Leave and delete',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          draftData()
+          router.push(url)
+        } else {
+          localStorage.removeItem('CourseCreateForm')
+          router.push(url)
+        }
+      })
+    } else {
+      router.push(url)
+    }
+  }
+
   const [inputValue, setInputValue] = useState('')
   const showSwal = () => {
     withReactContent(Swal).fire({
@@ -500,11 +580,58 @@ const CourseCreate = () => {
       },
     })
   }
+  const draftData = () => {
+    localStorage.setItem(
+      'CourseCreateForm',
+      JSON.stringify({
+        form: form,
+        description: richValue,
+        modules: modules,
+        language: language,
+        level: level,
+        type: type,
+        status: status,
+        rating: rating,
+        categorySelect: categorySelect,
+      })
+    )
+  }
 
+  function isEdited() {
+    return (
+      form.title != '' ||
+      form.date != '2024-01-01' ||
+      form.duration != undefined ||
+      form.lector != '' ||
+      form.price != undefined ||
+      modules.length != 0 ||
+      language != '' ||
+      level != '' ||
+      type != '' ||
+      status != '' ||
+      rating != 0.0
+    )
+  }
   useEffect(() => {
     getPageData()
+    function handleOnBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault()
+      return (e.returnValue = '')
+    }
+    // const handleBrowseAway = () => {
+    //   if (!true) return
+    //   if (window.confirm('You will lose the data')) return
+    //   routerNext.events.emit('routeChangeError')
+    //   throw 'routeChange aborted.'
+    // }
+    window.addEventListener('beforeunload', handleOnBeforeUnload, { capture: true })
+    // routerNext.events.on('routeChangeStart', handleBrowseAway)
+    return () => {
+      window.removeEventListener('beforeunload', handleOnBeforeUnload, { capture: true })
+      // routerNext.events.off('routeChangeStart', handleBrowseAway)
+    }
   }, [])
-  console.log(allCategorySelect)
+  console.log(allModules)
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
       <Box
@@ -517,33 +644,38 @@ const CourseCreate = () => {
         }}
       >
         <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Link href={'/admin'}>
-            <Box
-              sx={{
-                fontWeight: 'bold',
-                paddingLeft: 2,
-                paddingRight: 2,
-                color: '#000',
-                borderLeft: '2px solid #000',
-                fontSize: 20,
-              }}
-            >
-              Courses
-            </Box>
-          </Link>
-          <Link href={'/admin/users'}>
-            <Box
-              sx={{
-                fontWeight: 'bold',
-                paddingLeft: 2,
-                paddingRight: 2,
-                color: '#000',
-                fontSize: 20,
-              }}
-            >
-              Users
-            </Box>
-          </Link>
+          <Box
+            sx={{
+              fontWeight: 'bold',
+              paddingLeft: 2,
+              paddingRight: 2,
+              color: '#000',
+              borderLeft: '2px solid #000',
+              fontSize: 20,
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {
+              showPushAction('/admin')
+            }}
+          >
+            Courses
+          </Box>
+
+          <Box
+            sx={{
+              fontWeight: 'bold',
+              paddingLeft: 2,
+              paddingRight: 2,
+              color: '#000',
+              fontSize: 20,
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {
+              showPushAction('/admin/users')
+            }}
+          >
+            Users
+          </Box>
         </Box>
         <Box
           sx={{
@@ -596,7 +728,7 @@ const CourseCreate = () => {
               />
               <Tab
                 value={2}
-                label='Create lesson'
+                label={idLessonEdit ? 'Edit lesson' : 'Create lesson'}
                 sx={{
                   width: '33%',
                   color: '#000',
@@ -793,17 +925,37 @@ const CourseCreate = () => {
                     </div>
                   )}
                 />
-                <Button
-                  variant='contained'
-                  fullWidth
-                  sx={{
-                    marginTop: 2,
-                    fontWeight: 'bold',
-                  }}
-                  onClick={handleSubmit}
-                >
-                  {id ? 'Edit Course' : 'Add Course'}
-                </Button>
+                <Box sx={{ display: 'flex' }}>
+                  {isEdited() && (
+                    <Button
+                      variant='contained'
+                      sx={{
+                        marginTop: 2,
+                        fontWeight: 'bold',
+                        width: '12rem',
+                        marginRight: 2,
+                      }}
+                      onClick={(e) => {
+                        localStorage.removeItem('CourseCreateForm')
+                      }}
+                    >
+                      Clear draft
+                    </Button>
+                  )}
+
+                  <Button
+                    variant='contained'
+                    fullWidth
+                    sx={{
+                      marginTop: 2,
+                      fontWeight: 'bold',
+                    }}
+                    onClick={handleSubmit}
+                  >
+                    {id ? 'Edit Course' : 'Add Course'}
+                  </Button>
+                </Box>
+
                 {id && (
                   <Button
                     variant='contained'
@@ -894,55 +1046,141 @@ const CourseCreate = () => {
                           <AccordionDetails style={{ paddingLeft: '8px', paddingRight: '8px' }}>
                             {element.lessons.map((lesson, index) => {
                               return (
-                                <div
-                                  key={'lessonElement_' + i + '_' + index}
-                                  style={{
-                                    display: 'flex',
-                                    marginTop: '8px',
+                                <Box
+                                  key={'mainModuleContainer_' + i}
+                                  sx={{
+                                    color: '#0f0e16',
+                                    width: '100%',
                                     background: '#cccccc',
+                                    marginTop: 2,
+                                    padding: '16px',
+                                    boxShadow: 2,
                                   }}
+                                  onDragStart={(e) => {
+                                    setReDropBlock(true)
+                                    e.dataTransfer.setData(
+                                      'ID',
+                                      JSON.stringify({
+                                        ...element,
+                                        _i: index,
+                                        moduleI: i,
+                                      })
+                                    )
+                                  }}
+                                  draggable
                                 >
-                                  <Box
-                                    key={'mainModuleContainer_' + i}
-                                    sx={{
-                                      width: '15rem',
-                                      height: '10rem',
-                                      padding: '16px',
-                                    }}
-                                    onDragStart={(e) => {
-                                      setReDropBlock(true)
-                                      e.dataTransfer.setData(
-                                        'ID',
-                                        JSON.stringify({
-                                          ...lesson,
-                                          _i: index,
-                                          moduleI: i,
+                                  <Box sx={{ fontWeight: 'bold' }}>{lesson.title}</Box>
+
+                                  <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                                    <IconButton
+                                      onClick={(e) => {
+                                        setPreview(lesson.id == preview ? '-1' : lesson.id ?? '-1')
+                                      }}
+                                    >
+                                      <PreviewIcon />
+                                    </IconButton>
+                                    <IconButton
+                                      onClick={(e) => {
+                                        setIdLessonEdit(lesson.id ?? '-1')
+                                        setLessonForm({
+                                          title: lesson.title,
+                                          link: lesson.link,
                                         })
-                                      )
-                                    }}
-                                    draggable
-                                  >
-                                    <Box sx={{ fontWeight: 'bold' }}>{lesson.title}</Box>
-                                    <Box
-                                      sx={{
-                                        paddingLeft: '16px',
-                                        maxHeight: '50px',
-                                        overflow: 'auto',
+                                        setRichValueLesson(lesson.description)
+                                        setValue(2)
                                       }}
                                     >
-                                      <SlateView value={lesson.description} />
-                                    </Box>
-                                    <Box
-                                      sx={{
-                                        overflow: 'auto',
-                                        scrollbarWidth: 'none',
-                                        marginTop: 2,
+                                      <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                      onClick={async (e) => {
+                                        const response = await axios.delete(
+                                          urlLesson + '?id=' + lesson.id
+                                        )
+                                        const resultResponse = response.data
+                                        if (resultResponse) {
+                                          setAllModules(
+                                            allModules.filter((lesson) => lesson.id != lesson.id)
+                                          )
+                                        }
                                       }}
                                     >
-                                      {lesson.link}
-                                    </Box>
+                                      <DeleteIcon color='error' />
+                                    </IconButton>
                                   </Box>
-                                </div>
+                                  {preview == lesson.id && (
+                                    <>
+                                      <Box
+                                        sx={{
+                                          paddingLeft: '16px',
+                                          maxHeight: '10rem',
+                                          overflow: 'auto',
+                                          scrollbarWidth: 'none',
+                                        }}
+                                      >
+                                        <SlateView value={lesson.description} />
+                                      </Box>
+                                      <Box
+                                        sx={{
+                                          overflow: 'auto',
+                                          scrollbarWidth: 'none',
+                                          marginTop: 2,
+                                        }}
+                                      >
+                                        <ExampleYouTube url={lesson.link.split('?v=')[1]} />
+                                      </Box>
+                                    </>
+                                  )}
+                                </Box>
+                                // <div
+                                //   key={'lessonElement_' + i + '_' + index}
+                                //   style={{
+                                //     display: 'flex',
+                                //     marginTop: '8px',
+                                //     background: '#cccccc',
+                                //   }}
+                                // >
+                                //   <Box
+                                //     key={'mainModuleContainer_' + i}
+                                //     sx={{
+                                //       width: '15rem',
+                                //       height: '10rem',
+                                //       padding: '16px',
+                                //     }}
+                                //     onDragStart={(e) => {
+                                //       setReDropBlock(true)
+                                //       e.dataTransfer.setData(
+                                //         'ID',
+                                //         JSON.stringify({
+                                //           ...lesson,
+                                //           _i: index,
+                                //           moduleI: i,
+                                //         })
+                                //       )
+                                //     }}
+                                //     draggable
+                                //   >
+                                //     <Box sx={{ fontWeight: 'bold' }}>{lesson.title}</Box>
+                                //     <Box
+                                //       sx={{
+                                //         paddingLeft: '16px',
+                                //         maxHeight: '50px',
+                                //         overflow: 'auto',
+                                //       }}
+                                //     >
+                                //       <SlateView value={lesson.description} />
+                                //     </Box>
+                                //     <Box
+                                //       sx={{
+                                //         overflow: 'auto',
+                                //         scrollbarWidth: 'none',
+                                //         marginTop: 2,
+                                //       }}
+                                //     >
+                                //       {lesson.link}
+                                //     </Box>
+                                //   </Box>
+                                // </div>
                               )
                             })}
                             <Button
@@ -970,23 +1208,86 @@ const CourseCreate = () => {
                     )
                   })}
                 </Box>
-                <Grid
+                <Box
                   onDragOver={handleOnDragOver}
                   onDrop={handleOnDropDel}
-                  container
-                  sx={{ width: '50%', gap: 2, justifyContent: 'center' }}
+                  sx={{
+                    width: '70%',
+                    gap: 2,
+                    justifyContent: 'center',
+                    paddingLeft: 2,
+                    paddingRight: 2,
+                    maxHeight: '30rem',
+                    overflow: 'auto',
+                  }}
                 >
+                  <Box sx={{ width: '100%' }}>
+                    <Accordion
+                      expanded={expandedStored === 'panelStored'}
+                      onChange={handleChangeExpandedStored('panelStored')}
+                      sx={{}}
+                    >
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        sx={{
+                          boxShadow: 2,
+                        }}
+                      >
+                        Stored lessons
+                      </AccordionSummary>
+
+                      <AccordionDetails
+                        style={{
+                          paddingLeft: '8px',
+                          paddingRight: '8px',
+                          paddingBottom: '8px',
+                        }}
+                      >
+                        <Box sx={{ maxHeight: '10rem', overflowY: 'auto' }}>
+                          {storedModules.map((element, i) => {
+                            return (
+                              <Grid
+                                item
+                                key={'mainModuleContainer_' + i}
+                                sx={{
+                                  color: '#0f0e16',
+                                  width: '100%',
+                                  background: '#cccccc',
+                                  padding: '16px',
+                                  marginBottom: 1,
+                                }}
+                                onDragStart={(e) => {
+                                  setReDropBlock(true)
+                                  e.dataTransfer.setData(
+                                    'ID',
+                                    JSON.stringify({
+                                      ...element,
+                                      _i: i,
+                                      stored: true,
+                                    })
+                                  )
+                                }}
+                                draggable
+                              >
+                                <Box sx={{ fontWeight: 'bold' }}>{element.title}</Box>
+                              </Grid>
+                            )
+                          })}
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
+                  </Box>
                   {allModules.map((element, i) => {
                     return (
-                      <Grid
-                        item
+                      <Box
                         key={'mainModuleContainer_' + i}
                         sx={{
                           color: '#0f0e16',
-                          width: '15rem',
+                          width: '100%',
                           background: '#cccccc',
-                          maxHeight: '13rem',
+                          marginTop: 2,
                           padding: '16px',
+                          boxShadow: 2,
                         }}
                         onDragStart={(e) => {
                           setReDropBlock(true)
@@ -1001,28 +1302,29 @@ const CourseCreate = () => {
                         draggable
                       >
                         <Box sx={{ fontWeight: 'bold' }}>{element.title}</Box>
-                        <Box
-                          sx={{
-                            paddingLeft: '16px',
-                            maxHeight: '50px',
-                            overflow: 'auto',
-                            scrollbarWidth: 'none',
-                          }}
-                        >
-                          <SlateView value={element.description} />
-                        </Box>
-                        <Box sx={{ overflow: 'auto', scrollbarWidth: 'none', marginTop: 2 }}>
-                          {element.link}
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-                          <Button
-                            variant='contained'
-                            color='error'
-                            sx={{
-                              fontWeight: 'bold',
 
-                              fontSize: 10,
+                        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                          <IconButton
+                            onClick={(e) => {
+                              setPreview(element.id == preview ? '-1' : element.id ?? '-1')
                             }}
+                          >
+                            <PreviewIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={(e) => {
+                              setIdLessonEdit(element.id ?? '-1')
+                              setLessonForm({
+                                title: element.title,
+                                link: element.link,
+                              })
+                              setRichValueLesson(element.description)
+                              setValue(2)
+                            }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
                             onClick={async (e) => {
                               const response = await axios.delete(urlLesson + '?id=' + element.id)
                               const resultResponse = response.data
@@ -1033,40 +1335,27 @@ const CourseCreate = () => {
                               }
                             }}
                           >
-                            Delete
-                          </Button>
+                            <DeleteIcon color='error' />
+                          </IconButton>
                         </Box>
-                      </Grid>
-                    )
-                  })}
-                </Grid>
-                <Box sx={{ width: '20%', boxShadow: 2, minHeight: '20rem' }}>
-                  {storedModules.map((element, i) => {
-                    return (
-                      <Grid
-                        item
-                        key={'mainModuleContainer_' + i}
-                        sx={{
-                          color: '#0f0e16',
-                          width: '100%',
-                          background: '#cccccc',
-                          padding: '16px',
-                        }}
-                        onDragStart={(e) => {
-                          setReDropBlock(true)
-                          e.dataTransfer.setData(
-                            'ID',
-                            JSON.stringify({
-                              ...element,
-                              _i: i,
-                              stored: true,
-                            })
-                          )
-                        }}
-                        draggable
-                      >
-                        <Box sx={{ fontWeight: 'bold' }}>{element.title}</Box>
-                      </Grid>
+                        {preview == element.id && (
+                          <>
+                            <Box
+                              sx={{
+                                paddingLeft: '16px',
+                                maxHeight: '10rem',
+                                overflow: 'auto',
+                                scrollbarWidth: 'none',
+                              }}
+                            >
+                              <SlateView value={element.description} />
+                            </Box>
+                            <Box sx={{ overflow: 'auto', scrollbarWidth: 'none', marginTop: 2 }}>
+                              <ExampleYouTube url={element.link.split('?v=')[1]} />
+                            </Box>
+                          </>
+                        )}
+                      </Box>
                     )
                   })}
                 </Box>
@@ -1094,7 +1383,7 @@ const CourseCreate = () => {
                 </Box>
 
                 <Box sx={{ width: '100%', marginTop: 2 }}>
-                  <Example url={lessonForm.link.split('?v=')[1]} />
+                  <ExampleYouTube url={lessonForm.link.split('?v=')[1]} />
                 </Box>
 
                 <TextField
@@ -1123,27 +1412,62 @@ const CourseCreate = () => {
                   }}
                   onClick={async (e) => {
                     try {
-                      const response = await axios.post(urlLesson, {
-                        title: lessonForm.title,
-                        description: richValueLesson,
-                        link: lessonForm.link,
-                      })
-                      const resultResponse = response.data
-                      if (resultResponse) {
-                        console.log(resultResponse)
-                        setAllModules([
-                          ...allModules,
-                          {
-                            ...lessonForm,
-                            description: richValueLesson,
-                            id: resultResponse.lessonId,
-                          },
-                        ])
-                        setLessonForm({
-                          title: '',
-                          link: '',
+                      if (idLessonEdit) {
+                        const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
+                          title: lessonForm.title,
+                          description: richValueLesson,
+                          link: lessonForm.link,
                         })
-                        setValue(1)
+                        const resultResponse = response.data
+                        if (resultResponse) {
+                          setAllModules(
+                            allModules.map((module: Lesson) => {
+                              if (module.id == idLessonEdit) {
+                                console.log({
+                                  id: idLessonEdit,
+                                  title: lessonForm.title,
+                                  description: richValueLesson,
+                                  link: lessonForm.link,
+                                })
+                                return {
+                                  id: idLessonEdit,
+                                  title: lessonForm.title,
+                                  description: richValueLesson,
+                                  link: lessonForm.link,
+                                }
+                              }
+                              return module
+                            })
+                          )
+                          setLessonForm({
+                            title: '',
+                            link: '',
+                          })
+                          setValue(1)
+                        }
+                      } else {
+                        const response = await axios.post(urlLesson, {
+                          title: lessonForm.title,
+                          description: richValueLesson,
+                          link: lessonForm.link,
+                        })
+                        const resultResponse = response.data
+                        if (resultResponse) {
+                          console.log(resultResponse)
+                          setAllModules([
+                            ...allModules,
+                            {
+                              ...lessonForm,
+                              description: richValueLesson,
+                              id: resultResponse.lessonId,
+                            },
+                          ])
+                          setLessonForm({
+                            title: '',
+                            link: '',
+                          })
+                          setValue(1)
+                        }
                       }
                     } catch (error) {
                       alert(error)
@@ -1152,7 +1476,7 @@ const CourseCreate = () => {
                     }
                   }}
                 >
-                  Create
+                  {idLessonEdit ? 'Edit' : 'Create'}
                 </Button>
               </Box>
             </CustomTabPanel>
