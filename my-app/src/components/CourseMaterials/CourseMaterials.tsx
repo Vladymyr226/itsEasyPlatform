@@ -9,105 +9,7 @@ import openLock from '../../assets/openLock.svg'
 import closedLock from '../../assets/closedLock.svg'
 import video from '../../assets/greyVideo.svg'
 import Image from 'next/image'
-
-const data = [
-  {
-    chapteer: 'Введение',
-    materials: [
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-    ],
-  },
-  {
-    chapteer: 'Введение',
-    materials: [
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-    ],
-  },
-  {
-    chapteer: 'Введение',
-    materials: [
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-    ],
-  },
-  {
-    chapteer: 'Введение',
-    materials: [
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-    ],
-  },
-  {
-    chapteer: 'Введение',
-    materials: [
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-    ],
-  },
-  {
-    chapteer: 'Введение',
-    materials: [
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-    ],
-  },
-  {
-    chapteer: 'Введение',
-    materials: [
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-    ],
-  },
-  {
-    chapteer: 'Введение',
-    materials: [
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-      'Почему nodeJS для backend?',
-    ],
-  },
-]
+import Link from 'next/link'
 
 const CourseMaterials = ({ modules }: { modules: any }) => {
   const [selected, setSelected] = useState<number | null>(null)
@@ -141,10 +43,10 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
                   <Image src={notebook} alt='notebook' />
                   {module.lessons.length} лекций
                 </div>
-                <div>
+                {/* <div>
                   <Image src={clock} alt='clock' />
                   33 ч 48 мин
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -159,9 +61,16 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
                   <div className={s.materialItemInfo}>
                     <div>
                       <Image src={idx === 0 ? openLock : closedLock} alt='lock' />
-                      <span style={{ cursor: 'pointer' }}>Предосмотр</span>
+
+                      <Link href={lesson.data.link}>
+                        <span
+                          style={{ cursor: 'pointer', textDecoration: 'none', color: '#ffec3e' }}
+                        >
+                          Предосмотр
+                        </span>
+                      </Link>
                     </div>
-                    <span>15:22</span>
+                    {/* <span>15:22</span> */}
                   </div>
                 </li>
               ))}

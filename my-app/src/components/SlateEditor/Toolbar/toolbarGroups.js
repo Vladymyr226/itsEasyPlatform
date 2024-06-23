@@ -86,7 +86,7 @@ const toolbarGroups = [
     },
     {
       id: 14,
-      format: 'blockquote',
+      format: 'codeElem',
       type: 'block',
     },
   ],
@@ -126,6 +126,10 @@ const toolbarGroups = [
     {
       id: 23,
       type: 'table',
+    },
+    {
+      id: 24,
+      type: 'code',
     },
   ],
   [

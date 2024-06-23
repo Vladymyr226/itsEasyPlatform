@@ -209,7 +209,6 @@ const AdminTable = () => {
                       </Box>
                       <Box
                         sx={{
-                          borderRight: '2px solid #000',
                           minWidth: '10rem',
                           width: '100%',
                           textAlign: 'center',

@@ -19,7 +19,7 @@ const Link = ({ attributes, element, children }) => {
             {element.href}
           </a>
           <button onClick={() => removeLink(editor)}>
-            <img src={unlink} alt='' />
+            <img src={unlink} alt='' style={{ height: '15px' }} />
           </button>
         </div>
       )}

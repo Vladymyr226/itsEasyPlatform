@@ -41,56 +41,62 @@ const Prices = ({ price, groupPrice }: { price: number; groupPrice?: number }) =
 
 const CourseSidebar = ({
   price,
+  modules,
+  lessonsNum,
   groupPrice,
   rating,
 }: {
   price: number
+  modules: any
+  lessonsNum: number
   groupPrice?: number
   rating: number
 }) => {
   const [width, setWidth] = useState(0)
+  const [lessonsSum, setLessonsSum] = useState(0)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
     }
   }, [])
-
+  console.log(rating)
   return (
     <div className={s.sidebar}>
       {width >= 1200 && <Prices price={price} />}
       <p className={s.sidebarSubTitle}>Этот курс включает</p>
-      <div className={s.courseContent}>
+      {/* <div className={s.courseContent}>
         <Image src={video} alt='video' /> 22 часа видео лекций
-      </div>
-      <div className={s.courseContent}>
+      </div> */}
+      {/* <div className={s.courseContent}>
         <Image src={certificate} alt='certificate' /> Сертификат об окончании курсов
-      </div>
+      </div> */}
       <div className={s.courseContent}>
         <Image src={calendar} alt='calendar' /> Длительность курса 3 месяца
       </div>
       <div className={s.courseContent}>
-        <Image src={notes} alt='notes' /> 24 урока
+        <Image src={notes} alt='notes' />
+        {lessonsNum} урока
       </div>
       <div className={s.courseContent}>
-        <Image src={USB} alt='USB' /> 10 разделов
+        <Image src={USB} alt='USB' /> {modules && modules.length} разделов
       </div>
-      <div className={s.courseContent}>
+      {/* <div className={s.courseContent}>
         <Image src={exercises} alt='exercises' /> 42 текстовых заданий
-      </div>
-      <div className={s.courseContent}>
+      </div> */}
+      {/* <div className={s.courseContent}>
         <Image src={notebook} alt='notebook' /> 100 лекций
-      </div>
-      <div className={s.courseContent}>
+      </div> */}
+      {/* <div className={s.courseContent}>
         <Image src={watch} alt='watch' /> 38 часов консультации ментора
-      </div>
-      <div className={s.courseContent}>
+      </div> */}
+      {/* <div className={s.courseContent}>
         <Image src={time} alt='time' /> Общая продолжительность 29 ч 48 мин
-      </div>
+      </div> */}
 
       <div className={s.courseStatsWrapper}>
         <Rating rating={rating} isBig={true} />
-        <ViewsCount />
+        {/* <ViewsCount /> */}
       </div>
 
       <div className={s.divide}></div>

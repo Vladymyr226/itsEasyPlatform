@@ -124,6 +124,7 @@ const Toolbar = (props) => {
                 )
               case 'table':
                 return <TableSelector key={element.id} editor={editor} />
+
               default:
                 return null
             }

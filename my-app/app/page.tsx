@@ -59,17 +59,6 @@ export default function HomePage() {
         <PromoSlider />
 
         <h1 className={s.coursesTitle}>Курсы</h1>
-        {/* 
-        <CourseCard
-                  title={course.data.title}
-                  language={course.data.language}
-                  level={course.data.level}
-                  date={course.data.date}
-                  type={course.data.type}
-                  description={course.data.description}
-                  rating={course.data.rating}
-                  toLeft={index % 2 ? true : false}
-                /> */}
         {data &&
           data.map((course: Course, index: number) => {
             return (

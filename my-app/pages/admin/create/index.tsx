@@ -324,6 +324,7 @@ const CourseCreate = () => {
     setReDropBlock(false)
   }
   const router = useRouter()
+  console.log(modules)
   const handleSubmit = async (e: any) => {
     const json = {
       ...form,
@@ -344,7 +345,7 @@ const CourseCreate = () => {
         return tag.id
       }),
     }
-
+    console.log(json)
     try {
       if (id) {
         const response = await axios.put(url + '?id=' + id, json)
@@ -427,8 +428,24 @@ const CourseCreate = () => {
         setType(resultData[0].data.type)
         setStatus(resultData[0].data.status)
         setRating(resultData[0].data.rating)
+        console.log(resultData[0])
+        console.log(
+          resultData[0].data.modules.map((module: any) => {
+            console.log(module)
+            return module
+            // {
+            //   title: module.title,
+            //   lessons: module.lessons.map((lessonId: string) => {
+            //     const found = allLessons.filter(
+            //       (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId
+            //     )
+            //     return found[0]
+            //   }),
+            // }
+          })
+        )
         setModules(
-          result.getCourses[0].data.modules.map((module: any) => {
+          resultData[0].data.modules.map((module: any) => {
             return {
               title: module.title,
               lessons: module.lessons.map((lessonId: string) => {
@@ -440,7 +457,7 @@ const CourseCreate = () => {
             }
           })
         )
-        result.getCourses[0].data.modules.map((module: any) => {
+        resultData[0].data.modules.map((module: any) => {
           module.lessons.map((lessonId: string) => {
             allLessons = allLessons.filter(
               (moduleElemFilter: Lesson) => moduleElemFilter.id != lessonId
@@ -544,13 +561,15 @@ const CourseCreate = () => {
       Swal.fire({
         title: 'Do you want to save draft?',
         showCancelButton: true,
+        showDenyButton: true,
         confirmButtonText: 'Save and leave',
-        cancelButtonText: 'Leave and delete',
+        denyButtonText: 'Leave and delete',
       }).then(async (result) => {
         if (result.isConfirmed) {
           draftData()
           router.push(url)
-        } else {
+        }
+        if (result.isDenied) {
           localStorage.removeItem('CourseCreateForm')
           router.push(url)
         }
@@ -631,7 +650,7 @@ const CourseCreate = () => {
       // routerNext.events.off('routeChangeStart', handleBrowseAway)
     }
   }, [])
-  console.log(allModules)
+  console.log(richValue)
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
       <Box
@@ -679,7 +698,6 @@ const CourseCreate = () => {
         </Box>
         <Box
           sx={{
-            maxWidth: '900px',
             width: '100%',
             boxShadow: 2,
             borderRadius: '10px',
@@ -688,14 +706,12 @@ const CourseCreate = () => {
             borderTop: '4px solid #000',
           }}
         >
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
             <Tabs
               value={value}
               onChange={handleChange}
               aria-label='basic tabs example'
-              sx={{
-                maxWidth: '100%',
-              }}
+              sx={{}}
               TabIndicatorProps={{
                 style: {
                   backgroundColor: '#000',
@@ -706,8 +722,10 @@ const CourseCreate = () => {
                 value={0}
                 label='General'
                 sx={{
-                  width: '33%',
+                  minWidth: '33%',
+                  width: '100%',
                   color: '#000',
+
                   '&.Mui-selected': {
                     color: '#000',
                     fontWeight: 'bold',
@@ -718,7 +736,8 @@ const CourseCreate = () => {
                 value={1}
                 label='Structure'
                 sx={{
-                  width: '34%',
+                  minWidth: '34%',
+                  width: '100%',
                   color: '#000',
                   '&.Mui-selected': {
                     color: '#000',
@@ -730,7 +749,8 @@ const CourseCreate = () => {
                 value={2}
                 label={idLessonEdit ? 'Edit lesson' : 'Create lesson'}
                 sx={{
-                  width: '33%',
+                  minWidth: '33%',
+                  width: '100%',
                   color: '#000',
                   '&.Mui-selected': {
                     color: '#000',

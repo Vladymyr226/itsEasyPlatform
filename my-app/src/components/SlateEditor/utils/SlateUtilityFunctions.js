@@ -162,11 +162,14 @@ export const getBlock = (props) => {
           {children}
         </h3>
       )
-    case 'blockquote':
+    case 'codeElem':
       return (
-        <blockquote {...attributes} {...element.attr}>
-          {children}
-        </blockquote>
+        <pre {...attributes} style={{ wordWrap: 'break-word', whiteSpace: 'pre-wrap' }}>
+          <code style={{ background: '#ccc' }}>{children}</code>
+        </pre>
+        // <blockquote {...attributes} {...element.attr}>
+        //   {children}
+        // </blockquote>
       )
     case 'alignLeft':
       return (
@@ -238,6 +241,12 @@ export const getBlock = (props) => {
       return <Equation {...props} />
     case 'htmlCode':
       return <HtmlCode {...props} />
+    case 'code':
+      return (
+        <pre {...attributes}>
+          <code>{children}</code>
+        </pre>
+      )
     default:
       return (
         <div {...element.attr} {...attributes}>

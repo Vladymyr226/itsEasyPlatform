@@ -16,7 +16,7 @@ import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
-
+import { Box, Grid, Button, Typography } from '@mui/material'
 const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
 const urlLesson = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/lesson'
 interface CourseData {
@@ -40,6 +40,7 @@ interface Course {
 const CourseDetails = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Course>()
+  const [lessSum, setLessSum] = useState<number>()
   console.log(data)
   async function getPageData() {
     if (typeof window !== 'undefined') {
@@ -52,10 +53,12 @@ const CourseDetails = () => {
           },
         })
         const result = await response.json()
+        let lessonsSum = 0
         const modules = await Promise.all(
           result.data.modules.map(async (module: any) => {
             const lessons = await Promise.all(
               module.lessons.map(async (lessonId: string) => {
+                lessonsSum += 1
                 const responseLesson = await fetch(urlLesson + '/' + lessonId, {
                   headers: {
                     'Content-Type': 'application/json',
@@ -71,6 +74,8 @@ const CourseDetails = () => {
             }
           })
         )
+        setLessSum(lessonsSum)
+
         setData({ ...result, data: { ...result.data, modules: modules } })
       } else {
       }
@@ -105,7 +110,12 @@ const CourseDetails = () => {
           </div>
 
           {width < 1200 && (
-            <CourseSidebar price={data?.data.price ?? 0} rating={data?.data.price ?? 0} />
+            <CourseSidebar
+              lessonsNum={lessSum ?? 0}
+              price={data?.data.price ?? 0}
+              modules={data?.data.modules}
+              rating={data?.data.rating ?? 0}
+            />
           )}
 
           <p className={s.courseSubTitle}>
@@ -127,9 +137,9 @@ const CourseDetails = () => {
             </li>
           </ul>
           {data && (
-            <p className={s.descText}>
+            <div className={s.descText}>
               <SlateView value={data && data.data.description} />
-            </p>
+            </div>
           )}
 
           <p
@@ -182,7 +192,12 @@ const CourseDetails = () => {
 
         {width >= 1200 && (
           <div className={s.rightSide}>
-            <CourseSidebar price={data?.data.price ?? 0} rating={data?.data.price ?? 0} />
+            <CourseSidebar
+              lessonsNum={lessSum ?? 0}
+              price={data?.data.price ?? 0}
+              modules={data?.data.modules}
+              rating={data?.data.rating ?? 0}
+            />
           </div>
         )}
       </div>

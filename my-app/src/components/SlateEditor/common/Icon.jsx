@@ -16,6 +16,7 @@ import {
   MdAdd,
   MdKeyboardArrowRight,
   MdArrowForward,
+  MdOutlineCode,
 } from 'react-icons/md'
 import { BsTypeH1, BsTypeH2, BsTypeH3, BsCameraVideoFill } from 'react-icons/bs'
 import { FaSuperscript, FaSubscript } from 'react-icons/fa'
@@ -42,7 +43,7 @@ const iconList = {
   headingTwo: <BsTypeH2 size={20} />,
   headingThree: <BsTypeH3 size={20} />,
 
-  blockquote: <MdFormatQuote size={20} />,
+  codeElem: <MdOutlineCode size={20} />,
   superscript: <FaSuperscript size={15} />,
   subscript: <FaSubscript size={15} />,
   alignLeft: <MdFormatAlignLeft size={20} />,

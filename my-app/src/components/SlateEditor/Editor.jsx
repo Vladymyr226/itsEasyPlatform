@@ -62,6 +62,7 @@ const SlateEditor = (props) => {
               placeholder='Write something'
               renderElement={renderElement}
               renderLeaf={renderLeaf}
+              style={{ paddingLeft: '4px' }}
             />
           </div>
           {htmlAction.showInput && (
