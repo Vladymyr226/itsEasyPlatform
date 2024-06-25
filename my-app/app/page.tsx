@@ -36,7 +36,7 @@ export default function HomePage() {
   console.log(data)
   async function getPageData() {
     if (typeof window !== 'undefined') {
-      const response = await fetch(url + 's', {
+      const response = await fetch(url + 's?isActive=true', {
         headers: {
           'Content-Type': 'application/json',
         },

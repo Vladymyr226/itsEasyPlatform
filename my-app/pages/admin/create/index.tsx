@@ -52,10 +52,9 @@ import React from 'react'
 import YouTube, { YouTubeProps } from 'react-youtube'
 import Autocomplete from '@mui/material/Autocomplete'
 import withReactContent from 'sweetalert2-react-content'
+import { YouTubeProp, TabPanelProps, Lesson, Module, Tag } from '@/utils/interfaces'
+import * as AWS from 'aws-sdk'
 
-interface YouTubeProp {
-  url: string
-}
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
     // access to player in all event handlers via event.target
@@ -98,25 +97,6 @@ const textFieldColors = {
   // },
 }
 
-interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
-}
-interface Lesson {
-  id?: string
-  title: string
-  description: any
-  link: string
-}
-interface Module {
-  title: string
-  lessons: Array<Lesson>
-}
-interface Tag {
-  name_of_tag: string
-  id: string
-}
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props
 
@@ -348,7 +328,10 @@ const CourseCreate = () => {
     }
     try {
       if (id) {
-        const response = await axios.put(url + '?id=' + id, json)
+        const response = await axios.put(
+          url + '?id=' + id + '&isActive=' + (status == 'active' ? true : false),
+          json
+        )
         const resultResponse = response.data
         if (resultResponse) {
           Swal.fire('Changed!', '', 'success')
@@ -663,6 +646,47 @@ const CourseCreate = () => {
       })
     }
   }
+
+  // if (
+  //   !process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ||
+  //   !process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ||
+  //   !process.env.NEXT_PUBLIC_AWS_BUCKET_NAME
+  // ) {
+  //   throw new Error(
+  //     'Отсутствуют переменные окружения NEXT_PUBLIC_AWS_ACCESS_KEY_ID или NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY или NEXT_PUBLIC_AWS_BUCKET_NAME'
+  //   )
+  // }
+
+  // AWS.config.update({
+  //   accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+  //   secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+  //   region: 'eu-west-3',
+  // })
+
+  // const s3 = new AWS.S3()
+  // const uploadFileToS3 = async (file: File) => {
+  //   console.log(file)
+  //   const uploadParams = {
+  //     Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME ?? '',
+  //     Key: `${file.name}`,
+  //     Body: file,
+  //     ContentType: file.type,
+  //     ACL: 'public-read',
+  //   }
+
+  //   return new Promise((resolve, reject) => {
+  //     s3.upload(uploadParams, (err: any, data: any) => {
+  //       if (err) {
+  //         console.error('Ошибка загрузки файла:', err)
+
+  //         reject(`Ошибка загрузки файла: ${err}`)
+  //       } else {
+  //         console.log('Файл успешно загружен:', data.Location)
+  //         resolve(data.Location)
+  //       }
+  //     })
+  //   })
+  // }
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>

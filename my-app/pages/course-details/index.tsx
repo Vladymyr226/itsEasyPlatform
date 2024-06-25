@@ -111,6 +111,7 @@ const CourseDetails = () => {
 
           {width < 1200 && (
             <CourseSidebar
+              duration={data?.data.duration ?? 0}
               lessonsNum={lessSum ?? 0}
               price={data?.data.price ?? 0}
               modules={data?.data.modules}
@@ -193,6 +194,7 @@ const CourseDetails = () => {
         {width >= 1200 && (
           <div className={s.rightSide}>
             <CourseSidebar
+              duration={data?.data.duration ?? 0}
               lessonsNum={lessSum ?? 0}
               price={data?.data.price ?? 0}
               modules={data?.data.modules}

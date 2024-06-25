@@ -45,7 +45,9 @@ const CourseSidebar = ({
   lessonsNum,
   groupPrice,
   rating,
+  duration,
 }: {
+  duration: number
   price: number
   modules: any
   lessonsNum: number
@@ -72,7 +74,7 @@ const CourseSidebar = ({
         <Image src={certificate} alt='certificate' /> Сертификат об окончании курсов
       </div> */}
       <div className={s.courseContent}>
-        <Image src={calendar} alt='calendar' /> Длительность курса 3 месяца
+        <Image src={calendar} alt='calendar' /> Длительность курса {duration} месяца
       </div>
       <div className={s.courseContent}>
         <Image src={notes} alt='notes' />
