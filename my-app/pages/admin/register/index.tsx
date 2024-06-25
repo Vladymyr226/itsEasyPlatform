@@ -25,9 +25,6 @@ const AdminRegister = () => {
       setWidth(window.innerWidth)
     }
   }, [])
-
-  //  bg-dark shadow-lg p-5 rounded-lg border-t-4 border-yellow w-full max-w-[30rem]')
-  //   dropModal
   return (
     <Layout>
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>

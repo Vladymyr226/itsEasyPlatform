@@ -324,8 +324,8 @@ const CourseCreate = () => {
     setReDropBlock(false)
   }
   const router = useRouter()
-  console.log(modules)
   const handleSubmit = async (e: any) => {
+    // await uploadFileToS3(videoFile)
     const json = {
       ...form,
       description: richValue,
@@ -340,12 +340,12 @@ const CourseCreate = () => {
           }),
         }
       }),
+      status: status == 'active' ? true : false,
       rating: rating,
       category: categorySelect.map((tag) => {
         return tag.id
       }),
     }
-    console.log(json)
     try {
       if (id) {
         const response = await axios.put(url + '?id=' + id, json)
@@ -371,7 +371,6 @@ const CourseCreate = () => {
       return
     }
   }
-
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
@@ -421,12 +420,12 @@ const CourseCreate = () => {
             }
           })
         )
+        setStatus(resultData[0].data.status ? 'active' : 'draft')
         setId(resultData[0].id)
         setLanguage(resultData[0].data.language)
         setLevel(resultData[0].data.level)
         setRichValue(resultData[0].data.description)
         setType(resultData[0].data.type)
-        setStatus(resultData[0].data.status)
         setRating(resultData[0].data.rating)
         console.log(resultData[0])
         console.log(
@@ -562,7 +561,7 @@ const CourseCreate = () => {
         title: 'Do you want to save draft?',
         showCancelButton: true,
         showDenyButton: true,
-        confirmButtonText: 'Save and leave',
+        confirmButtonText: 'Save draft and leave',
         denyButtonText: 'Leave and delete',
       }).then(async (result) => {
         if (result.isConfirmed) {
@@ -586,15 +585,19 @@ const CourseCreate = () => {
       input: 'text',
       inputValue,
       preConfirm: async () => {
-        const val = Swal.getInput()?.value || ''
-        const response = await axios.post(urlTag + '?title=' + val)
-        const resultResponse = response.data
-        if (resultResponse) {
-          Swal.fire('Created!', '', 'success')
-          setAllCategorySelect([
-            ...allCategorySelect,
-            { name_of_tag: val, id: resultResponse.tagId },
-          ])
+        if (!Swal.getInput()?.value) {
+          Swal.showValidationMessage('<i class="fa fa-info-circle"></i> Tag name is required')
+        } else {
+          const val = Swal.getInput()?.value || ''
+          const response = await axios.post(urlTag + '?title=' + val)
+          const resultResponse = response.data
+          if (resultResponse) {
+            Swal.fire('Created!', '', 'success')
+            setAllCategorySelect([
+              ...allCategorySelect,
+              { name_of_tag: val, id: resultResponse.tagId },
+            ])
+          }
         }
       },
     })
@@ -650,7 +653,17 @@ const CourseCreate = () => {
       // routerNext.events.off('routeChangeStart', handleBrowseAway)
     }
   }, [])
-  console.log(richValue)
+
+  const [mediaValue, setMediaValue] = useState<{ type: string; content: File }>()
+  const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setMediaValue({
+        type: event.target.files[0].type.split('/')[0],
+        content: event.target.files[0],
+      })
+    }
+  }
+
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
       <Box
@@ -876,20 +889,13 @@ const CourseCreate = () => {
                     <MenuItem value={'with-lector'}>With lector</MenuItem>
                   </Select>
                 </Box>
-                {!id && (
-                  <Box sx={{ marginTop: 2 }}>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      fullWidth
-                      id='statusSelect'
-                      value={status}
-                      onChange={handleChangeStatus}
-                    >
-                      <MenuItem value={'active'}>Active</MenuItem>
-                      <MenuItem value={'draft'}>Draft</MenuItem>
-                    </Select>
-                  </Box>
-                )}
+                <Box sx={{ marginTop: 2 }}>
+                  <InputLabel>Status</InputLabel>
+                  <Select fullWidth id='statusSelect' value={status} onChange={handleChangeStatus}>
+                    <MenuItem value={'active'}>Active</MenuItem>
+                    <MenuItem value={'draft'}>Draft</MenuItem>
+                  </Select>
+                </Box>
                 <Box sx={{ display: 'flex', marginTop: 1 }}>
                   <Box sx={{ marginTop: 1, fontWeight: 'bold', color: '#000' }}>Rating</Box>
                   <Rating
@@ -945,6 +951,14 @@ const CourseCreate = () => {
                     </div>
                   )}
                 />
+                <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
+                  <input
+                    type='file'
+                    accept='video/mp4 image/png, image/jpeg'
+                    onChange={handlePreviewMediaChange}
+                  />
+                </Button>
+
                 <Box sx={{ display: 'flex' }}>
                   {isEdited() && (
                     <Button
@@ -957,6 +971,44 @@ const CourseCreate = () => {
                       }}
                       onClick={(e) => {
                         localStorage.removeItem('CourseCreateForm')
+                        setForm({
+                          title: '',
+                          date: '2024-01-01',
+                          duration: null,
+                          lector: '',
+                          price: null,
+                        })
+                        setLessonForm({
+                          title: '',
+                          link: '',
+                        })
+                        let selectedModulesArr: Array<Lesson> = []
+                        modules.map((module: Module) => {
+                          module.lessons.map((less: Lesson) => {
+                            selectedModulesArr.push(less)
+                          })
+                        })
+                        setAllModules([...allModules, ...selectedModulesArr])
+                        setModules([])
+
+                        setRichValue([
+                          {
+                            type: 'paragaph',
+                            children: [{ text: '' }],
+                          },
+                        ])
+                        setRichValueLesson([
+                          {
+                            type: 'paragaph',
+                            children: [{ text: '' }],
+                          },
+                        ])
+                        setLanguage('')
+                        setLevel('')
+                        setType('')
+                        setStatus('')
+                        setRating(0.0)
+                        setCategorySelect([])
                       }}
                     >
                       Clear draft
@@ -1065,6 +1117,7 @@ const CourseCreate = () => {
 
                           <AccordionDetails style={{ paddingLeft: '8px', paddingRight: '8px' }}>
                             {element.lessons.map((lesson, index) => {
+                              console.log()
                               return (
                                 <Box
                                   key={'mainModuleContainer_' + i}
@@ -1089,8 +1142,7 @@ const CourseCreate = () => {
                                   }}
                                   draggable
                                 >
-                                  <Box sx={{ fontWeight: 'bold' }}>{lesson.title}</Box>
-
+                                  <Box sx={{ fontWeight: 'bold' }}>{lesson.title ?? ''}</Box>
                                   <Box sx={{ display: 'flex', justifyContent: 'end' }}>
                                     <IconButton
                                       onClick={(e) => {

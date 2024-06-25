@@ -11,6 +11,8 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useState } from 'react'
 import axios from 'axios'
+import { setCookie } from 'cookies-next'
+
 const url = 'https://its-easy-platform-back-end.vercel.app/api/auth/register'
 
 const textFieldColors = {
@@ -55,7 +57,8 @@ const Registration = () => {
       )
       const resultResponse = response.data
       if (resultResponse) {
-        localStorage.setItem('jwt', resultResponse.token)
+        setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
+        // localStorage.setItem('jwt', resultResponse.token)
         router.push('/admin')
       }
     } catch (error) {

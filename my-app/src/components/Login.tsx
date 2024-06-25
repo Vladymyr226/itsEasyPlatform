@@ -12,6 +12,8 @@ import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import axios from 'axios'
+import { setCookie } from 'cookies-next'
+
 const textFieldColors = {
   '& label.Mui-focused': {
     color: '#ffec3e',
@@ -51,7 +53,7 @@ const Login = () => {
       const resultResponse = response.data
       if (resultResponse) {
         router.push('/admin')
-        localStorage.setItem('jwt', resultResponse.token)
+        setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
       }
     } catch (error) {}
   }
