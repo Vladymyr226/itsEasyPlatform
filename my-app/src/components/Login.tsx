@@ -13,6 +13,7 @@ import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import axios from 'axios'
 import { setCookie } from 'cookies-next'
+import Swal from 'sweetalert2'
 
 const textFieldColors = {
   '& label.Mui-focused': {
@@ -55,7 +56,9 @@ const Login = () => {
         router.push('/admin')
         setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
       }
-    } catch (error) {}
+    } catch (error) {
+      Swal.fire('Login failure!', '', 'error')
+    }
   }
 
   return (
@@ -80,7 +83,12 @@ const Login = () => {
               color: '#ffec3e',
             },
           }}
-          sx={{ ...textFieldColors }}
+          sx={{
+            ...textFieldColors,
+            '& input:-internal-autofill-selected': {
+              color: '#123',
+            },
+          }}
         />
         <TextField
           margin='normal'

@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import axios from 'axios'
 import { setCookie } from 'cookies-next'
+import Swal from 'sweetalert2'
 
 const url = 'https://its-easy-platform-back-end.vercel.app/api/auth/register'
 
@@ -48,9 +49,33 @@ const Registration = () => {
     password: '',
   })
 
+  function validateString(input: string) {
+    const trimmedInput = input.trim()
+    const pattern = /^[a-zA-Z0-9]{10,100}$/
+    const isValidLength = trimmedInput.length >= 10 && trimmedInput.length <= 100
+    const matchesPattern = pattern.test(trimmedInput)
+    return isValidLength && matchesPattern
+  }
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try {
+      if (form.userName.trim().length < 3 || form.userName.trim().length >= 32) {
+        Swal.fire('Username must be longer than 3 and shorter than 32 characters!', '', 'error')
+        return
+      }
+      if (form.email.trim().length > 40) {
+        Swal.fire('Email must be shorter than 40 characters!', '', 'error')
+        return
+      }
+      if (!validateString(form.password)) {
+        Swal.fire(
+          'Password must be at least 10 characters long and contain only digits and letters!',
+          '',
+          'error'
+        )
+        return
+      }
+
       const response = await axios.post(
         url + '?userName=' + form.userName + '&email=' + form.email + '&password=' + form.password,
         {}
@@ -58,12 +83,12 @@ const Registration = () => {
       const resultResponse = response.data
       if (resultResponse) {
         setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
-        // localStorage.setItem('jwt', resultResponse.token)
+        Swal.fire('You signed up successfully!', '', 'success')
         router.push('/admin')
       }
     } catch (error) {
       alert(error)
-      console.error(error)
+      Swal.fire('Sign up failure!', '', 'error')
       return
     }
   }

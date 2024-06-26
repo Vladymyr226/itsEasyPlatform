@@ -216,7 +216,9 @@ const AdminTable = () => {
                           paddingBottom: 1,
                         }}
                       >
-                        {element.created_at}
+                        {new Date(element.created_at).toLocaleDateString() +
+                          ' , ' +
+                          new Date(element.created_at).toLocaleTimeString()}
                       </Box>
                     </Box>
                   </div>

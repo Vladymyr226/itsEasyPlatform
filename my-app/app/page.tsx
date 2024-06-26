@@ -78,10 +78,6 @@ export default function HomePage() {
             )
           })}
 
-        {/* <CourseCard />
-        <CourseCard toLeft={true} />
-        <CourseCard /> */}
-
         {width >= 1200 ? (
           <button className={s.loadMoreButton}>
             Смотреть ещё курсы <Image src={plus} alt='plus' />

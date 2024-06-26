@@ -24,6 +24,8 @@ import EditIcon from '@mui/icons-material/Edit'
 import Link from 'next/link'
 import axios from 'axios'
 import Swal from 'sweetalert2'
+import { deleteCookie } from 'cookies-next'
+
 const tableColumn = {
   minWidth: '10rem',
   width: '100%',
@@ -127,9 +129,23 @@ const AdminTable = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
+    <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
+        <Link href={'/admin'}>
+          <Button
+            variant='contained'
+            color='error'
+            onClick={() => {
+              deleteCookie('jwt')
+            }}
+          >
+            Logout
+          </Button>
+        </Link>
+      </Box>
       <Box
         sx={{
+          marginTop: 8,
           paddingLeft: '2rem',
           paddingRight: '2rem',
           width: '100%',

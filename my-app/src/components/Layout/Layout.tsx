@@ -64,7 +64,12 @@ const Layout = ({ children }: LayoutProps) => {
         <div className={s.upperFooter}>
           <Logo />
 
-          <div className={s.footerInfo}>
+          <div
+            className={s.footerInfo}
+            style={{
+              minWidth: '80%',
+            }}
+          >
             <div className={s.footerInfoCard}>
               <p className={s.footerInfoTitle}>Направления</p>
               <div className={s.listWrapper}>
@@ -83,7 +88,7 @@ const Layout = ({ children }: LayoutProps) => {
             </div>
 
             <div className={s.footerInfoCard}>
-              <p className={s.footerInfoTitle}>Служба поддержки</p>
+              <p className={s.footerInfoTitle}>Служба_поддержки</p>
               <ul className={s.footerInfoList}>
                 <li className={s.footerInfoItem}>Связаться с отделом продаж</li>
                 <li className={s.footerInfoItem}>Получить помощь</li>
