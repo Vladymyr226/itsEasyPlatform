@@ -623,6 +623,7 @@ const CourseCreate = () => {
           const resultResponse = response.data
           if (resultResponse) {
             Swal.fire('Created!', '', 'success')
+            setEditTrigger(true)
             setAllCategorySelect([
               ...allCategorySelect,
               { name_of_tag: val, id: resultResponse.tagId },
@@ -1003,6 +1004,7 @@ const CourseCreate = () => {
                     precision={0.1}
                     onChange={(event, newValue) => {
                       setRating(newValue ?? 5.0)
+                      setEditTrigger(true)
                     }}
                     value={rating || 0}
                     sx={{
@@ -1018,7 +1020,10 @@ const CourseCreate = () => {
                   multiple
                   id='combo-box-demo'
                   value={categorySelect}
-                  onChange={(event, value: any) => setCategorySelect(value)}
+                  onChange={(event, value: any) => {
+                    setCategorySelect(value)
+                    setEditTrigger(true)
+                  }}
                   getOptionLabel={(option: any) => option.name_of_tag}
                   options={allCategorySelect}
                   fullWidth
@@ -1098,7 +1103,6 @@ const CourseCreate = () => {
                         marginRight: 2,
                       }}
                       onClick={(e) => {
-                        localStorage.removeItem('CourseCreateForm')
                         setForm({
                           title: '',
                           date: '2024-01-01',
@@ -1198,6 +1202,7 @@ const CourseCreate = () => {
                                 name={'module' + i}
                                 autoFocus
                                 onChange={(e) => {
+                                  setEditTrigger(true)
                                   setModules(
                                     modules.map((module, moduleIndex) => {
                                       if (i == moduleIndex) {
@@ -1221,6 +1226,7 @@ const CourseCreate = () => {
                                   marginRight: 4,
                                 }}
                                 onClick={(e) => {
+                                  setEditTrigger(true)
                                   setModules(
                                     modules.filter((moduleElem, index) => {
                                       if (i !== index) {
@@ -1251,6 +1257,7 @@ const CourseCreate = () => {
                                     <TextField {...params} label='Stored lessons' />
                                   )}
                                   onChange={(event, value: any) => {
+                                    setEditTrigger(true)
                                     setModules(
                                       modules.map((modulesElem, index) => {
                                         if (
@@ -1364,6 +1371,7 @@ const CourseCreate = () => {
                                     </IconButton>
                                     <IconButton
                                       onClick={async (e) => {
+                                        setEditTrigger(true)
                                         setStoredModules([...storedModules, lesson])
                                         setModules(
                                           modules.map((elem, index) => {
@@ -1425,7 +1433,7 @@ const CourseCreate = () => {
                                   setValue(2)
                                 }}
                               >
-                                {createLessonIndx === i ? 'Cancel' : 'Create lesson'}
+                                Create lesson
                               </Button>
                             </Box>
                           </AccordionDetails>
@@ -1510,6 +1518,7 @@ const CourseCreate = () => {
                       return
                     }
                     try {
+                      setEditTrigger(true)
                       if (idLessonEdit) {
                         let found = false
                         storedModules.map((less) => {
