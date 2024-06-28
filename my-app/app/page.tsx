@@ -23,6 +23,11 @@ interface CourseData {
   lector: string
   modules: any
   price: number
+  mediaValue: mediaDataValue
+}
+interface mediaDataValue {
+  type: string
+  content: string
 }
 interface Course {
   id: string
@@ -42,6 +47,7 @@ export default function HomePage() {
         },
       })
       const result = await response.json()
+      console.log(result)
       setData(result.getCourses)
     }
   }
@@ -73,6 +79,7 @@ export default function HomePage() {
                   rating={course.data.rating}
                   toLeft={index % 2 == 1 ? true : false}
                   id={course.id}
+                  mediaValue={course.data.mediaValue}
                 />
               </>
             )

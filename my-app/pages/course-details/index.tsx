@@ -2,13 +2,15 @@
 import s from './CourseDetails.module.css'
 import courseImage from '../../src/assets/courseImage.png'
 import skillsImage from '../../src/assets/skillsImage.png'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Comments from '@/components/Comments/Comments'
 import CourseControlls from '@/components/CourseControlls/CourseControlls'
 import CourseMaterials from '@/components/CourseMaterials/CourseMaterials'
 import CourseSidebar from '@/components/CourseSidebar/CourseSidebar'
 import PlayButton from '@/components/PlayButton/PlayButton'
+import { PauseButton } from '@/components/PlayButton/PlayButton'
+
 import PopularCourses from '@/components/PopularCourses/PopularCourses'
 import Rating from '@/components/Rating/Rating'
 import SkillsList from '@/components/SkillsList/SkillsList'
@@ -31,6 +33,7 @@ interface CourseData {
   lector: string
   modules: any
   price: number
+  mediaValue: any
 }
 interface Course {
   id: string
@@ -81,6 +84,9 @@ const CourseDetails = () => {
       }
     }
   }
+  const [play, setPlay] = useState(false)
+  const videoRef = useRef(null)
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
@@ -101,12 +107,38 @@ const CourseDetails = () => {
           </div>
 
           <div className={s.courseImageWrapper}>
-            <Image className={s.courseImage} src={courseImage} alt='course' />
-            <PlayButton />
-            <div className={s.courseStatsWrapper}>
-              {data && <Rating rating={data?.data.rating} />}
-              <ViewsCount />
-            </div>
+            {typeof data?.data.mediaValue?.content == 'string' && (
+              <>
+                {data?.data.mediaValue.type == 'image' ? (
+                  <>
+                    <img
+                      className={s.courseImage}
+                      src={data?.data.mediaValue.content}
+                      alt='course'
+                    />
+                    {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
+                    <div className={s.courseStatsWrapper}>
+                      {data && <Rating rating={data?.data.rating} />}
+                      <ViewsCount />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <video
+                      ref={videoRef}
+                      src={data?.data.mediaValue.content}
+                      style={{ width: '100%' }}
+                    />
+                    {!play && <PlayButton onClickPlay={setPlay} videoRef={videoRef} />}
+                    {play && <PauseButton onClickPlay={setPlay} videoRef={videoRef} />}
+                    <div className={s.courseStatsWrapper}>
+                      {data && <Rating rating={data?.data.rating} />}
+                      <ViewsCount />
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
 
           {width < 1200 && (
@@ -162,7 +194,7 @@ const CourseDetails = () => {
             className={s.courseImageWrapper}
           >
             <Image className={s.courseImage} src={skillsImage} alt='skills' />
-            <PlayButton />
+            {/* <PlayButton /> */}
           </div>
 
           <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>

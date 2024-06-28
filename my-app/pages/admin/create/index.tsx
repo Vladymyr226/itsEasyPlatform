@@ -56,6 +56,7 @@ import { YouTubeProp, TabPanelProps, Lesson, Module, Tag } from '@/utils/interfa
 import ArchiveIcon from '@mui/icons-material/Archive'
 import * as AWS from 'aws-sdk'
 import { isEqual } from 'lodash-es'
+import { deleteCookie } from 'cookies-next'
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
@@ -183,6 +184,7 @@ const CourseCreate = () => {
     price: null,
   })
   const [fetchedData, setFetchedData] = useState<any>()
+  const [fetchedMediaData, setFetchedMediaData] = useState<any>()
 
   const [rating, setRating] = useState(0.0)
   const [richValue, setRichValue] = useState<Array<any>>([
@@ -317,26 +319,14 @@ const CourseCreate = () => {
     setReDropBlock(false)
   }
   const router = useRouter()
+
   const handleSubmit = async (e: any) => {
     // await uploadFileToS3(videoFile)
-    if (mediaValue?.content) {
-      console.log(mediaValue?.content)
-      const result = await uploadFileToS3(mediaValue?.content)
-      console.log(result)
-    }
 
-    return
     if (id && !editTrigger) {
       router.push('/admin')
       return
     }
-    console.log(
-      modules.filter((elem) => {
-        if (countModuleNameMeet(elem.title) > 1) {
-          return 'Error'
-        }
-      }).length
-    )
     if (
       modules.filter((elem) => {
         if (countModuleNameMeet(elem.title) > 1) {
@@ -349,6 +339,15 @@ const CourseCreate = () => {
     }
     const json = {
       ...form,
+      mediaValue: {
+        type: mediaValue?.type,
+        content:
+          typeof mediaValue?.content === 'string'
+            ? mediaValue?.content
+            : mediaValue
+            ? await uploadFileToS3(mediaValue.content)
+            : null,
+      },
       description: richValue,
       language: language,
       level: level,
@@ -367,7 +366,6 @@ const CourseCreate = () => {
         return tag.id
       }),
     }
-    console.log(json)
     try {
       if (id) {
         const response = await axios.put(
@@ -437,6 +435,12 @@ const CourseCreate = () => {
             link: lesson.data.link,
           }
         })
+        if (resultData[0].data.mediaValue) {
+          setMediaValue({
+            type: resultData[0].data.mediaValue.type,
+            content: resultData[0].data.mediaValue.content,
+          })
+        }
 
         setCategorySelect(
           resultTag.getTags.filter((tag: any) => {
@@ -446,6 +450,7 @@ const CourseCreate = () => {
           })
         )
         setFetchedData(resultData[0].data.description)
+        setFetchedMediaData(resultData[0].data.mediaValue)
         setStatus(resultData[0].data.status ? 'active' : 'draft')
         setId(resultData[0].id)
         setLanguage(resultData[0].data.language)
@@ -627,22 +632,6 @@ const CourseCreate = () => {
       },
     })
   }
-  const draftData = () => {
-    // localStorage.setItem(
-    //   'CourseCreateForm',
-    //   JSON.stringify({
-    //     form: form,
-    //     description: richValue,
-    //     modules: modules,
-    //     language: language,
-    //     level: level,
-    //     type: type,
-    //     status: status,
-    //     rating: rating,
-    //     categorySelect: categorySelect,
-    //   })
-    // )
-  }
 
   function isEdited() {
     return (
@@ -662,9 +651,11 @@ const CourseCreate = () => {
           type: 'paragaph',
           children: [{ text: '' }],
         },
-      ])
+      ]) ||
+      !isEqual(mediaValue, fetchedMediaData)
     )
   }
+
   useEffect(() => {
     getPageData()
     function handleOnBeforeUnload(e: BeforeUnloadEvent) {
@@ -688,6 +679,7 @@ const CourseCreate = () => {
   const [mediaValue, setMediaValue] = useState<{ type: string; content: File }>()
   const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
+      setEditTrigger(true)
       setMediaValue({
         type: event.target.files[0].type.split('/')[0],
         content: event.target.files[0],
@@ -713,7 +705,6 @@ const CourseCreate = () => {
 
   const s3 = new AWS.S3()
   const uploadFileToS3 = async (file: File) => {
-    console.log(file)
     const uploadParams = {
       Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME ?? '',
       Key: `${file.name}`,
@@ -721,8 +712,6 @@ const CourseCreate = () => {
       ContentType: file.type,
       ACL: 'public-read',
     }
-    console.log(uploadParams)
-
     return new Promise((resolve, reject) => {
       s3.upload(uploadParams, (err: any, data: any) => {
         if (err) {
@@ -763,8 +752,23 @@ const CourseCreate = () => {
 
     return result.length
   }
+  console.log(fetchedMediaData)
+  console.log(!isEqual(mediaValue, fetchedMediaData))
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
+        <Link href={'/admin'}>
+          <Button
+            variant='contained'
+            color='error'
+            onClick={() => {
+              deleteCookie('jwt')
+            }}
+          >
+            Logout
+          </Button>
+        </Link>
+      </Box>
       <Box
         sx={{
           paddingLeft: '2rem',
@@ -1048,13 +1052,40 @@ const CourseCreate = () => {
                   )}
                 />
                 <Button onClick={showSwal}>Create Tag</Button>
-                <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
-                  <input
-                    type='file'
-                    accept='video/mp4, image/png, image/jpeg'
-                    onChange={handlePreviewMediaChange}
-                  />
-                </Button>
+                {typeof mediaValue?.content == 'string' && (
+                  <>
+                    {mediaValue.type == 'image' ? (
+                      <>
+                        <img src={mediaValue?.content} />
+                      </>
+                    ) : (
+                      <>
+                        <video controls src={mediaValue?.content} style={{ width: '100%' }} />
+                      </>
+                    )}
+                  </>
+                )}
+                <Box sx={{ display: 'flex' }}>
+                  <Button
+                    variant='contained'
+                    component='label'
+                    onClick={() => {
+                      setEditTrigger(true)
+                      setMediaValue(undefined)
+                    }}
+                    sx={{ mt: 1, mr: 1 }}
+                  >
+                    Remove
+                  </Button>
+
+                  <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
+                    <input
+                      type='file'
+                      accept='video/mp4, image/png, image/jpeg'
+                      onChange={handlePreviewMediaChange}
+                    />
+                  </Button>
+                </Box>
 
                 <Box sx={{ display: 'flex' }}>
                   {isEdited() && (

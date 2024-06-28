@@ -15,6 +15,7 @@ interface CourseDescriptionProps {
   description: any
   rating: number
   id: string
+  mediaValue: any
 }
 const CourseDescription = (props: CourseDescriptionProps) => {
   const [width, setWidth] = useState(0)
@@ -61,7 +62,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
         </li>
       </ul>
 
-      {width < 1200 && <CourseImage rating={props.rating} />}
+      {width < 1200 && <CourseImage mediaValue={props.mediaValue} rating={props.rating} />}
 
       <p
         className={s.descText}

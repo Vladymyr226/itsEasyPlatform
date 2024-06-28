@@ -13,6 +13,7 @@ interface CourseCardProps {
   rating: number
   toLeft: boolean
   id: string
+  mediaValue: any
 }
 const CourseCard = (props: CourseCardProps) => {
   const [width, setWidth] = useState(0)
@@ -36,9 +37,10 @@ const CourseCard = (props: CourseCardProps) => {
         description={props.description}
         rating={props.rating}
         id={props.id}
+        mediaValue={props.mediaValue}
       />
 
-      {width >= 1200 && <CourseImage rating={props.rating} />}
+      {width >= 1200 && <CourseImage mediaValue={props.mediaValue} rating={props.rating} />}
     </div>
   )
 }

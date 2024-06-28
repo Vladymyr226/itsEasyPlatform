@@ -20,6 +20,7 @@ import IconButton from '@mui/material/IconButton'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Link from 'next/link'
+import { deleteCookie } from 'cookies-next'
 const tableColumn = {
   minWidth: '10rem',
   width: '100%',
@@ -88,6 +89,19 @@ const AdminTable = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
+        <Link href={'/admin'}>
+          <Button
+            variant='contained'
+            color='error'
+            onClick={() => {
+              deleteCookie('jwt')
+            }}
+          >
+            Logout
+          </Button>
+        </Link>
+      </Box>
       <Box
         sx={{
           paddingLeft: '2rem',
