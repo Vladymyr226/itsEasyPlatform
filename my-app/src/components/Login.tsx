@@ -1,15 +1,9 @@
-import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import axios from 'axios'
 import { setCookie } from 'cookies-next'
@@ -34,13 +28,7 @@ const textFieldColors = {
     borderColor: '#fff',
   },
 }
-const theme = createTheme()
-
-function cleanInputs() {
-  const tmp = (document.getElementById('formSignIn') as HTMLFormElement).reset()
-}
-
-const url = 'https://its-easy-platform-back-end.vercel.app/api/auth/login?'
+const url = `${process.env.NEXT_BACK_HOST_API}/auth/login?`
 
 const Login = () => {
   const router = useRouter()

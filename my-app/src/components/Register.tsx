@@ -1,12 +1,8 @@
-import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { createTheme } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -14,7 +10,7 @@ import axios from 'axios'
 import { setCookie } from 'cookies-next'
 import Swal from 'sweetalert2'
 
-const url = 'https://its-easy-platform-back-end.vercel.app/api/auth/register'
+const url = `${process.env.NEXT_BACK_HOST_API}/auth/register`
 
 const textFieldColors = {
   '& label.Mui-focused': {
@@ -35,12 +31,6 @@ const textFieldColors = {
     borderColor: '#fff',
   },
 }
-const theme = createTheme()
-
-function cleanInputs() {
-  const tmp = (document.getElementById('formSignIn') as HTMLFormElement).reset()
-}
-
 const Registration = () => {
   const router = useRouter()
   const [form, setForm] = useState({

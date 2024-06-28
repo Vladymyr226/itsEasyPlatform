@@ -10,7 +10,7 @@ import plus from '../src/assets/plus.svg'
 import loadMoreButton from '../src/assets/loadMoreButton.png'
 import Layout from '@/components/Layout/Layout'
 import './globals.css'
-const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
+const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 interface CourseData {
   title: string
   language: string
@@ -38,7 +38,6 @@ export default function HomePage() {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Array<Course>>()
 
-  console.log(data)
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const response = await fetch(url + 's?isActive=true', {
@@ -51,7 +50,6 @@ export default function HomePage() {
       setData(result.getCourses)
     }
   }
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)

@@ -1,26 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import Comments from '@/components/Comments/Comments'
-import CourseControlls from '@/components/CourseControlls/CourseControlls'
-import CourseMaterials from '@/components/CourseMaterials/CourseMaterials'
-import CourseSidebar from '@/components/CourseSidebar/CourseSidebar'
-import PlayButton from '@/components/PlayButton/PlayButton'
-import PopularCourses from '@/components/PopularCourses/PopularCourses'
-import Rating from '@/components/Rating/Rating'
-import SkillsList from '@/components/SkillsList/SkillsList'
-import ViewsCount from '@/components/ViewsCount/ViewsCount'
-import Layout from '@/components/Layout/Layout'
-import '../../../app/globals.css'
 import { Box, Button, Typography } from '@mui/material'
 import LinearProgress from '@mui/material/LinearProgress'
-
-import IconButton from '@mui/material/IconButton'
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
 import Link from 'next/link'
 import { deleteCookie } from 'cookies-next'
+import '../../../app/globals.css'
+
 const tableColumn = {
   minWidth: '10rem',
   width: '100%',
@@ -28,14 +14,7 @@ const tableColumn = {
   fontWeight: 'bold',
   background: '#cccccc',
 }
-const tableElement = {
-  minWidth: '10rem',
-  width: '100%',
-  textAlign: 'center',
-  fontWeight: 'bold',
-  background: '#ffec3e',
-}
-const url = 'https://its-easy-platform-back-end.vercel.app/api/auth/users'
+const url = `${process.env.NEXT_BACK_HOST_API}/auth/users`
 
 const TableColumns = () => {
   return (
@@ -65,8 +44,6 @@ const TableColumns = () => {
   )
 }
 const AdminTable = () => {
-  const [width, setWidth] = useState(0)
-
   const [data, setData] = useState<Array<any>>()
   async function getPageData() {
     if (typeof window !== 'undefined') {
@@ -82,7 +59,6 @@ const AdminTable = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setWidth(window.innerWidth)
       getPageData()
     }
   }, [])
@@ -178,7 +154,7 @@ const AdminTable = () => {
             {data ? (
               data.map((element) => {
                 return (
-                  <div key={'MainelementContainer'}>
+                  <div key={'MainelementContainerUsers'}>
                     <Box
                       key={'rowDividerWide_'}
                       sx={{

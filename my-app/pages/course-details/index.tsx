@@ -1,6 +1,5 @@
 'use client'
 import s from './CourseDetails.module.css'
-import courseImage from '../../src/assets/courseImage.png'
 import skillsImage from '../../src/assets/skillsImage.png'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
@@ -18,9 +17,10 @@ import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
-import { Box, Grid, Button, Typography } from '@mui/material'
-const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
-const urlLesson = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/lesson'
+
+const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
+const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
+
 interface CourseData {
   title: string
   language: string
@@ -44,7 +44,9 @@ const CourseDetails = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Course>()
   const [lessSum, setLessSum] = useState<number>()
-  console.log(data)
+  const [play, setPlay] = useState(false)
+  const videoRef = useRef(null)
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
@@ -84,8 +86,6 @@ const CourseDetails = () => {
       }
     }
   }
-  const [play, setPlay] = useState(false)
-  const videoRef = useRef(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

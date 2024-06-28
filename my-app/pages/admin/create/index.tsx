@@ -76,9 +76,9 @@ function ExampleYouTube(props: YouTubeProp) {
   return <YouTube videoId={props.url} opts={opts} onReady={onPlayerReady} />
 }
 
-const url = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/course'
-const urlLesson = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/lesson'
-const urlTag = 'https://its-easy-platform-back-end.vercel.app/api/cabinet/tag'
+const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
+const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
+const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 
 const textFieldColors = {
   // '& label.Mui-focused': {
@@ -117,26 +117,54 @@ function CustomTabPanel(props: TabPanelProps) {
 }
 
 const CourseCreate = () => {
-  const [width, setWidth] = useState(0)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setWidth(window.innerWidth)
-    }
-  }, [])
-
-  //  bg-dark shadow-lg p-5 rounded-lg border-t-4 border-yellow w-full max-w-[30rem]')
-  //   dropModal
+  const router = useRouter()
+  // States
+  const [createLessonIndx, setCreateLessonIndx] = useState(-1)
   const [id, setId] = useState()
   const [idLessonEdit, setIdLessonEdit] = useState<string | null>(null)
   const [value, setValue] = useState(0)
-  const [imageUrl, setImageUrl] = useState('')
-
   const [language, setLanguage] = useState('')
   const [level, setLevel] = useState('')
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
+  const [modules, setModules] = useState<Array<Module>>([])
+  const [allModules, setAllModules] = useState<Array<Lesson>>([])
+  const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
+  const [expanded, setExpanded] = useState<string | false>(false)
+  const [reDropBlock, setReDropBlock] = useState(false)
+  const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
+  const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
+  const [form, setForm] = useState<any>({
+    title: '',
+    date: '2024-01-01',
+    duration: null,
+    lector: '',
+    price: null,
+  })
+  const [fetchedData, setFetchedData] = useState<any>()
+  const [fetchedMediaData, setFetchedMediaData] = useState<any>()
+  const [rating, setRating] = useState(0.0)
+  const [richValue, setRichValue] = useState<Array<any>>([
+    {
+      type: 'paragaph',
+      children: [{ text: '' }],
+    },
+  ])
+  const [richValueLesson, setRichValueLesson] = useState([
+    {
+      type: 'paragaph',
+      children: [{ text: '' }],
+    },
+  ])
+  const [lessonForm, setLessonForm] = useState({
+    title: '',
+    link: '',
+  })
+  const [preview, setPreview] = useState('-1')
+  const [editTrigger, setEditTrigger] = useState(false)
+  const [mediaValue, setMediaValue] = useState<{ type: string; content: File }>()
 
+  // Handlers
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setIdLessonEdit(null)
     setLessonForm({
@@ -167,162 +195,20 @@ const CourseCreate = () => {
     setEditTrigger(true)
     setStatus(event.target.value as string)
   }
-
-  const [modules, setModules] = useState<Array<Module>>([])
-  const [allModules, setAllModules] = useState<Array<Lesson>>([])
-  const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
-  const [expanded, setExpanded] = useState<string | false>(false)
-  const [expandedStored, setExpandedStored] = useState<string | false>(false)
-  const [reDropBlock, setReDropBlock] = useState(false)
-  const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
-  const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
-  const [form, setForm] = useState<any>({
-    title: '',
-    date: '2024-01-01',
-    duration: null,
-    lector: '',
-    price: null,
-  })
-  const [fetchedData, setFetchedData] = useState<any>()
-  const [fetchedMediaData, setFetchedMediaData] = useState<any>()
-
-  const [rating, setRating] = useState(0.0)
-  const [richValue, setRichValue] = useState<Array<any>>([
-    {
-      type: 'paragaph',
-      children: [{ text: '' }],
-    },
-  ])
-  const [richValueLesson, setRichValueLesson] = useState([
-    {
-      type: 'paragaph',
-      children: [{ text: '' }],
-    },
-  ])
-  const [lessonForm, setLessonForm] = useState({
-    title: '',
-    link: '',
-  })
-  const [preview, setPreview] = useState('-1')
-  const [editTrigger, setEditTrigger] = useState(false)
-
   const handleChangeExpanded =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false)
     }
-
-  const handleChangeExpandedStored =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpandedStored(isExpanded ? panel : false)
-    }
-
-  const handleOnDragOver = (e: any) => {
-    e.preventDefault()
-    setReDropBlock(false)
-  }
-  const handleOnDropDel = (e: any) => {
-    const delField = JSON.parse(e.dataTransfer.getData('ID'))
-
-    if (!delField.stored) {
-      console.log(delField)
-      setModules(
-        modules.map((elem, index) => {
-          if (delField.moduleI === index) {
-            return {
-              title: elem.title,
-              lessons: elem.lessons.filter((lesson, lessonIndex) => {
-                if (lessonIndex !== delField._i) {
-                  return lesson
-                }
-                setAllModules([...allModules, lesson])
-              }),
-            }
-          }
-          return elem
-        })
-      )
-    } else {
-      setStoredModules(
-        storedModules.filter((elem, index) => {
-          if (delField._i !== index) {
-            return elem
-          }
-          setAllModules([...allModules, elem])
-        })
-      )
+  const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setEditTrigger(true)
+      setMediaValue({
+        type: event.target.files[0].type.split('/')[0],
+        content: event.target.files[0],
+      })
     }
   }
-  const handleOnDrop = (e: any, i: number) => {
-    if (!reDropBlock) {
-      if (!JSON.parse(e.dataTransfer.getData('ID')).stored) {
-        setModules(
-          modules.map((modulesElem, index) => {
-            if (
-              index == i &&
-              modulesElem.lessons.filter(
-                (reDropElem) => reDropElem.id === JSON.parse(e.dataTransfer.getData('ID')).id
-              ).length === 0
-            ) {
-              setAllModules(
-                allModules.filter(
-                  (allModulesElem, modulesIndex) =>
-                    modulesIndex != JSON.parse(e.dataTransfer.getData('ID'))._i
-                )
-              )
-              return {
-                title: modulesElem.title,
-                lessons: [
-                  ...modulesElem.lessons,
-                  {
-                    id: JSON.parse(e.dataTransfer.getData('ID')).id,
-                    title: JSON.parse(e.dataTransfer.getData('ID')).title,
-                    description: JSON.parse(e.dataTransfer.getData('ID')).description,
-                    link: JSON.parse(e.dataTransfer.getData('ID')).link,
-                    fields: JSON.parse(e.dataTransfer.getData('ID')).fields,
-                  },
-                ],
-              }
-            }
-            return modulesElem
-          })
-        )
-      } else {
-        setModules(
-          modules.map((modulesElem, index) => {
-            if (index == i) {
-              setStoredModules(
-                storedModules.filter(
-                  (allModulesElem, modulesIndex) =>
-                    modulesIndex != JSON.parse(e.dataTransfer.getData('ID'))._i
-                )
-              )
-              return {
-                title: modulesElem.title,
-                lessons: [
-                  ...modulesElem.lessons,
-                  {
-                    id: JSON.parse(e.dataTransfer.getData('ID')).id,
-                    title: JSON.parse(e.dataTransfer.getData('ID')).title,
-                    description: JSON.parse(e.dataTransfer.getData('ID')).description,
-                    link: JSON.parse(e.dataTransfer.getData('ID')).link,
-                    fields: JSON.parse(e.dataTransfer.getData('ID')).fields,
-                  },
-                ],
-              }
-            }
-            return modulesElem
-          })
-        )
-      }
-    }
-
-    setReDropBlock(false)
-  }
-  const router = useRouter()
-
   const handleSubmit = async (e: any) => {
-    // await uploadFileToS3(videoFile)
-
     if (id && !editTrigger) {
       router.push('/admin')
       return
@@ -394,6 +280,53 @@ const CourseCreate = () => {
       return
     }
   }
+
+  // sweet alert functions
+  function showPushAction(url: string) {
+    if (id ? editTrigger : isEdited()) {
+      Swal.fire({
+        title: 'Do you want to save changes?',
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'Save',
+        denyButtonText: 'Forget',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          handleSubmit('')
+        }
+        if (result.isDenied) {
+          localStorage.removeItem('CourseCreateForm')
+          router.push(url)
+        }
+      })
+    } else {
+      router.push(url)
+    }
+  }
+  const showSwal = () => {
+    withReactContent(Swal).fire({
+      title: 'Create tag',
+      input: 'text',
+      preConfirm: async () => {
+        if (!Swal.getInput()?.value.trim()) {
+          Swal.showValidationMessage('<i class="fa fa-info-circle"></i> Tag name is required')
+        } else {
+          const val = Swal.getInput()?.value.trim() || ''
+          const response = await axios.post(urlTag + '?title=' + val)
+          const resultResponse = response.data
+          if (resultResponse) {
+            Swal.fire('Created!', '', 'success')
+            setEditTrigger(true)
+            setAllCategorySelect([
+              ...allCategorySelect,
+              { name_of_tag: val, id: resultResponse.tagId },
+            ])
+          }
+        }
+      },
+    })
+  }
+  // fetching functions
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
@@ -568,126 +501,19 @@ const CourseCreate = () => {
       }
     }
   }
-  function showDeleteAlert() {
-    Swal.fire({
-      title: 'Do you want to delete the course?',
-
-      showCancelButton: true,
-      confirmButtonText: 'Delete',
-      confirmButtonColor: '#d8342c',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const response = await axios.delete(url + '?id=' + id)
-        const resultResponse = response.data
-        if (resultResponse) {
-          Swal.fire('Deleted!', '', 'success')
-          router.push('/admin')
-        }
-      }
-    })
-  }
-  function showPushAction(url: string) {
-    if (id ? editTrigger : isEdited()) {
-      Swal.fire({
-        title: 'Do you want to save changes?',
-        showCancelButton: true,
-        showDenyButton: true,
-        confirmButtonText: 'Save',
-        denyButtonText: 'Forget',
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          handleSubmit('')
-        }
-        if (result.isDenied) {
-          localStorage.removeItem('CourseCreateForm')
-          router.push(url)
-        }
-      })
-    } else {
-      router.push(url)
-    }
-  }
-
-  const [inputValue, setInputValue] = useState('')
-  const showSwal = () => {
-    withReactContent(Swal).fire({
-      title: 'Create tag',
-      input: 'text',
-      inputValue,
-      preConfirm: async () => {
-        if (!Swal.getInput()?.value.trim()) {
-          Swal.showValidationMessage('<i class="fa fa-info-circle"></i> Tag name is required')
-        } else {
-          const val = Swal.getInput()?.value.trim() || ''
-          const response = await axios.post(urlTag + '?title=' + val)
-          const resultResponse = response.data
-          if (resultResponse) {
-            Swal.fire('Created!', '', 'success')
-            setEditTrigger(true)
-            setAllCategorySelect([
-              ...allCategorySelect,
-              { name_of_tag: val, id: resultResponse.tagId },
-            ])
-          }
-        }
-      },
-    })
-  }
-
-  function isEdited() {
-    return (
-      form.title != '' ||
-      form.date != '2024-01-01' ||
-      form.duration != undefined ||
-      form.lector != '' ||
-      form.price != undefined ||
-      modules.length != 0 ||
-      language != '' ||
-      level != '' ||
-      type != '' ||
-      status != '' ||
-      rating != 0.0 ||
-      !compareRichTexts(richValue, [
-        {
-          type: 'paragaph',
-          children: [{ text: '' }],
-        },
-      ]) ||
-      !isEqual(mediaValue, fetchedMediaData)
-    )
-  }
-
   useEffect(() => {
     getPageData()
     function handleOnBeforeUnload(e: BeforeUnloadEvent) {
       e.preventDefault()
       return (e.returnValue = '')
     }
-    // const handleBrowseAway = () => {
-    //   if (!true) return
-    //   if (window.confirm('You will lose the data')) return
-    //   routerNext.events.emit('routeChangeError')
-    //   throw 'routeChange aborted.'
-    // }
     window.addEventListener('beforeunload', handleOnBeforeUnload, { capture: true })
-    // routerNext.events.on('routeChangeStart', handleBrowseAway)
     return () => {
       window.removeEventListener('beforeunload', handleOnBeforeUnload, { capture: true })
-      // routerNext.events.off('routeChangeStart', handleBrowseAway)
     }
   }, [])
 
-  const [mediaValue, setMediaValue] = useState<{ type: string; content: File }>()
-  const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setEditTrigger(true)
-      setMediaValue({
-        type: event.target.files[0].type.split('/')[0],
-        content: event.target.files[0],
-      })
-    }
-  }
-
+  // AWS module
   if (
     !process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ||
     !process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ||
@@ -727,7 +553,7 @@ const CourseCreate = () => {
     })
   }
 
-  const [createLessonIndx, setCreateLessonIndx] = useState(-1)
+  // comparing functions
   function compareIsLessonEdited(lessonId: string, moduleI: number) {
     const lessonToCompare = modules[moduleI].lessons.filter((less) => less.id == lessonId)
     return (
@@ -736,7 +562,6 @@ const CourseCreate = () => {
       compareRichTexts(richValueLesson, lessonToCompare[0].description)
     )
   }
-
   function compareRichTexts(first: Array<any>, second: Array<any>) {
     let result = first.length == second.length
     if (result) {
@@ -753,8 +578,29 @@ const CourseCreate = () => {
 
     return result.length
   }
-  console.log(fetchedMediaData)
-  console.log(!isEqual(mediaValue, fetchedMediaData))
+  function isEdited() {
+    return (
+      form.title != '' ||
+      form.date != '2024-01-01' ||
+      form.duration != undefined ||
+      form.lector != '' ||
+      form.price != undefined ||
+      modules.length != 0 ||
+      language != '' ||
+      level != '' ||
+      type != '' ||
+      status != '' ||
+      rating != 0.0 ||
+      !compareRichTexts(richValue, [
+        {
+          type: 'paragaph',
+          children: [{ text: '' }],
+        },
+      ]) ||
+      !isEqual(mediaValue, fetchedMediaData)
+    )
+  }
+
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
       <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
@@ -1167,8 +1013,6 @@ const CourseCreate = () => {
                   {modules.map((element, i) => {
                     return (
                       <Box
-                        onDragOver={handleOnDragOver}
-                        onDrop={(e) => handleOnDrop(e, i)}
                         key={'mainModuleContainer_' + i}
                         sx={{ boxShadow: 2, border: '1px solid' }}
                       >
