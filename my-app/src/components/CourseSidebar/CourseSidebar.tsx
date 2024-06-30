@@ -27,8 +27,8 @@ const Prices = ({
     <>
       <h3 className={s.sidebarTitle}>Самообучение</h3>
       <div className={s.priceWrapper}>
-        {priceDiscount ? <span className={s.prevPrice}>${priceDiscount}</span> : <></>}
-        <span className={s.currentPrice}>${price}</span>
+        <span className={s.prevPrice}>${price}</span>
+        <span className={s.currentPrice}>${priceDiscount}</span>
       </div>
       <button className={s.sidebarFillButton}>Купить сейчас</button>
       {groupPrice && (
@@ -73,6 +73,13 @@ const CourseSidebar = ({
     }
   }, [])
   console.log(rating)
+
+  function declOfNum(number: number, titles: any) {
+    const cases = [2, 0, 1, 1, 1, 2]
+    return titles[
+      number % 100 > 4 && number % 100 < 20 ? 2 : cases[number % 10 < 5 ? number % 10 : 5]
+    ]
+  }
   return (
     <div className={s.sidebar}>
       {width >= 1200 && <Prices price={price} priceDiscount={priceDiscount} />}
@@ -84,7 +91,8 @@ const CourseSidebar = ({
         <Image src={certificate} alt='certificate' /> Сертификат об окончании курсов
       </div> */}
       <div className={s.courseContent}>
-        <Image src={calendar} alt='calendar' /> Длительность курса {duration} месяца
+        <Image src={calendar} alt='calendar' /> Длительность курса {duration}
+        {declOfNum(duration, [' день', ' дня', ' дней'])}
       </div>
       <div className={s.courseContent}>
         <Image src={notes} alt='notes' />

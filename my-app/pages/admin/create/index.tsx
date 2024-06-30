@@ -273,7 +273,7 @@ const CourseCreate = () => {
         content:
           typeof mediaValue?.content === 'string'
             ? mediaValue?.content
-            : mediaValue
+            : mediaValue?.content
             ? await uploadFileToS3(mediaValue.content)
             : null,
       },
