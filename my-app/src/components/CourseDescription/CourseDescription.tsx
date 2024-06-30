@@ -52,10 +52,12 @@ const CourseDescription = (props: CourseDescriptionProps) => {
           <p className={s.infoItemTitle}>Создан</p>
           <p className={s.infoItemContent}>01.02.2023</p>
         </li>
-        <li className={s.infoItem}>
-          <p className={s.infoItemTitle}>Старт группы</p>
-          <p className={s.infoItemContent}>{props.date}</p>
-        </li>
+        {props.type == 'with-lector' && (
+          <li className={s.infoItem}>
+            <p className={s.infoItemTitle}>Старт группы</p>
+            <p className={s.infoItemContent}>{props.date}</p>
+          </li>
+        )}
         <li className={s.infoItem}>
           <p className={s.infoItemTitle}>Тип</p>
           <p className={s.infoItemContent}>{props.type}</p>
@@ -69,7 +71,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
         style={{
           minWidth: '50rem',
           maxWidth: '90rem',
-          maxHeight: '20rem',
+          maxHeight: '7rem',
           overflowY: 'auto',
           scrollbarWidth: 'none',
         }}

@@ -10,6 +10,7 @@
 
 @media screen and (min-width: 1200px) {
   .courseCard {
+    height: 400px;
     margin-top: 150px;
     flex-direction: row;
     gap: 50px;

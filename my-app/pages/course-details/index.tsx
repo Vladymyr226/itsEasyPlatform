@@ -17,6 +17,7 @@ import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
+import { Box } from '@mui/material'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
@@ -33,6 +34,7 @@ interface CourseData {
   lector: string
   modules: any
   price: number
+  priceDiscount?: number
   mediaValue: any
 }
 interface Course {
@@ -94,6 +96,8 @@ const CourseDetails = () => {
     }
   }, [])
 
+  console.log(data)
+  const imgRef = useRef(null)
   return (
     <Layout>
       <div className={s.coursePage}>
@@ -111,16 +115,19 @@ const CourseDetails = () => {
               <>
                 {data?.data.mediaValue.type == 'image' ? (
                   <>
-                    <img
-                      className={s.courseImage}
-                      src={data?.data.mediaValue.content}
-                      alt='course'
-                    />
-                    {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
-                    <div className={s.courseStatsWrapper}>
-                      {data && <Rating rating={data?.data.rating} />}
-                      <ViewsCount />
-                    </div>
+                    <Box sx={{ background: '#000000', display: 'flex', justifyContent: 'center' }}>
+                      <img
+                        className={s.courseImage}
+                        src={data?.data.mediaValue.content}
+                        style={{ maxHeight: '650px' }}
+                        alt='course'
+                      />
+                      {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
+                      <div className={s.courseStatsWrapper}>
+                        {data && <Rating rating={data?.data.rating} />}
+                        <ViewsCount />
+                      </div>
+                    </Box>
                   </>
                 ) : (
                   <>
@@ -146,6 +153,7 @@ const CourseDetails = () => {
               duration={data?.data.duration ?? 0}
               lessonsNum={lessSum ?? 0}
               price={data?.data.price ?? 0}
+              priceDiscount={data?.data.priceDiscount ?? 0}
               modules={data?.data.modules}
               rating={data?.data.rating ?? 0}
             />
@@ -229,6 +237,7 @@ const CourseDetails = () => {
               duration={data?.data.duration ?? 0}
               lessonsNum={lessSum ?? 0}
               price={data?.data.price ?? 0}
+              priceDiscount={data?.data.priceDiscount ?? 0}
               modules={data?.data.modules}
               rating={data?.data.rating ?? 0}
             />

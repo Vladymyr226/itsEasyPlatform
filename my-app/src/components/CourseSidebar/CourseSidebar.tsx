@@ -14,12 +14,20 @@ import ViewsCount from '../ViewsCount/ViewsCount'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
-const Prices = ({ price, groupPrice }: { price: number; groupPrice?: number }) => {
+const Prices = ({
+  price,
+  priceDiscount,
+  groupPrice,
+}: {
+  price: number
+  priceDiscount?: number
+  groupPrice?: number
+}) => {
   return (
     <>
       <h3 className={s.sidebarTitle}>Самообучение</h3>
       <div className={s.priceWrapper}>
-        <span className={s.prevPrice}>${price + 100}</span>
+        {priceDiscount ? <span className={s.prevPrice}>${priceDiscount}</span> : <></>}
         <span className={s.currentPrice}>${price}</span>
       </div>
       <button className={s.sidebarFillButton}>Купить сейчас</button>
@@ -41,6 +49,7 @@ const Prices = ({ price, groupPrice }: { price: number; groupPrice?: number }) =
 
 const CourseSidebar = ({
   price,
+  priceDiscount,
   modules,
   lessonsNum,
   groupPrice,
@@ -49,6 +58,7 @@ const CourseSidebar = ({
 }: {
   duration: number
   price: number
+  priceDiscount?: number
   modules: any
   lessonsNum: number
   groupPrice?: number
@@ -65,7 +75,7 @@ const CourseSidebar = ({
   console.log(rating)
   return (
     <div className={s.sidebar}>
-      {width >= 1200 && <Prices price={price} />}
+      {width >= 1200 && <Prices price={price} priceDiscount={priceDiscount} />}
       <p className={s.sidebarSubTitle}>Этот курс включает</p>
       {/* <div className={s.courseContent}>
         <Image src={video} alt='video' /> 22 часа видео лекций
@@ -103,7 +113,7 @@ const CourseSidebar = ({
 
       <div className={s.divide}></div>
 
-      {width < 1200 && <Prices price={price} />}
+      {width < 1200 && <Prices price={price} priceDiscount={priceDiscount} />}
 
       <p className={s.footerTitle}>Планируете обучение 5 или более человек?</p>
       <p className={s.footerText}>

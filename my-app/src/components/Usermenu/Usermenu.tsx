@@ -7,6 +7,8 @@ import teacher from '../../assets/teacher.svg'
 import logout from '../../assets/logout.svg'
 import RequestModal from '../../components/RequestModal/RequestModal'
 import Image from 'next/image'
+import { deleteCookie } from 'cookies-next'
+import Swal from 'sweetalert2'
 
 const Usermenu = () => {
   const [isUsermenuShown, setIsUsermenuShown] = useState(false)
@@ -48,7 +50,13 @@ const Usermenu = () => {
             <Image src={teacher} alt='teacher' />
             <p>Стать преподавателем</p>
           </div>
-          <div className={s.usermenuItem}>
+          <div
+            className={s.usermenuItem}
+            onClick={(e) => {
+              deleteCookie('jwt')
+              Swal.fire('You logged out successfully', '', 'success')
+            }}
+          >
             <Image src={logout} alt='logout' />
             <p>Выйти</p>
           </div>
