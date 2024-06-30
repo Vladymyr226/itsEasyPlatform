@@ -106,7 +106,7 @@ const AdminTable = () => {
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
       <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
-        <Link href={'/admin'}>
+        <Link href={'/admin/login'}>
           <Button
             variant='contained'
             color='error'

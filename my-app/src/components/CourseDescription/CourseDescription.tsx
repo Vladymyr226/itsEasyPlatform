@@ -66,18 +66,32 @@ const CourseDescription = (props: CourseDescriptionProps) => {
 
       {width < 1200 && <CourseImage mediaValue={props.mediaValue} rating={props.rating} />}
 
-      <p
-        className={s.descText}
-        style={{
-          minWidth: '50rem',
-          maxWidth: '90rem',
-          maxHeight: '7rem',
-          overflowY: 'auto',
-          scrollbarWidth: 'none',
-        }}
-      >
-        <SlateView value={props.description} />
-      </p>
+      {width > 1200 ? (
+        <p
+          className={s.descText}
+          style={{
+            minWidth: '50rem',
+            maxWidth: '90rem',
+            maxHeight: '7rem',
+            overflowY: 'auto',
+            scrollbarWidth: 'none',
+          }}
+        >
+          <SlateView value={props.description} />
+        </p>
+      ) : (
+        <p
+          className={s.descText}
+          style={{
+            width: '100%',
+            maxHeight: '7rem',
+            overflowY: 'auto',
+            scrollbarWidth: 'none',
+          }}
+        >
+          <SlateView value={props.description} />
+        </p>
+      )}
 
       <Link href={'/course-details?id=' + props.id}>
         <Button text='Узнать больше' />
