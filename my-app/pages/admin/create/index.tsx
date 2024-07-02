@@ -2,7 +2,7 @@
 
 import courseImage from '../../src/assets/courseImage.png'
 import skillsImage from '../../src/assets/skillsImage.png'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Comments from '@/components/Comments/Comments'
 import CourseControlls from '@/components/CourseControlls/CourseControlls'
@@ -593,6 +593,23 @@ const CourseCreate = () => {
         },
       ]) ||
       !isEqual(mediaValue, fetchedMediaData)
+    )
+  }
+
+  const dragLesson = useRef<number>(0)
+  const draggedOverLesson = useRef<number>(0)
+  function handleSort(lessonsGet: any, i: number) {
+    const lessonClone = [...lessonsGet]
+    const temp = lessonClone[dragLesson.current]
+    lessonClone[dragLesson.current] = lessonClone[draggedOverLesson.current]
+    lessonClone[draggedOverLesson.current] = temp
+    setModules(
+      modules.map((module: any, moduleIndex) => {
+        if (moduleIndex == i) {
+          return { title: module.title, lessons: lessonClone }
+        }
+        return module
+      })
     )
   }
 
@@ -1227,16 +1244,22 @@ const CourseCreate = () => {
                               </Box>
                               {element.lessons.map((lesson, index) => {
                                 return (
-                                  <Box
+                                  <div
                                     key={'mainModuleContainer_' + i}
-                                    sx={{
+                                    style={{
                                       color: '#0f0e16',
                                       width: '100%',
                                       background: '#cccccc',
-                                      marginTop: 2,
+                                      marginTop: '16px',
                                       padding: '16px',
-                                      boxShadow: 2,
+                                      boxShadow:
+                                        '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
                                     }}
+                                    draggable
+                                    onDragStart={() => (dragLesson.current = index)}
+                                    onDragEnter={() => (draggedOverLesson.current = index)}
+                                    onDragEnd={(e) => handleSort(element.lessons, i)}
+                                    onDragOver={(e) => e.preventDefault()}
                                   >
                                     <Box sx={{ fontWeight: 'bold' }}>{lesson.title ?? ''}</Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'end' }}>
@@ -1323,7 +1346,7 @@ const CourseCreate = () => {
                                         </Box>
                                       </>
                                     )}
-                                  </Box>
+                                  </div>
                                 )
                               })}
                               <Box sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}>
