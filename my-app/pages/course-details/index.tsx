@@ -82,7 +82,7 @@ const CourseDetails = () => {
           })
         )
         setLessSum(lessonsSum)
-
+        localStorage.setItem('SelectedCourse', result.id)
         setData({ ...result, data: { ...result.data, modules: modules } })
       } else {
       }
@@ -92,6 +92,7 @@ const CourseDetails = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
+
       getPageData()
     }
   }, [])

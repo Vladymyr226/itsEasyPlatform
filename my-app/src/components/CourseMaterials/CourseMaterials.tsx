@@ -62,7 +62,10 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
                     <div>
                       <Image src={idx === 0 ? openLock : closedLock} alt='lock' />
 
-                      <Link href={lesson.data.link}>
+                      <Link
+                        href={'/lesson?id=' + lesson.id}
+                        onClick={(e) => localStorage.setItem('SelectedModuleIndex', index + '')}
+                      >
                         <span
                           style={{ cursor: 'pointer', textDecoration: 'none', color: '#ffec3e' }}
                         >
