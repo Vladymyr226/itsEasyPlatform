@@ -614,6 +614,7 @@ const CourseCreate = () => {
       0,
       temp
     )
+    setEditTrigger(true)
     setModules(
       modules.map((module: any, moduleIndex) => {
         if (moduleIndex == i) {
