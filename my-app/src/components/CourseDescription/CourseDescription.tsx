@@ -19,7 +19,6 @@ interface CourseDescriptionProps {
 }
 const CourseDescription = (props: CourseDescriptionProps) => {
   const [width, setWidth] = useState(0)
-  console.log(props)
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth)
