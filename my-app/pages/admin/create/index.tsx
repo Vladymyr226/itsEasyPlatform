@@ -596,17 +596,38 @@ const CourseCreate = () => {
     )
   }
 
-  const dragLesson = useRef<number>(0)
-  const draggedOverLesson = useRef<number>(0)
+  const dragLesson = useRef<any>(0)
+  const draggedOverLesson = useRef<any>(0)
   function handleSort(lessonsGet: any, i: number) {
     const lessonClone = [...lessonsGet]
-    const temp = lessonClone[dragLesson.current]
-    lessonClone[dragLesson.current] = lessonClone[draggedOverLesson.current]
-    lessonClone[draggedOverLesson.current] = temp
+    let draggedIdx = -1
+    const temp = lessonClone.filter((less, i) => {
+      if (less.id == dragLesson.current) {
+        draggedIdx = i
+        return less
+      }
+    })[0]
+    lessonClone.splice(
+      draggedOverLesson.current > draggedIdx
+        ? draggedOverLesson.current + 1
+        : draggedOverLesson.current,
+      0,
+      temp
+    )
     setModules(
       modules.map((module: any, moduleIndex) => {
         if (moduleIndex == i) {
-          return { title: module.title, lessons: lessonClone }
+          return {
+            title: module.title,
+            lessons: lessonClone.filter(
+              (less, i) =>
+                less.id != dragLesson.current ||
+                i ==
+                  (draggedOverLesson.current > draggedIdx
+                    ? draggedOverLesson.current + 1
+                    : draggedOverLesson.current)
+            ),
+          }
         }
         return module
       })
@@ -1256,7 +1277,7 @@ const CourseCreate = () => {
                                         '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
                                     }}
                                     draggable
-                                    onDragStart={() => (dragLesson.current = index)}
+                                    onDragStart={() => (dragLesson.current = lesson.id)}
                                     onDragEnter={() => (draggedOverLesson.current = index)}
                                     onDragEnd={(e) => handleSort(element.lessons, i)}
                                     onDragOver={(e) => e.preventDefault()}
