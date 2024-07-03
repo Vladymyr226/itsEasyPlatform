@@ -10,6 +10,7 @@ import plus from '../src/assets/plus.svg'
 import loadMoreButton from '../src/assets/loadMoreButton.png'
 import Layout from '@/components/Layout/Layout'
 import './globals.css'
+import Link from 'next/link'
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 interface CourseData {
   title: string
@@ -84,9 +85,11 @@ export default function HomePage() {
           })}
 
         {width >= 1200 ? (
-          <button className={s.loadMoreButton}>
-            Смотреть ещё курсы <Image src={plus} alt='plus' />
-          </button>
+          <Link href={'/allCourses'}>
+            <button className={s.loadMoreButton}>
+              Смотреть ещё курсы <Image src={plus} alt='plus' />
+            </button>
+          </Link>
         ) : (
           <div className={s.loadMoreImageWrapper}>
             <Image className={s.mobileLoadMoreButton} src={loadMoreButton} alt='load more' />
