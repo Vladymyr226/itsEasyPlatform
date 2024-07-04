@@ -72,7 +72,6 @@ const CourseSidebar = ({
       setWidth(window.innerWidth)
     }
   }, [])
-  console.log(rating)
 
   function declOfNum(number: number, titles: any) {
     const cases = [2, 0, 1, 1, 1, 2]

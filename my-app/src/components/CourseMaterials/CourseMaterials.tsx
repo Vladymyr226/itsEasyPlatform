@@ -21,7 +21,6 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
 
     setSelected(i)
   }
-  console.log(modules)
 
   return (
     <div className={s.materialsAccordion}>

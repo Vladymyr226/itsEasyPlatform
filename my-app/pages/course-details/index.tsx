@@ -97,7 +97,6 @@ const CourseDetails = () => {
     }
   }, [])
 
-  console.log(data)
   const imgRef = useRef(null)
   return (
     <Layout>

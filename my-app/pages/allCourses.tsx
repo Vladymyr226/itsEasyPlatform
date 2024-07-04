@@ -124,7 +124,6 @@ const AllCoursesDetails = () => {
   }
 
   useEffect(() => {
-    console.log('render')
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
       getPageData()
@@ -141,7 +140,6 @@ const AllCoursesDetails = () => {
   const [date, setDate] = useState('')
 
   const [price, setPrice] = useState([0, 10000])
-  console.log(price)
   const [maxPrice, setMaxPrice] = useState()
   const [language, setLanguage] = useState<any>([])
   const [level, setLevel] = useState<any>([])

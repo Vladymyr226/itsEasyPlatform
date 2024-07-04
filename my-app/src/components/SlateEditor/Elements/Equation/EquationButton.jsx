@@ -30,7 +30,6 @@ const EquationButton = ({ editor }) => {
     if (!math) return
     selection && Transforms.select(editor, selection)
     insertEquation(editor, math, displayInline)
-    console.log('btn click')
     setShowInput(false)
   }
   return (

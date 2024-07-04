@@ -47,7 +47,6 @@ export default function HomePage() {
         },
       })
       const result = await response.json()
-      console.log(result)
       setData(result.getCourses)
     }
   }

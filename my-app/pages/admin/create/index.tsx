@@ -57,6 +57,7 @@ import ArchiveIcon from '@mui/icons-material/Archive'
 import * as AWS from 'aws-sdk'
 import { isEqual } from 'lodash-es'
 import { deleteCookie } from 'cookies-next'
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
@@ -130,7 +131,6 @@ const CourseCreate = () => {
   const [modules, setModules] = useState<Array<Module>>([])
   const [allModules, setAllModules] = useState<Array<Lesson>>([])
   const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
-  const [expanded, setExpanded] = useState<string | false>(false)
   const [reDropBlock, setReDropBlock] = useState(false)
   const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
@@ -200,10 +200,7 @@ const CourseCreate = () => {
     setError({})
     setStatus(event.target.value as string)
   }
-  const handleChangeExpanded =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false)
-    }
+
   const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setEditTrigger(true)
@@ -1106,17 +1103,8 @@ const CourseCreate = () => {
                           key={'mainModuleContainer_' + i}
                           sx={{ boxShadow: 2, border: '1px solid' }}
                         >
-                          <Accordion
-                            expanded={expanded === 'panel' + i}
-                            onChange={handleChangeExpanded('panel' + i)}
-                            sx={{}}
-                          >
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              sx={{
-                                borderBottom: expanded === 'panel' + i ? '2px solid' : '',
-                              }}
-                            >
+                          <Accordion defaultExpanded={true} sx={{}}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{}}>
                               <div
                                 style={{
                                   display: 'flex',
@@ -1169,7 +1157,6 @@ const CourseCreate = () => {
                                           return moduleElem
                                         }
                                         setAllModules([...allModules, ...moduleElem.lessons])
-                                        setExpanded('')
                                       })
                                     )
                                   }}
@@ -1179,7 +1166,13 @@ const CourseCreate = () => {
                               </div>
                             </AccordionSummary>
 
-                            <AccordionDetails style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+                            <AccordionDetails
+                              style={{
+                                paddingLeft: '8px',
+                                paddingRight: '8px',
+                                borderTop: '2px solid',
+                              }}
+                            >
                               <Box sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}>
                                 <Box sx={{ maxWidth: '40%', width: '100%' }}>
                                   <Autocomplete
@@ -1203,11 +1196,6 @@ const CourseCreate = () => {
                                               (reDropElem) => reDropElem.id === value.id
                                             ).length === 0
                                           ) {
-                                            console.log(
-                                              storedModules.filter(
-                                                (storedModule) => storedModule.id != value.id
-                                              )
-                                            )
                                             setStoredModules(
                                               storedModules.filter(
                                                 (storedModule) => storedModule.id != value.id
@@ -1264,113 +1252,130 @@ const CourseCreate = () => {
                                   />
                                 </Box>
                               </Box>
-                              {element.lessons.map((lesson, index) => {
-                                return (
-                                  <div
-                                    key={'mainModuleContainer_' + i}
-                                    style={{
-                                      color: '#0f0e16',
-                                      width: '100%',
-                                      background: '#cccccc',
-                                      marginTop: '16px',
-                                      padding: '16px',
-                                      boxShadow:
-                                        '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
-                                    }}
-                                    draggable
-                                    onDragStart={() => (dragLesson.current = lesson.id)}
-                                    onDragEnter={() => (draggedOverLesson.current = index)}
-                                    onDragEnd={(e) => handleSort(element.lessons, i)}
-                                    onDragOver={(e) => e.preventDefault()}
-                                  >
-                                    <Box sx={{ fontWeight: 'bold' }}>{lesson.title ?? ''}</Box>
-                                    <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-                                      <IconButton
-                                        onClick={(e) => {
-                                          setPreview(
-                                            lesson.id == preview ? '-1' : lesson.id ?? '-1'
-                                          )
+                              <Box
+                                sx={{
+                                  width: '100%',
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <Box sx={{ width: '70%' }}>
+                                  {element.lessons.map((lesson, index) => {
+                                    return (
+                                      <div
+                                        key={'mainModuleContainer_' + i}
+                                        style={{
+                                          color: '#0f0e16',
+                                          width: '100%',
+                                          background: '#cccccc',
+                                          marginTop: '16px',
+                                          padding: '16px',
+                                          boxShadow:
+                                            '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
                                         }}
+                                        draggable
+                                        onDragStart={() => (dragLesson.current = lesson.id)}
+                                        onDragEnter={() => (draggedOverLesson.current = index)}
+                                        onDragEnd={(e) => handleSort(element.lessons, i)}
+                                        onDragOver={(e) => e.preventDefault()}
                                       >
-                                        <PreviewIcon />
-                                      </IconButton>
-                                      <IconButton
-                                        onClick={(e) => {
-                                          setIdLessonEdit(
-                                            idLessonEdit == lesson.id
-                                              ? null
-                                              : lesson.id
-                                              ? lesson.id
-                                              : null
-                                          )
-                                          setLessonForm({
-                                            title: lesson.title,
-                                            link: lesson.link,
-                                          })
-                                          setRichValueLesson(lesson.description)
-                                          setCreateLessonIndx(i)
-                                          setValue(2)
-                                        }}
-                                      >
-                                        <EditIcon />
-                                      </IconButton>
-                                      <IconButton
-                                        onClick={async (e) => {
-                                          setEditTrigger(true)
-                                          setError({})
-                                          setStoredModules([...storedModules, lesson])
-                                          setModules(
-                                            modules.map((elem, index) => {
-                                              if (i === index) {
-                                                return {
-                                                  title: elem.title,
-                                                  lessons: elem.lessons.filter(
-                                                    (lessonFilter, lessonIndex) => {
-                                                      if (lessonFilter.id !== lesson.id) {
-                                                        return lessonFilter
-                                                      }
-                                                      setStoredModules([
-                                                        ...storedModules,
-                                                        lessonFilter,
-                                                      ])
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                          <DragIndicatorIcon />
+                                          <Box sx={{ fontWeight: 'bold' }}>
+                                            {lesson.title ?? ''}
+                                          </Box>
+                                        </Box>
+
+                                        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                                          <IconButton
+                                            onClick={(e) => {
+                                              setPreview(
+                                                lesson.id == preview ? '-1' : lesson.id ?? '-1'
+                                              )
+                                            }}
+                                          >
+                                            <PreviewIcon />
+                                          </IconButton>
+                                          <IconButton
+                                            onClick={(e) => {
+                                              setIdLessonEdit(
+                                                idLessonEdit == lesson.id
+                                                  ? null
+                                                  : lesson.id
+                                                  ? lesson.id
+                                                  : null
+                                              )
+                                              setLessonForm({
+                                                title: lesson.title,
+                                                link: lesson.link,
+                                              })
+                                              setRichValueLesson(lesson.description)
+                                              setCreateLessonIndx(i)
+                                              setValue(2)
+                                            }}
+                                          >
+                                            <EditIcon />
+                                          </IconButton>
+                                          <IconButton
+                                            onClick={async (e) => {
+                                              setEditTrigger(true)
+                                              setError({})
+                                              setStoredModules([...storedModules, lesson])
+                                              setModules(
+                                                modules.map((elem, index) => {
+                                                  if (i === index) {
+                                                    return {
+                                                      title: elem.title,
+                                                      lessons: elem.lessons.filter(
+                                                        (lessonFilter, lessonIndex) => {
+                                                          if (lessonFilter.id !== lesson.id) {
+                                                            return lessonFilter
+                                                          }
+                                                          setStoredModules([
+                                                            ...storedModules,
+                                                            lessonFilter,
+                                                          ])
+                                                        }
+                                                      ),
                                                     }
-                                                  ),
-                                                }
-                                              }
-                                              return elem
-                                            })
-                                          )
-                                        }}
-                                      >
-                                        <ArchiveIcon color='error' />
-                                      </IconButton>
-                                    </Box>
-                                    {preview == lesson.id && idLessonEdit != lesson.id && (
-                                      <>
-                                        <Box
-                                          sx={{
-                                            paddingLeft: '16px',
-                                            maxHeight: '10rem',
-                                            overflow: 'auto',
-                                            scrollbarWidth: 'none',
-                                          }}
-                                        >
-                                          <SlateView value={lesson.description} />
+                                                  }
+                                                  return elem
+                                                })
+                                              )
+                                            }}
+                                          >
+                                            <ArchiveIcon color='error' />
+                                          </IconButton>
                                         </Box>
-                                        <Box
-                                          sx={{
-                                            overflow: 'auto',
-                                            scrollbarWidth: 'none',
-                                            marginTop: 2,
-                                          }}
-                                        >
-                                          <ExampleYouTube url={lesson.link.split('?v=')[1]} />
-                                        </Box>
-                                      </>
-                                    )}
-                                  </div>
-                                )
-                              })}
+                                        {preview == lesson.id && idLessonEdit != lesson.id && (
+                                          <>
+                                            <Box
+                                              sx={{
+                                                paddingLeft: '16px',
+                                                maxHeight: '10rem',
+                                                overflow: 'auto',
+                                                scrollbarWidth: 'none',
+                                              }}
+                                            >
+                                              <SlateView value={lesson.description} />
+                                            </Box>
+                                            <Box
+                                              sx={{
+                                                overflow: 'auto',
+                                                scrollbarWidth: 'none',
+                                                marginTop: 2,
+                                              }}
+                                            >
+                                              <ExampleYouTube url={lesson.link.split('?v=')[1]} />
+                                            </Box>
+                                          </>
+                                        )}
+                                      </div>
+                                    )
+                                  })}
+                                </Box>
+                              </Box>
+
                               <Box sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}>
                                 <Button
                                   variant='contained'
