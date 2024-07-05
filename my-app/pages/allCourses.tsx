@@ -34,13 +34,14 @@ import MailIcon from '@mui/icons-material/Mail'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import TextField from '@mui/material/TextField'
 import Slider from '@mui/material/Slider'
-import { InputLabel } from '@mui/material'
+import { InputLabel, IconButton } from '@mui/material'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Autocomplete from '@mui/material/Autocomplete'
 import { TabPanelProps, Module, Tag } from '@/utils/interfaces'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import CourseCard from '@/components/CourseCard/CourseCard'
+import ClearIcon from '@mui/icons-material/Clear'
 
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 
@@ -209,9 +210,18 @@ const AllCoursesDetails = () => {
     setDataDisplay(filteredRes)
   }
   const DrawerList = (
-    <Box sx={{ width: 250 }} role='presentation'>
-      <Box sx={{ padding: 2 }}>
-        <Box>
+    // <Box sx={{ width: 250 }} role='presentation'>
+    <Box
+      sx={{
+        padding: 2,
+        display: 'flex',
+        background: '#ffec3e',
+        borderRadius: 2,
+        width: '100%',
+        gap: 2,
+      }}
+    >
+      {/* <Box>
           <h3>Start date</h3>
           <TextField
             autoComplete='off'
@@ -229,8 +239,8 @@ const AllCoursesDetails = () => {
               marginTop: 0,
             }}
           />
-        </Box>
-        <Box>
+        </Box> */}
+      {/* <Box>
           <h3>Price</h3>
           <Slider
             getAriaLabel={() => 'Temperature range'}
@@ -239,87 +249,101 @@ const AllCoursesDetails = () => {
             onChange={handlePriceChange}
             valueLabelDisplay='auto'
           />
-        </Box>
-        <Box>
-          <InputLabel>Language</InputLabel>
-          <Select
-            multiple
-            fullWidth
-            id='languageSelect'
-            value={language}
-            onChange={handleChangeLanguage}
-          >
-            <MenuItem value={'RU'}>RU</MenuItem>
-            <MenuItem value={'UA'}>UA</MenuItem>
-            <MenuItem value={'EN'}>EN</MenuItem>
-          </Select>
-        </Box>
-        <Box>
-          <InputLabel>Level</InputLabel>
-          <Select multiple fullWidth id='levelSelect' value={level} onChange={handleChangeLevel}>
-            <MenuItem value={'Beginner'}>Beginner</MenuItem>
-            <MenuItem value={'Junior'}>Junior</MenuItem>
-            <MenuItem value={'Middle'}>Middle</MenuItem>
-            <MenuItem value={'Senior'}>Senior</MenuItem>
-          </Select>
-        </Box>
-        <Box>
-          <InputLabel>Type</InputLabel>
-          <Select multiple fullWidth value={type} onChange={handleChangeType} id='typeSelect'>
-            <MenuItem value={'self-education'}>Self education</MenuItem>
-            <MenuItem value={'with-lector'}>With lector</MenuItem>
-          </Select>
-        </Box>
-        <Box sx={{ marginTop: 2 }}>
-          <Autocomplete
-            disablePortal
-            multiple
-            id='combo-box-demo'
-            value={categorySelect}
-            onChange={(event, value: any) => {
-              setCategorySelect(value)
-            }}
-            getOptionLabel={(option: any) => option.name_of_tag}
-            options={allCategorySelect}
-            fullWidth
-            renderInput={(params) => <TextField {...params} label='Category' />}
-            renderOption={(props: object, option: any, state: object) => (
-              <div {...props} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div>{option.name_of_tag}</div>
-              </div>
-            )}
-          />
-        </Box>
-        <Box sx={{ position: 'absolute', display: 'flex', bottom: 0, left: 0, width: 250 }}>
-          <Button
-            variant='outlined'
-            sx={{ borderRadius: 0 }}
-            onClick={(e) => {
-              setDate('')
-              setPrice([0, maxPrice ?? 1000])
-              setLanguage([])
-              setLevel([])
-              setType([])
-              setCategorySelect([])
-              setAllCategorySelect([])
-              setDataDisplay(data)
-            }}
-          >
-            Clear
-          </Button>
-          <Button
-            fullWidth
-            variant='contained'
-            sx={{ borderRadius: 0 }}
-            onClick={(e) => {
-              handleApply()
-            }}
-          >
-            Apply
-          </Button>
-        </Box>
+        </Box> */}
+      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
+        <InputLabel>Language</InputLabel>
+        <Select
+          multiple
+          fullWidth
+          id='languageSelect'
+          value={language}
+          onChange={handleChangeLanguage}
+        >
+          <MenuItem value={'RU'}>RU</MenuItem>
+          <MenuItem value={'UA'}>UA</MenuItem>
+          <MenuItem value={'EN'}>EN</MenuItem>
+        </Select>
       </Box>
+      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
+        <InputLabel>Level</InputLabel>
+        <Select multiple fullWidth id='levelSelect' value={level} onChange={handleChangeLevel}>
+          <MenuItem value={'Beginner'}>Beginner</MenuItem>
+          <MenuItem value={'Junior'}>Junior</MenuItem>
+          <MenuItem value={'Middle'}>Middle</MenuItem>
+          <MenuItem value={'Senior'}>Senior</MenuItem>
+        </Select>
+      </Box>
+      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
+        <InputLabel>Type</InputLabel>
+        <Select multiple fullWidth value={type} onChange={handleChangeType} id='typeSelect'>
+          <MenuItem value={'self-education'}>Self education</MenuItem>
+          <MenuItem value={'with-lector'}>With lector</MenuItem>
+        </Select>
+      </Box>
+      <Box sx={{ width: '100%', minWidth: '15rem' }}>
+        <InputLabel>&nbsp;</InputLabel>
+        <Autocomplete
+          disablePortal
+          limitTags={3}
+          multiple
+          id='combo-box-demo'
+          value={categorySelect}
+          onChange={(event, value: any) => {
+            setCategorySelect(value)
+          }}
+          getOptionLabel={(option: any) => option.name_of_tag}
+          options={allCategorySelect}
+          fullWidth
+          sx={{
+            '.MuiInputBase-input': {
+              height: '1.5rem',
+            },
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label='Category'
+              sx={{
+                '.MuiInputBase-input': {
+                  height: '1.5rem',
+                },
+              }}
+            />
+          )}
+          renderOption={(props: object, option: any, state: object) => (
+            <div {...props} style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div>{option.name_of_tag}</div>
+            </div>
+          )}
+        />
+      </Box>
+      <IconButton
+        aria-label='delete'
+        sx={{ marginTop: 3, width: '50px' }}
+        onClick={(e) => {
+          setDate('')
+          setPrice([0, maxPrice ?? 1000])
+          setLanguage([])
+          setLevel([])
+          setType([])
+          setCategorySelect([])
+
+          setDataDisplay(data)
+        }}
+      >
+        <ClearIcon />
+      </IconButton>
+      <Button
+        variant='text'
+        sx={{ borderRadius: 0, marginTop: 3, width: '30rem', color: '#000' }}
+        onClick={(e) => {
+          handleApply()
+        }}
+      >
+        <b>Apply</b>
+      </Button>
     </Box>
+    // </Box>
   )
 
   function isSecondDateAfterFirst(date1: string, date2: string) {
@@ -338,28 +362,30 @@ const AllCoursesDetails = () => {
   return (
     <Layout>
       <Box sx={{ display: 'inline' }}>
-        <Drawer open={open} onClose={toggleDrawer(false)}>
+        {/* <Drawer open={open} onClose={toggleDrawer(false)}>
           {DrawerList}
-        </Drawer>
-        <Button
-          variant='contained'
-          onClick={toggleDrawer(true)}
-          endIcon={<FilterAltIcon />}
-          sx={{
-            background: '#ffec3e',
-            border: '2px solid #ffec3e',
-            color: '#000',
-            maxHeight: '56px',
-            '&:hover': {
-              backgroundColor: '#0f0e16',
+        </Drawer> */}
+
+        {/* <Button
+            variant='contained'
+            onClick={toggleDrawer(true)}
+            endIcon={<FilterAltIcon />}
+            sx={{
+              background: '#ffec3e',
               border: '2px solid #ffec3e',
-              color: '#ffec3e',
-              boxShadow: 'none',
-            },
-          }}
-        >
-          Filter
-        </Button>
+              color: '#000',
+              maxHeight: '56px',
+              '&:hover': {
+                backgroundColor: '#0f0e16',
+                border: '2px solid #ffec3e',
+                color: '#ffec3e',
+                boxShadow: 'none',
+              },
+            }}
+          >
+            Filter
+          </Button> */}
+        {DrawerList}
         <Box sx={{ width: '100%', color: '#fff', minHeight: '40rem' }}>
           {dataDisplay && dataDisplay.length > 0 ? (
             dataDisplay.map((course: Course, index: number) => {
