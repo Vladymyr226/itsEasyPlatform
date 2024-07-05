@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Comments from '@/components/Comments/Comments'
 import CourseControlls from '@/components/CourseControlls/CourseControlls'
-import CourseMaterials from '@/components/CourseMaterials/CourseMaterials'
+import CourseLessonMaterials from '@/components/CourseMaterials/CourseLessonMaterials'
 import CourseSidebar from '@/components/CourseSidebar/CourseSidebar'
 import PlayButton from '@/components/PlayButton/PlayButton'
 import { PauseButton } from '@/components/PlayButton/PlayButton'
@@ -250,11 +250,12 @@ const LessonDetails = () => {
               height: '140vb',
               overflowY: 'scroll',
               scrollbarWidth: 'none',
-              background: '#fff',
-              padding: 1,
+              paddingLeft: 1,
             }}
           >
-            {modules &&
+            {modules && <CourseLessonMaterials modules={modules} />}
+
+            {/* {modules &&
               modules.map((element: Module, i: number) => {
                 return (
                   <Box key={'mainModuleContainer_' + i} sx={{ boxShadow: 2, marginTop: 1 }}>
@@ -318,7 +319,7 @@ const LessonDetails = () => {
                     </Accordion>
                   </Box>
                 )
-              })}
+              })} */}
           </Box>
         </Box>
       )}
