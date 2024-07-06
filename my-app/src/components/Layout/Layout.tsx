@@ -12,18 +12,30 @@ import BurgerMenu from '../../components/BurgerMenu/BurgerMenu'
 import { ReactNode, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Container from '../Container/Container'
+import Link from 'next/link'
 
 type LayoutProps = {
   children: ReactNode
 }
-
+const urlHost = `${
+  process.env.NEXT_PUBLIC_DEV !== 'dev' ? 'https://cb-shchus.vercel.app/' : 'http://localhost:3000/'
+}`
 const Layout = ({ children }: LayoutProps) => {
   const [width, setWidth] = useState(0)
+
+  function getPageUrl() {
+    const fullUrl =
+      typeof window !== 'undefined' ? window.location.href.replace(urlHost, '').split('/') : '123'
+    return fullUrl
+  }
+  const [targetSite, setTargetSite] = useState<string>()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
     }
+    const pageUrl = getPageUrl()
+    setTargetSite(pageUrl[0])
   }, [])
 
   return (
@@ -37,8 +49,24 @@ const Layout = ({ children }: LayoutProps) => {
             {width >= 1200 ? (
               <>
                 <div className={s.headerNavigation}>
-                  <div className={s.headerActiveNavigationLink}>Главная</div>
-                  <div className={s.headerNavigationLink}>Онлайн курсы</div>
+                  <div
+                    className={
+                      targetSite == '' ? s.headerActiveNavigationLink : s.headerNavigationLink
+                    }
+                  >
+                    Главная
+                  </div>
+                  <Link href={'/allCourses'}>
+                    <div
+                      className={
+                        targetSite == 'allCourses'
+                          ? s.headerActiveNavigationLink
+                          : s.headerNavigationLink
+                      }
+                    >
+                      Курсы
+                    </div>
+                  </Link>
                   <div className={s.headerNavigationLink}>Про нас</div>
                   <div className={s.headerNavigationLink}>Карьера</div>
                 </div>

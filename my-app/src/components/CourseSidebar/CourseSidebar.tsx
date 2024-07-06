@@ -13,6 +13,9 @@ import Rating from '../Rating/Rating'
 import ViewsCount from '../ViewsCount/ViewsCount'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import axios from 'axios'
+
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 const Prices = ({
   price,
@@ -23,6 +26,23 @@ const Prices = ({
   priceDiscount?: number
   groupPrice?: number
 }) => {
+  const [userData, setUserData] = useState<any>()
+  async function getPageData() {
+    if (typeof window !== 'undefined') {
+      const userId = localStorage.getItem('UserID')
+      const responseUser = await fetch(urlUser + '/' + userId, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultUser = await responseUser.json()
+
+      setUserData(resultUser)
+    }
+  }
+  useEffect(() => {
+    getPageData()
+  }, [])
   return (
     <>
       <h3 className={s.sidebarTitle}>Самообучение</h3>
@@ -30,7 +50,24 @@ const Prices = ({
         <span className={s.prevPrice}>${price}</span>
         <span className={s.currentPrice}>${priceDiscount}</span>
       </div>
-      <button className={s.sidebarFillButton}>Купить сейчас</button>
+      <button
+        className={s.sidebarFillButton}
+        onClick={async (e) => {
+          const response = await axios.put(urlUser + '?id=' + userData.id, {
+            purchasedCoursesId: [
+              ...userData.purchased_courses_id,
+              Number(localStorage.getItem('SelectedCourseIndex')),
+            ],
+            favouriteCoursesId: [...userData.favourite_courses_id],
+            comletedLessonsId: [...userData.comleted_lessons_id],
+          })
+
+          const resultResponse = response.data
+          console.log(resultResponse)
+        }}
+      >
+        Купить сейчас
+      </button>
       {groupPrice && (
         <div>
           <div className={s.divide}></div>

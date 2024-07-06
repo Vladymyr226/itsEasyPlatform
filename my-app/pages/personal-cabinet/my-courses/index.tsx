@@ -1,5 +1,5 @@
 'use client'
-import s from '../CourseDetails.module.css'
+import s from './MyCourse.module.css'
 import skillsImage from '../../../src/assets/skillsImage.png'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
@@ -15,7 +15,7 @@ import Rating from '@/components/Rating/Rating'
 import SkillsList from '@/components/SkillsList/SkillsList'
 import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
-import '../app/globals.css'
+import '../../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
 import { Box, Button } from '@mui/material'
 import YouTube, { YouTubeProps } from 'react-youtube'
@@ -42,12 +42,16 @@ import { TabPanelProps, Module, Tag } from '@/utils/interfaces'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import CourseCard from '@/components/CourseCard/CourseCard'
 import ClearIcon from '@mui/icons-material/Clear'
+import CircularProgress from '@mui/material/CircularProgress'
+import Link from 'next/link'
+import ForwardIcon from '@mui/icons-material/Forward'
 import { styled } from '@mui/material/styles'
 
 import Popper from '@mui/material/Popper'
 import Paper from '@mui/material/Paper'
 
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
@@ -83,7 +87,7 @@ interface Course {
   data: CourseData
   is_active: boolean
 }
-const AllCoursesDetails = () => {
+const MyCourses = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<any>()
   const [dataDisplay, setDataDisplay] = useState<any>()
@@ -91,10 +95,20 @@ const AllCoursesDetails = () => {
   const [moduleLessons, setModuleLessons] = useState<Array<string>>()
   const [play, setPlay] = useState(false)
   const videoRef = useRef(null)
+  const [userData, setUserData] = useState<any>()
 
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
+      const userId = localStorage.getItem('UserID')
+      const responseUser = await fetch(urlUser + '/' + userId, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultUser = await responseUser.json()
+
+      setUserData(resultUser)
 
       const responseTag = await fetch(urlTag + 's', {
         headers: {
@@ -114,8 +128,11 @@ const AllCoursesDetails = () => {
         },
       })
       const result = await responseCourse.json()
-      setData(result.getCourses)
-      setDataDisplay(result.getCourses)
+      const resultData = result.getCourses.filter(
+        (course: any) => resultUser.purchased_courses_id.indexOf(course.id) != -1
+      )
+      setData(resultData)
+      setDataDisplay(resultData)
       setMaxPrice(
         result.getCourses
           .map((course: any) => {
@@ -170,9 +187,6 @@ const AllCoursesDetails = () => {
     } = event
     setType(typeof type === 'string' ? type.split(',') : value)
   }
-  const handlePriceChange = (event: any, newValue: any) => {
-    setPrice(newValue)
-  }
 
   const handleApply = () => {
     let filteredRes = data
@@ -213,6 +227,20 @@ const AllCoursesDetails = () => {
     }
     setDataDisplay(filteredRes)
   }
+
+  function isSecondDateAfterFirst(date1: string, date2: string) {
+    const firstDate = new Date(date1)
+    const secondDate = new Date(date2)
+
+    return secondDate > firstDate
+  }
+  function arrayContainsAll(superset: any, subset: any) {
+    return subset.every((element: any) => superset.includes(element))
+  }
+  function arraysHaveCommonElements(array1: any, array2: any) {
+    return array1.some((element: any) => array2.includes(element))
+  }
+
   const CustomPopper = (props: any) => {
     return <Popper {...props} placement='bottom-start' />
   }
@@ -264,11 +292,11 @@ const AllCoursesDetails = () => {
           PaperComponent={CustomPaper}
           sx={{
             color: '#fff',
-            '&[aria-selected="true"]': {
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-            },
             '& .MuiChip-label': {
               color: '#fff',
+            },
+            '&[aria-selected="true"]': {
+              borderColor: 'rgba(255, 255, 255, 0.3)',
             },
             '& .MuiChip-deleteIcon': {
               color: '#fff',
@@ -344,62 +372,6 @@ const AllCoursesDetails = () => {
             </Box>
           )}
         />
-        {/* <Autocomplete
-          disablePortal
-          limitTags={3}
-          multiple
-          id='combo-box-demo'
-          value={categorySelect}
-          onChange={(event, value: any) => {
-            setCategorySelect(value)
-          }}
-          getOptionLabel={(option: any) => option.name_of_tag}
-          options={allCategorySelect}
-          fullWidth
-          sx={{
-            color: '#fff',
-            '& .MuiInputLabel-root': {
-              color: 'rgba(255, 255, 255, 0.3)', // Label color
-            },
-            '.MuiInputBase-input': {
-              height: '1.5rem',
-            },
-            '& [aria-expanded=true]': {
-              background: 'rgba(255, 255, 255, 0.1)',
-            },
-            '& .MuiSvgIcon-root': {
-              color: 'rgba(255, 255, 255, 0.3)',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-            },
-            '.MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(255, 255, 255, 0.2)',
-            },
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label='Category'
-              sx={{
-                '.MuiInputBase-input': {
-                  height: '1.5rem',
-                },
-              }}
-            />
-          )}
-          renderOption={(props: object, option: any, state: object) => (
-            <div
-              {...props}
-              style={{ display: 'flex', justifyContent: 'space-between', background: '#123' }}
-            >
-              <div>{option.name_of_tag}</div>
-            </div>
-          )}
-        /> */}
       </Box>
       <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
         <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>Level</InputLabel>
@@ -593,18 +565,32 @@ const AllCoursesDetails = () => {
     </Box>
     // </Box>
   )
-
-  function isSecondDateAfterFirst(date1: string, date2: string) {
-    const firstDate = new Date(date1)
-    const secondDate = new Date(date2)
-
-    return secondDate > firstDate
+  function countLessons(course: any) {
+    let summ = 0
+    let summCompleted = 0
+    course.modules.map((module: Module) => {
+      module.lessons.map((lesson) => {
+        summ += 1
+        if (userData.comleted_lessons_id.indexOf(lesson) != -1) {
+          summCompleted += 1
+        }
+      })
+    })
+    return summCompleted + '/' + summ
   }
-  function arrayContainsAll(superset: any, subset: any) {
-    return subset.every((element: any) => superset.includes(element))
-  }
-  function arraysHaveCommonElements(array1: any, array2: any) {
-    return array1.some((element: any) => array2.includes(element))
+  function getProgress(course: any) {
+    let summ = 0
+    let summCompleted = 0
+    course.modules.map((module: Module) => {
+      module.lessons.map((lesson) => {
+        summ += 1
+        if (userData.comleted_lessons_id.indexOf(lesson) != -1) {
+          summCompleted += 1
+        }
+      })
+    })
+
+    return summ == 0 ? 0 : (summCompleted * 100) / summ
   }
 
   return (
@@ -616,18 +602,102 @@ const AllCoursesDetails = () => {
             dataDisplay.map((course: Course, index: number) => {
               return (
                 <>
-                  <CourseCard
-                    title={course.data.title}
-                    language={course.data.language}
-                    level={course.data.level}
-                    date={course.data.date}
-                    type={course.data.type}
-                    description={course.data.description}
-                    rating={course.data.rating}
-                    toLeft={index % 2 == 1 ? true : false}
-                    id={course.id}
-                    mediaValue={course.data.mediaValue}
-                  />
+                  <div key={'MainelementContainer_' + course.id}>
+                    {index != 0 && (
+                      <Box
+                        key={'rowDividerWide_'}
+                        sx={{
+                          width: '100%',
+                          background: 'rgba(255, 255, 255, 0.3)',
+                          minWidth: '60rem',
+                          height: '2px',
+                        }}
+                      ></Box>
+                    )}
+                    <Box
+                      key={'rowContainerWide_'}
+                      sx={{
+                        display: 'flex',
+                        paddingTop: '0.5rem',
+                        paddingBottom: '0.5rem',
+                        width: '100%',
+                        color: '#fff',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {course.data.title}
+                      </Box>
+
+                      <Box
+                        sx={{
+                          borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {course.data.language}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {course.data.level}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {course.data.type}
+                      </Box>
+
+                      <Box
+                        sx={{
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                          display: 'flex',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <CircularProgress
+                          variant='determinate'
+                          size={20}
+                          sx={{ color: '#0B6623' }}
+                          value={getProgress(course.data)}
+                        />
+                        <Box sx={{ marginLeft: 2 }}>{countLessons(course.data)}</Box>
+                        <Link href={'/course-details?id=' + course.id}>
+                          <ForwardIcon sx={{ marginLeft: 2, color: 'rgba(255, 255, 255, 0.3)' }} />
+                        </Link>
+                      </Box>
+                    </Box>
+                  </div>
                 </>
               )
             })
@@ -642,4 +712,4 @@ const AllCoursesDetails = () => {
   )
 }
 
-export default AllCoursesDetails
+export default MyCourses

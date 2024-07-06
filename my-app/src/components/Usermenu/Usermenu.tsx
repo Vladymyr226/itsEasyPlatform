@@ -9,6 +9,7 @@ import RequestModal from '../../components/RequestModal/RequestModal'
 import Image from 'next/image'
 import { deleteCookie } from 'cookies-next'
 import Swal from 'sweetalert2'
+import Link from 'next/link'
 
 const Usermenu = () => {
   const [isUsermenuShown, setIsUsermenuShown] = useState(false)
@@ -32,10 +33,12 @@ const Usermenu = () => {
 
       {isUsermenuShown && (
         <DropModal isUsermenu={true} setIsDropModalShown={setIsUsermenuShown}>
-          <div className={s.usermenuItem}>
-            <Image src={study} alt='study' />
-            <p>Мое обучение</p>
-          </div>
+          <Link href={'/personal-cabinet/my-courses'}>
+            <div className={s.usermenuItem}>
+              <Image src={study} alt='study' />
+              <p>Мое обучение</p>
+            </div>
+          </Link>
           <div className={s.usermenuItem}>
             <Image src={heart} alt='heart' />
             <p>Избранные</p>

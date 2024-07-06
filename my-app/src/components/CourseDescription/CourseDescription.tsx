@@ -92,7 +92,12 @@ const CourseDescription = (props: CourseDescriptionProps) => {
         </p>
       )}
 
-      <Link href={'/course-details?id=' + props.id}>
+      <Link
+        href={'/course-details?id=' + props.id}
+        onClick={(e) => {
+          localStorage.setItem('SelectedCourseIndex', props.id + '')
+        }}
+      >
         <Button text='Узнать больше' />
       </Link>
     </div>

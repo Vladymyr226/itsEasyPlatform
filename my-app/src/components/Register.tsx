@@ -73,6 +73,7 @@ const Registration = () => {
       const resultResponse = response.data
       if (resultResponse) {
         setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
+        localStorage.setItem('UserID', resultResponse.user.id)
         Swal.fire('You signed up successfully!', '', 'success')
         router.push('/admin')
       }

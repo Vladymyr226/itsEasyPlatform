@@ -17,6 +17,12 @@ export interface Module {
   lessons: Array<Lesson>
 }
 export interface Tag {
+  icon_url: string
   name_of_tag: string
+  id: string
+}
+export interface Skill {
+  icon_url: string
+  name_skill: string
   id: string
 }

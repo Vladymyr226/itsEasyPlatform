@@ -27,6 +27,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import axios from 'axios'
 interface CourseData {
   title: string
   language: string
@@ -52,6 +53,7 @@ interface Module {
 }
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 interface LessonData {
   title: string
   link: string
@@ -68,14 +70,24 @@ const LessonDetails = () => {
   const [moduleLessons, setModuleLessons] = useState<Array<string>>()
   const [modules, setModules] = useState<Array<Module>>()
 
-  const [play, setPlay] = useState(false)
+  const [id, setId] = useState<number>()
   const videoRef = useRef(null)
+  const [userData, setUserData] = useState<any>()
 
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
+      const userId = localStorage.getItem('UserID')
+      const responseUser = await fetch(urlUser + '/' + userId, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultUser = await responseUser.json()
 
+      setUserData(resultUser)
       if (fullUrl.split('id=')[1]) {
+        setId(Number(fullUrl.split('id=')[1]))
         const response = await fetch(urlLesson + '/' + fullUrl.split('id=')[1], {
           headers: {
             'Content-Type': 'application/json',
@@ -157,16 +169,10 @@ const LessonDetails = () => {
   }
   const router = useRouter()
 
-  const [expanded, setExpanded] = useState<string | false>(false)
-  const handleChangeExpanded =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false)
-    }
-
   return (
     <Layout>
-      {data && (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', height: '140vb' }}>
+        {data && (
           <Box
             sx={{
               width: '100%',
@@ -214,9 +220,35 @@ const LessonDetails = () => {
                   ></Button>
                 )}
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                  <Button variant='contained' sx={{ maxWidth: '500px', width: '50%' }}>
-                    Complete
-                  </Button>
+                  {userData && userData.comleted_lessons_id.indexOf(id) == -1 && (
+                    <Button
+                      variant='contained'
+                      sx={{ maxWidth: '500px', width: '50%' }}
+                      onClick={async (e) => {
+                        const response = await axios.put(urlUser + '?id=' + userData.id, {
+                          purchasedCoursesId: [...userData.purchased_courses_id],
+                          favouriteCoursesId: [...userData.favourite_courses_id],
+                          comletedLessonsId: [...userData.comleted_lessons_id, id],
+                        })
+                        const resultResponse = response.data
+                        if (
+                          resultResponse &&
+                          moduleLessons &&
+                          getLessonIndx() >= 0 &&
+                          getLessonIndx() < moduleLessons?.length - 1
+                        ) {
+                          if (moduleLessons) {
+                            router.push('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
+                            setTimeout(() => {
+                              router.refresh()
+                            }, 100)
+                          }
+                        }
+                      }}
+                    >
+                      Complete
+                    </Button>
+                  )}
                 </Box>
 
                 {moduleLessons &&
@@ -244,6 +276,8 @@ const LessonDetails = () => {
               </Box>
             </Box>
           </Box>
+        )}
+        {data && (
           <Box
             sx={{
               width: '380px',
@@ -253,76 +287,10 @@ const LessonDetails = () => {
               paddingLeft: 1,
             }}
           >
-            {modules && <CourseLessonMaterials modules={modules} />}
-
-            {/* {modules &&
-              modules.map((element: Module, i: number) => {
-                return (
-                  <Box key={'mainModuleContainer_' + i} sx={{ boxShadow: 2, marginTop: 1 }}>
-                    <Accordion defaultExpanded={true} sx={{}}>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        sx={{
-                          borderBottom: expanded === 'panel' + i ? '2px solid' : '',
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'flex',
-                            width: '100%',
-                            gap: '10px',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <p>{element.title}</p>
-                        </div>
-                      </AccordionSummary>
-
-                      <AccordionDetails style={{ paddingLeft: '8px', paddingRight: '8px' }}>
-                        {element.lessons.map((lesson: any, index: number) => {
-                          return (
-                            <div
-                              key={'mainModuleContainer_' + i}
-                              style={{
-                                color: '#0f0e16',
-                                width: '100%',
-                                background: '#cccccc',
-                                marginTop: '16px',
-                                padding: '16px',
-                                boxShadow:
-                                  '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
-                                display: 'flex',
-                              }}
-                              onClick={(e) => {
-                                if (moduleLessons) {
-                                  localStorage.setItem('SelectedModuleIndex', i + '')
-                                  router.push('/lesson?id=' + lesson.id)
-
-                                  setTimeout(() => {
-                                    router.refresh()
-                                  }, 100)
-                                }
-                              }}
-                            >
-                              <Checkbox
-                                checked={false}
-                                disabled
-                                inputProps={{ 'aria-label': 'controlled' }}
-                              />
-                              <Box sx={{ fontWeight: 'bold', marginTop: 1.3 }}>
-                                {lesson.data.title ?? ''}
-                              </Box>
-                            </div>
-                          )
-                        })}
-                      </AccordionDetails>
-                    </Accordion>
-                  </Box>
-                )
-              })} */}
+            {modules && <CourseLessonMaterials modules={modules} selectedLesson={id ?? -1} />}
           </Box>
-        </Box>
-      )}
+        )}
+      </Box>
     </Layout>
   )
 }

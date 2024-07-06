@@ -42,6 +42,7 @@ const Login = () => {
       const resultResponse = response.data
       if (resultResponse) {
         router.push('/admin')
+        localStorage.setItem('UserID', resultResponse.user.id)
         setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
       }
     } catch (error) {

@@ -12,8 +12,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Accordion, AccordionDetails, AccordionSummary, Checkbox } from '@mui/material'
 import { useRouter } from 'next/navigation'
-
-const CourseLessonMaterials = ({ modules }: { modules: any }) => {
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
+const CourseLessonMaterials = ({
+  modules,
+  selectedLesson,
+}: {
+  modules: any
+  selectedLesson: number
+}) => {
   const [selected, setSelected] = useState<number | null>(null)
 
   const toggle = (i: number) => {
@@ -23,7 +29,23 @@ const CourseLessonMaterials = ({ modules }: { modules: any }) => {
 
     setSelected(i)
   }
+  const [userData, setUserData] = useState<any>()
+  async function getPageData() {
+    if (typeof window !== 'undefined') {
+      const fullUrl = window.location.href
+      const userId = localStorage.getItem('UserID')
+      const responseUser = await fetch(urlUser + '/' + userId, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultUser = await responseUser.json()
+
+      setUserData(resultUser)
+    }
+  }
   useEffect(() => {
+    getPageData()
     const SelectedModuleIndex = localStorage.getItem('SelectedModuleIndex')
     if (SelectedModuleIndex) {
       setSelected(Number(SelectedModuleIndex))
@@ -54,7 +76,10 @@ const CourseLessonMaterials = ({ modules }: { modules: any }) => {
               </div>
             </div>
 
-            <ul className={`${s.accordionContent} ${selected === index ? s.show : ''}`}>
+            <ul
+              className={`${s.accordionContent} ${selected === index ? s.show : ''}`}
+              style={{ padding: 0, gap: 0 }}
+            >
               {module.lessons.map((lesson: any, idx: number) => (
                 <li
                   className={s.materialItemLesson}
@@ -67,18 +92,25 @@ const CourseLessonMaterials = ({ modules }: { modules: any }) => {
                       router.refresh()
                     }, 100)
                   }}
+                  style={{
+                    background: selectedLesson == lesson.id ? 'rgba(197, 142, 254, 0.1)' : '',
+                    padding: '12px',
+                    paddingLeft: '25px',
+                  }}
                 >
                   <div className={s.materialItemTitle}>
-                    <Checkbox
-                      checked={false}
-                      inputProps={{ 'aria-label': 'controlled' }}
-                      sx={{
-                        color: 'inherit',
-                        '&.Mui-checked': {
+                    {userData && (
+                      <Checkbox
+                        checked={userData && userData.comleted_lessons_id.indexOf(lesson.id) != -1}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                        sx={{
                           color: 'inherit',
-                        },
-                      }}
-                    />
+                          '&.Mui-checked': {
+                            color: 'inherit',
+                          },
+                        }}
+                      />
+                    )}
                     <span>{lesson && lesson.data.title}</span>
                   </div>
                 </li>

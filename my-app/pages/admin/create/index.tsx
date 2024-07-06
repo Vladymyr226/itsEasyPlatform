@@ -52,8 +52,7 @@ import React from 'react'
 import YouTube, { YouTubeProps } from 'react-youtube'
 import Autocomplete from '@mui/material/Autocomplete'
 import withReactContent from 'sweetalert2-react-content'
-import { YouTubeProp, TabPanelProps, Lesson, Module, Tag } from '@/utils/interfaces'
-import ArchiveIcon from '@mui/icons-material/Archive'
+import { YouTubeProp, TabPanelProps, Lesson, Module, Tag, Skill } from '@/utils/interfaces'
 import * as AWS from 'aws-sdk'
 import { isEqual } from 'lodash-es'
 import { deleteCookie } from 'cookies-next'
@@ -80,6 +79,7 @@ function ExampleYouTube(props: YouTubeProp) {
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
+const urlSkill = `${process.env.NEXT_BACK_HOST_API}/cabinet/skill`
 
 const textFieldColors = {
   // '& label.Mui-focused': {
@@ -133,7 +133,9 @@ const CourseCreate = () => {
   const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
   const [reDropBlock, setReDropBlock] = useState(false)
   const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
+  const [skillsSelect, setSkillsSelect] = useState<Array<Skill>>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
+  const [allSkillSelect, setAllSkillSelect] = useState<Array<Skill>>([])
   const [form, setForm] = useState<any>({
     title: '',
     date: '2024-01-01',
@@ -342,28 +344,87 @@ const CourseCreate = () => {
       router.push(url)
     }
   }
-  const showSwal = () => {
-    withReactContent(Swal).fire({
-      title: 'Create tag',
-      input: 'text',
-      preConfirm: async () => {
-        if (!Swal.getInput()?.value.trim()) {
-          Swal.showValidationMessage('<i class="fa fa-info-circle"></i> Tag name is required')
-        } else {
-          const val = Swal.getInput()?.value.trim() || ''
-          const response = await axios.post(urlTag + '?title=' + val)
-          const resultResponse = response.data
-          if (resultResponse) {
-            Swal.fire('Created!', '', 'success')
-            setEditTrigger(true)
-            setError({})
-            setAllCategorySelect([
-              ...allCategorySelect,
-              { name_of_tag: val, id: resultResponse.tagId },
-            ])
-          }
+  const showSwalSkill = () => {
+    Swal.fire({
+      title: 'Create Skill',
+      html: `
+          <input type="text" id="textInput" class="swal2-input" placeholder="Enter title">
+      `,
+      focusConfirm: false,
+      preConfirm: () => {
+        const textInput = (Swal.getPopup()?.querySelector('#textInput') as HTMLInputElement).value
+
+        if (!textInput || textInput.trim() == '') {
+          Swal.showValidationMessage(`Please enter text`)
         }
+
+        return { textInput: textInput }
       },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const response = await axios.post(
+          urlSkill + '?title=' + result.value.textInput + '&iconUrl=' + ''
+        )
+        const resultResponse = response.data
+        if (resultResponse) {
+          Swal.fire('Created!', '', 'success')
+          setEditTrigger(true)
+          setError({})
+          console.log(resultResponse)
+          setAllSkillSelect([
+            ...allSkillSelect,
+            {
+              name_skill: result.value.textInput,
+              id: resultResponse.skillId,
+              icon_url: '',
+            },
+          ])
+        }
+      }
+    })
+  }
+  const showSwalTag = () => {
+    Swal.fire({
+      title: 'Create tag',
+      html: `
+          <input type="text" id="textInput" class="swal2-input" placeholder="Enter title">
+          <input type="file" id="fileInput" class="swal2-file">
+      `,
+      focusConfirm: false,
+      preConfirm: () => {
+        const textInput = (Swal.getPopup()?.querySelector('#textInput') as HTMLInputElement).value
+        const fileInput = (Swal.getPopup()?.querySelector('#fileInput') as HTMLInputElement).files
+
+        if (!textInput || textInput.trim() == '') {
+          Swal.showValidationMessage(`Please enter text`)
+        }
+
+        return { textInput: textInput, fileInput: fileInput }
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const selectedFileURL =
+          result.value.fileInput.length > 0 ? await uploadFileToS3(result.value.fileInput[0]) : ''
+
+        const response = await axios.post(
+          urlTag + '?title=' + result.value.textInput + '&iconUrl=' + selectedFileURL
+        )
+        const resultResponse = response.data
+        if (resultResponse) {
+          Swal.fire('Created!', '', 'success')
+          setEditTrigger(true)
+          setError({})
+          console.log(resultResponse)
+          setAllCategorySelect([
+            ...allCategorySelect,
+            {
+              name_of_tag: result.value.textInput,
+              id: resultResponse.tagId,
+              icon_url: selectedFileURL as string,
+            },
+          ])
+        }
+      }
     })
   }
   // fetching functions
@@ -383,6 +444,18 @@ const CourseCreate = () => {
         })
       )
 
+      const responseSkill = await fetch(urlSkill + 's', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultSkill = await responseSkill.json()
+      setAllSkillSelect(
+        resultSkill.getSkills.map((skill: any) => {
+          return skill
+        })
+      )
+
       if (fullUrl.split('_id=')[1]) {
         const response = await fetch(url + 's?id=' + fullUrl.split('_id=')[1], {
           headers: {
@@ -390,6 +463,7 @@ const CourseCreate = () => {
           },
         })
         const result = await response.json()
+        console.log(result)
         const responseLesson = await fetch(urlLesson + 's', {
           headers: {
             'Content-Type': 'application/json',
@@ -957,7 +1031,16 @@ const CourseCreate = () => {
                     renderInput={(params) => <TextField {...params} label='Category' />}
                     renderOption={(props: object, option: any, state: object) => (
                       <div {...props} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <div>{option.name_of_tag}</div>
+                        {option.icon_url && (
+                          <img
+                            src={option.icon_url}
+                            alt={'tagIcon_' + option.id}
+                            style={{ width: 20, height: 20 }}
+                          ></img>
+                        )}
+                        <div style={{ textAlign: 'left', width: '100%', paddingLeft: '10px' }}>
+                          {option.name_of_tag}
+                        </div>
                         <IconButton
                           key={'deleteButton_' + option.id}
                           aria-label='delete'
@@ -985,7 +1068,50 @@ const CourseCreate = () => {
                       </div>
                     )}
                   />
-                  <Button onClick={showSwal}>Create Tag</Button>
+                  <Button onClick={showSwalTag}>Create Tag</Button>
+
+                  <Autocomplete
+                    disablePortal
+                    multiple
+                    id='skills'
+                    value={skillsSelect}
+                    onChange={(event, value: any) => {
+                      setSkillsSelect(value)
+                      setEditTrigger(true)
+                      setError({})
+                    }}
+                    getOptionLabel={(option: any) => option.name_skill}
+                    options={allSkillSelect}
+                    fullWidth
+                    renderInput={(params) => <TextField {...params} label='Skill' />}
+                    renderOption={(props: object, option: any, state: object) => (
+                      <div {...props} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div>{option.name_skill}</div>
+                        <IconButton
+                          key={'deleteButtonSkill_' + option.id}
+                          aria-label='delete'
+                          onClick={async (e) => {
+                            const deletingOption = option
+                            const response = await axios.delete(urlSkill + '?id=' + option.id)
+                            const resultResponse = response.data
+                            if (resultResponse) {
+                              setAllSkillSelect(
+                                allSkillSelect.filter((skill) => skill.id !== deletingOption.id)
+                              )
+                              setSkillsSelect(
+                                skillsSelect.filter((skill) => skill.id !== deletingOption.id)
+                              )
+                              Swal.fire('Deleted!', '', 'success')
+                            }
+                          }}
+                        >
+                          <DeleteIcon key={'deleteIconSkill_'} color='primary' />
+                        </IconButton>
+                      </div>
+                    )}
+                  />
+                  <Button onClick={showSwalSkill}>Create skill</Button>
+
                   {typeof mediaValue?.content == 'string' && (
                     <>
                       {mediaValue.type == 'image' ? (
@@ -1344,7 +1470,7 @@ const CourseCreate = () => {
                                               )
                                             }}
                                           >
-                                            <ArchiveIcon color='error' />
+                                            <DeleteIcon color='error' />
                                           </IconButton>
                                         </Box>
                                         {preview == lesson.id && idLessonEdit != lesson.id && (
