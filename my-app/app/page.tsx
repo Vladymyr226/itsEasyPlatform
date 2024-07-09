@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import s from './HomePage.module.css'
 import CourseCard from '@/components/CourseCard/CourseCard'
@@ -17,6 +17,10 @@ import { Box, Button, TextField, IconButton } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { Tag } from '@/utils/interfaces'
 import courseShadow from '../src/assets/shadows/courseHoverShadow.png'
+import { styled } from '@mui/material/styles'
+
+import Popper from '@mui/material/Popper'
+import Paper from '@mui/material/Paper'
 interface CourseData {
   title: string
   language: string
@@ -39,6 +43,7 @@ interface Course {
   id: string
   data: CourseData
   is_active: boolean
+  created_at: string
 }
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 export default function HomePage() {
@@ -68,8 +73,11 @@ export default function HomePage() {
         },
       })
       const result = await response.json()
-      setData(result.getCourses)
-      setDataDisplay(result.getCourses)
+      const dataRes = result.getCourses.sort(function (a: any, b: any) {
+        return b.data.rating - a.data.rating
+      })
+      setData(dataRes)
+      setDataDisplay(dataRes)
     }
   }
   useEffect(() => {
@@ -98,25 +106,41 @@ export default function HomePage() {
           )
         )
       }
-      if (searchField.length > 0) {
+      if (searchField.length >= 2) {
         filteredRes = filteredRes.filter((dataFilter: any) =>
-          dataFilter.data.title.includes(searchField.trim())
+          dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase())
         )
       }
     }
-
+    if (filteredRes) {
+      filteredRes = filteredRes.sort(function (a: any, b: any) {
+        return b.data.rating - a.data.rating
+      })
+    }
     setDataDisplay(filteredRes)
   }
+  const CustomPopper = (props: any) => {
+    return <Popper {...props} placement='bottom-start' />
+  }
 
+  // Custom Paper Component
+  const CustomPaper = styled(Paper)(({ theme }) => ({
+    '& .MuiAutocomplete-listbox': {
+      padding: 0,
+    },
+    '&& .Mui-selected': {
+      color: '#fff',
+      background: '#45444e',
+    },
+  }))
   return (
     <Layout>
       <div className={s.homePage}>
         <PromoSlider />
-
         <h1 className={s.coursesTitle}>Курсы</h1>
-        <Box sx={{ paddingTop: 10, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ paddingTop: 4, display: 'flex', justifyContent: 'center' }}>
           <form
-            style={{ maxWidth: '1000px', width: '100%' }}
+            style={{ maxWidth: '700px', width: '100%', position: 'relative' }}
             onSubmit={(e) => {
               e.preventDefault()
               handleApply()
@@ -135,11 +159,11 @@ export default function HomePage() {
                       handleApply()
                     }}
                   >
-                    <SearchIcon sx={{ color: '#45454e' }} fontSize='large' />
+                    <SearchIcon sx={{ color: '#45454e' }} fontSize='medium' />
                   </IconButton>
                 ),
               }}
-              inputProps={{ style: { fontSize: 25 } }}
+              inputProps={{ style: { fontSize: 18 } }}
               sx={{
                 background: '#171622',
                 '& .MuiInputBase-root': {
@@ -161,21 +185,61 @@ export default function HomePage() {
                 },
               }}
             />
+            {searchField.trim().length >= 2 && (
+              <div
+                style={{
+                  width: '100%',
+                  background: '#171622',
+                  position: 'absolute',
+                  zIndex: 4,
+                  border: '1px solid #28263a',
+                }}
+              >
+                {dataDisplay
+                  .filter((dataFilter: any) =>
+                    dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase())
+                  )
+                  .map((result: any) => {
+                    return (
+                      <Box
+                        key={result.id}
+                        onClick={(e) => {
+                          setSearchField(result.data.title)
+                          handleApply()
+                        }}
+                        sx={{
+                          padding: '10px',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            background: '#28263a',
+                          },
+                        }}
+                      >
+                        {result.data.title}
+                      </Box>
+                    )
+                  })}
+              </div>
+            )}
           </form>
         </Box>
         <Box
           sx={{
             display: 'flex',
             justifyContent: { xs: 'left', md: 'center' },
-            marginTop: 4,
+            marginTop: 2,
+            marginBottom: -6,
           }}
         >
           <Box
             sx={{
               display: 'flex',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
               overflowX: 'auto',
               scrollbarWidth: 'none',
-              maxWidth: '1000px',
+              maxWidth: '1200px',
+              width: '100%',
               gap: 2,
               padding: 2,
             }}
@@ -213,9 +277,14 @@ export default function HomePage() {
                     <img
                       src={tag.icon_url}
                       alt={'tagIcon_' + tag.id}
-                      style={{ width: 45, height: 45 }}
+                      style={{ width: 30, height: 30 }}
                     />
-                    <div style={{ marginLeft: 8, paddingRight: '50px', whiteSpace: 'nowrap' }}>
+                    <div
+                      style={{
+                        marginLeft: 8,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {tag.name_of_tag}
                     </div>
                   </Box>
@@ -224,7 +293,7 @@ export default function HomePage() {
             })}
           </Box>
         </Box>
-        {dataDisplay &&
+        {dataDisplay && dataDisplay.length > 0 ? (
           dataDisplay.map((course: Course, index: number) => {
             return (
               <>
@@ -239,10 +308,16 @@ export default function HomePage() {
                   toLeft={index % 2 == 1 ? true : false}
                   id={course.id}
                   mediaValue={course.data.mediaValue}
+                  createdAt={course.created_at}
                 />
               </>
             )
-          })}
+          })
+        ) : (
+          <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '150px' }}>
+            Nothing was found
+          </h1>
+        )}
 
         {width >= 1200 ? (
           <Link href={'/allCourses'}>

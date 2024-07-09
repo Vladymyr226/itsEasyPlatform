@@ -137,6 +137,17 @@ const LessonDetails = () => {
       getPageData()
     }
   }, [])
+  useEffect(() => {
+    if (id && modules) {
+      modules.map((module: any) => {
+        module.lessons.map((less: any) => {
+          if (less.id == id) {
+            setData(less)
+          }
+        })
+      })
+    }
+  }, [id])
 
   const imgRef = useRef(null)
   const opts: YouTubeProps['opts'] = {
@@ -209,10 +220,8 @@ const LessonDetails = () => {
                     onClick={(e) => {
                       if (getLessonIndx() > 0) {
                         if (moduleLessons) {
-                          router.push('/lesson?id=' + moduleLessons[getLessonIndx() - 1])
-                          setTimeout(() => {
-                            router.refresh()
-                          }, 100)
+                          router.replace('/lesson?id=' + moduleLessons[getLessonIndx() - 1])
+                          setId(Number(moduleLessons[getLessonIndx() - 1]))
                         }
                       }
                     }}
@@ -238,10 +247,8 @@ const LessonDetails = () => {
                           getLessonIndx() < moduleLessons?.length - 1
                         ) {
                           if (moduleLessons) {
-                            router.push('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
-                            setTimeout(() => {
-                              router.refresh()
-                            }, 100)
+                            router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
+                            setId(Number(moduleLessons[getLessonIndx() + 1]))
                           }
                         }
                       }}
@@ -263,10 +270,8 @@ const LessonDetails = () => {
                           getLessonIndx() < moduleLessons?.length - 1
                         ) {
                           if (moduleLessons) {
-                            router.push('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
-                            setTimeout(() => {
-                              router.refresh()
-                            }, 100)
+                            router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
+                            setId(Number(moduleLessons[getLessonIndx() + 1]))
                           }
                         }
                       }}
@@ -287,7 +292,9 @@ const LessonDetails = () => {
               paddingLeft: 1,
             }}
           >
-            {modules && <CourseLessonMaterials modules={modules} selectedLesson={id ?? -1} />}
+            {modules && (
+              <CourseLessonMaterials setId={setId} modules={modules} selectedLesson={id ?? -1} />
+            )}
           </Box>
         )}
       </Box>

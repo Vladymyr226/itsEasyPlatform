@@ -34,7 +34,7 @@ import MailIcon from '@mui/icons-material/Mail'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import TextField from '@mui/material/TextField'
 import Slider from '@mui/material/Slider'
-import { InputLabel, IconButton, Chip } from '@mui/material'
+import { InputLabel, IconButton, Chip, ToggleButtonGroup, ToggleButton, Grid } from '@mui/material'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -46,7 +46,9 @@ import { styled } from '@mui/material/styles'
 
 import Popper from '@mui/material/Popper'
 import Paper from '@mui/material/Paper'
-
+import GridViewIcon from '@mui/icons-material/GridView'
+import ViewStreamIcon from '@mui/icons-material/ViewStream'
+import CourseGridCard from '@/components/CourseGridCard/CourseGridCard'
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
@@ -82,6 +84,7 @@ interface Course {
   id: string
   data: CourseData
   is_active: boolean
+  created_at: string
 }
 const AllCoursesDetails = () => {
   const [width, setWidth] = useState(0)
@@ -181,11 +184,6 @@ const AllCoursesDetails = () => {
         isSecondDateAfterFirst(date, dataFilter.data.date)
       )
     }
-    if (price) {
-      filteredRes = filteredRes.filter(
-        (dataFilter: any) => dataFilter.data.price >= price[0] && dataFilter.data.price <= price[1]
-      )
-    }
     if (language.length) {
       filteredRes = filteredRes.filter(
         (dataFilter: any) => language.indexOf(dataFilter.data.language) != -1
@@ -227,6 +225,7 @@ const AllCoursesDetails = () => {
       background: '#45444e',
     },
   }))
+  const [view, setView] = useState('list')
 
   const DrawerList = (
     // <Box sx={{ width: 250 }} role='presentation'>
@@ -242,6 +241,26 @@ const AllCoursesDetails = () => {
         gap: 2,
       }}
     >
+      <ToggleButtonGroup
+        orientation='vertical'
+        value={view}
+        exclusive
+        onChange={(e, newView) => {
+          setView(newView)
+        }}
+        sx={{ height: '60px' }}
+      >
+        <ToggleButton value='list' aria-label='list' sx={{}}>
+          <ViewStreamIcon
+            sx={{ fontSize: 20, color: view == 'list' ? '#fff' : 'rgba(255, 255, 255, 0.2)' }}
+          />
+        </ToggleButton>
+        <ToggleButton value='grid' aria-label='grid' sx={{}}>
+          <GridViewIcon
+            sx={{ fontSize: 20, color: view == 'grid' ? '#fff' : 'rgba(255, 255, 255, 0.2)' }}
+          />
+        </ToggleButton>
+      </ToggleButtonGroup>
       <Box sx={{ width: '100%', minWidth: '15rem' }}>
         <InputLabel>&nbsp;</InputLabel>
         <Autocomplete
@@ -504,10 +523,109 @@ const AllCoursesDetails = () => {
               borderColor: 'rgba(255, 255, 255, 0.2)',
             },
           }}
+          renderValue={(selected: any) => (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {selected.map((value: any) => (
+                <Box key={value} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {value === 'RU' && (
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      viewBox='0 0 9 6'
+                      width='20'
+                      height='12'
+                    >
+                      <rect fill='#fff' width='9' height='3' />
+                      <rect fill='#d52b1e' y='3' width='9' height='3' />
+                      <rect fill='#0039a6' y='2' width='9' height='2' />
+                    </svg>
+                  )}
+                  {value === 'UA' && (
+                    <svg xmlns='http://www.w3.org/2000/svg' width='20' height='12'>
+                      <rect width='1200' height='10' fill='#0057B7' />
+                      <rect width='1200' height='10' y='6' fill='#FFD700' />
+                    </svg>
+                  )}
+                  {value === 'EN' && (
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      viewBox='0 0 50 30'
+                      width='20'
+                      height='12'
+                    >
+                      <clipPath id='t'>
+                        <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
+                      </clipPath>
+                      <path d='M0,0v30h50v-30z' fill='#012169' />
+                      <path d='M0,0 50,30M50,0 0,30' stroke='#fff' stroke-width='6' />
+                      <path
+                        d='M0,0 50,30M50,0 0,30'
+                        clip-path='url(#t)'
+                        stroke='#C8102E'
+                        stroke-width='4'
+                      />
+                      <path
+                        d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
+                        fill='#C8102E'
+                        stroke='#FFF'
+                        stroke-width='2'
+                      />
+                    </svg>
+                  )}
+                  <span>{value}</span>
+                </Box>
+              ))}
+            </Box>
+          )}
         >
-          <MenuItem value={'RU'}>RU</MenuItem>
-          <MenuItem value={'UA'}>UA</MenuItem>
-          <MenuItem value={'EN'}>EN</MenuItem>
+          <MenuItem value={'RU'}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+              <div style={{ height: '20px', width: '20px', position: 'relative' }}>
+                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 6' width='35' height='20'>
+                  <rect fill='#fff' width='9' height='3' />
+                  <rect fill='#d52b1e' y='3' width='9' height='3' />
+                  <rect fill='#0039a6' y='2' width='9' height='2' />
+                </svg>
+              </div>
+              <p style={{ marginLeft: '20px' }}>RU</p>
+            </Box>
+          </MenuItem>
+          <MenuItem value={'UA'}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+              <div style={{ height: '20px', width: '20px', position: 'relative' }}>
+                <svg xmlns='http://www.w3.org/2000/svg' width='35' height='20'>
+                  <rect width='1200' height='10' fill='#0057B7' />
+                  <rect width='1200' height='10' y='10' fill='#FFD700' />
+                </svg>
+              </div>
+              <p style={{ marginLeft: '20px' }}>UA</p>
+            </Box>
+          </MenuItem>
+          <MenuItem value={'EN'}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ height: '20px', width: '20px', position: 'relative' }}>
+                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 30' width='35' height='20'>
+                  <clipPath id='t'>
+                    <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
+                  </clipPath>
+                  <path d='M0,0v30h50v-30z' fill='#012169' />
+                  <path d='M0,0 50,30M50,0 0,30' stroke='#fff' stroke-width='6' />
+                  <path
+                    d='M0,0 50,30M50,0 0,30'
+                    clip-path='url(#t)'
+                    stroke='#C8102E'
+                    stroke-width='4'
+                  />
+                  <path
+                    d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
+                    fill='#C8102E'
+                    stroke='#FFF'
+                    stroke-width='2'
+                  />
+                </svg>
+              </div>
+              <p style={{ marginLeft: '20px' }}>EN</p>
+            </div>
+          </MenuItem>
         </Select>
       </Box>
 
@@ -565,9 +683,9 @@ const AllCoursesDetails = () => {
         </Select>
       </Box>
 
-      <IconButton
-        aria-label='delete'
-        sx={{ marginTop: 3, width: '50px', marginRight: -2 }}
+      <Button
+        variant='text'
+        sx={{ borderRadius: 0, marginTop: 3, width: '20rem', color: '#fff' }}
         onClick={(e) => {
           setDate('')
           setPrice([0, maxPrice ?? 1000])
@@ -579,16 +697,7 @@ const AllCoursesDetails = () => {
           setDataDisplay(data)
         }}
       >
-        <ClearIcon sx={{ color: '#fff' }} />
-      </IconButton>
-      <Button
-        variant='text'
-        sx={{ borderRadius: 0, marginTop: 3, width: '20rem', color: '#fff' }}
-        onClick={(e) => {
-          handleApply()
-        }}
-      >
-        <b>Apply</b>
+        <b>Clear</b>
       </Button>
     </Box>
     // </Box>
@@ -607,34 +716,72 @@ const AllCoursesDetails = () => {
     return array1.some((element: any) => array2.includes(element))
   }
 
+  useEffect(() => {
+    handleApply()
+  }, [categorySelect])
+  useEffect(() => {
+    handleApply()
+  }, [level])
+  useEffect(() => {
+    handleApply()
+  }, [language])
+  useEffect(() => {
+    handleApply()
+  }, [type])
   return (
     <Layout>
       <Box sx={{ display: 'inline' }}>
         {DrawerList}
         <Box sx={{ width: '100%', color: '#fff', minHeight: '40rem' }}>
-          {dataDisplay && dataDisplay.length > 0 ? (
-            dataDisplay.map((course: Course, index: number) => {
-              return (
-                <>
-                  <CourseCard
-                    title={course.data.title}
-                    language={course.data.language}
-                    level={course.data.level}
-                    date={course.data.date}
-                    type={course.data.type}
-                    description={course.data.description}
-                    rating={course.data.rating}
-                    toLeft={index % 2 == 1 ? true : false}
-                    id={course.id}
-                    mediaValue={course.data.mediaValue}
-                  />
-                </>
-              )
-            })
-          ) : (
-            <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
-              No data found
-            </h1>
+          {view == 'list' && (
+            <>
+              {dataDisplay && dataDisplay.length > 0 ? (
+                dataDisplay.map((course: Course, index: number) => {
+                  return (
+                    <>
+                      <CourseCard
+                        title={course.data.title}
+                        language={course.data.language}
+                        level={course.data.level}
+                        date={course.data.date}
+                        type={course.data.type}
+                        description={course.data.description}
+                        rating={course.data.rating}
+                        toLeft={index % 2 == 1 ? true : false}
+                        id={course.id}
+                        mediaValue={course.data.mediaValue}
+                        createdAt={course.created_at}
+                      />
+                    </>
+                  )
+                })
+              ) : (
+                <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                  Nothing was found
+                </h1>
+              )}
+            </>
+          )}
+          {view == 'grid' && (
+            <>
+              {dataDisplay && dataDisplay.length > 0 ? (
+                <Grid container sx={{ gap: 20, justifyContent: 'center', paddingTop: 10 }}>
+                  {dataDisplay.map((course: Course, index: number) => {
+                    return (
+                      <>
+                        <Grid item sx={{}}>
+                          <CourseGridCard course={course} />
+                        </Grid>
+                      </>
+                    )
+                  })}
+                </Grid>
+              ) : (
+                <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                  Nothing was found
+                </h1>
+              )}
+            </>
           )}
         </Box>
       </Box>

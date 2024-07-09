@@ -47,8 +47,10 @@ const Prices = ({
     <>
       <h3 className={s.sidebarTitle}>Самообучение</h3>
       <div className={s.priceWrapper}>
-        <span className={s.prevPrice}>${price}</span>
-        <span className={s.currentPrice}>${priceDiscount}</span>
+        {priceDiscount && priceDiscount > 0 ? <span className={s.prevPrice}>${price}</span> : <></>}
+        <span className={s.currentPrice}>
+          ${priceDiscount && priceDiscount > 0 ? priceDiscount : price}
+        </span>
       </div>
       <button
         className={s.sidebarFillButton}
@@ -155,7 +157,7 @@ const CourseSidebar = ({
         {/* <ViewsCount /> */}
       </div>
 
-      <div className={s.divide}></div>
+      {/* <div className={s.divide}></div>
 
       {width < 1200 && <Prices price={price} priceDiscount={priceDiscount} />}
 
@@ -164,7 +166,7 @@ const CourseSidebar = ({
         Получите доступ к более чем 57 лучших курсов на IT’s easy для своей команды - когда угодно,
         где угодно.
       </p>
-      <button className={s.footerButton}>Получить IT’s easy business </button>
+      <button className={s.footerButton}>Получить IT’s easy business </button> */}
     </div>
   )
 }

@@ -20,6 +20,7 @@ const tableColumn = {
 }
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
+const urlFeedback = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback`
 
 const TableColumns = () => {
   return (
@@ -59,6 +60,13 @@ const TableColumns = () => {
           ...tableColumn,
         }}
       >
+        Status
+      </Box>
+      <Box
+        sx={{
+          ...tableColumn,
+        }}
+      >
         Control buttons
       </Box>
     </>
@@ -74,7 +82,16 @@ const AdminTable = () => {
         },
       })
       const result = await response.json()
-      setData(result.getCourses)
+      console.log(
+        result.getCourses.sort(function (a: any, b: any) {
+          return (new Date(b.created_at) as any) - (new Date(a.created_at) as any)
+        })
+      )
+      setData(
+        result.getCourses.sort(function (a: any, b: any) {
+          return (new Date(b.created_at) as any) - (new Date(a.created_at) as any)
+        })
+      )
     }
   }
   useEffect(() => {
@@ -201,7 +218,7 @@ const AdminTable = () => {
                 paddingTop: 1,
                 paddingBottom: 1,
                 width: '100%',
-                minWidth: '60rem',
+                minWidth: '70rem',
               }}
             >
               <TableColumns />
@@ -215,7 +232,7 @@ const AdminTable = () => {
                       sx={{
                         width: '100%',
                         background: '#000',
-                        minWidth: '60rem',
+                        minWidth: '70rem',
                         height: '2px',
                       }}
                     ></Box>
@@ -292,6 +309,18 @@ const AdminTable = () => {
                       </Box>
                       <Box
                         sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {element.is_active ? 'active' : 'archived'}
+                      </Box>
+                      <Box
+                        sx={{
                           display: 'flex',
                           justifyContent: 'space-around',
                           minWidth: '10rem',
@@ -319,7 +348,7 @@ const AdminTable = () => {
               <div>
                 <LinearProgress
                   sx={{
-                    minWidth: '60rem',
+                    minWidth: '70rem',
                   }}
                 />
                 <Box

@@ -116,7 +116,6 @@ function CustomTabPanel(props: TabPanelProps) {
     </div>
   )
 }
-
 const CourseCreate = () => {
   const router = useRouter()
   // States
@@ -138,7 +137,7 @@ const CourseCreate = () => {
   const [allSkillSelect, setAllSkillSelect] = useState<Array<Skill>>([])
   const [form, setForm] = useState<any>({
     title: '',
-    date: '2024-01-01',
+    date: new Date().toISOString().split('T')[0],
     duration: null,
     lector: '',
     price: null,
@@ -248,9 +247,6 @@ const CourseCreate = () => {
       form.price == null ||
       form.price == 0 ||
       form.price < 0 ||
-      form.priceDiscount == null ||
-      form.priceDiscount == 0 ||
-      form.priceDiscount < 0 ||
       language == '' ||
       level == '' ||
       type == '' ||
@@ -646,7 +642,7 @@ const CourseCreate = () => {
   function isEdited() {
     return (
       form.title != '' ||
-      form.date != '2024-01-01' ||
+      form.date != new Date().toISOString().split('T')[0] ||
       form.duration != undefined ||
       form.lector != '' ||
       form.price != undefined ||
@@ -844,26 +840,6 @@ const CourseCreate = () => {
                     margin='normal'
                     required
                     fullWidth
-                    id='date'
-                    type='date'
-                    label='Date'
-                    name='date'
-                    onChange={(e) => {
-                      setForm({ ...form, date: e.target.value })
-                      setEditTrigger(true)
-                      setError({})
-                    }}
-                    value={form.date || '2024-01-01'}
-                    sx={{
-                      ...textFieldColors,
-                      marginTop: 3,
-                    }}
-                  />
-                  <TextField
-                    autoComplete='off'
-                    margin='normal'
-                    required
-                    fullWidth
                     error={(error && error.duration) ?? false}
                     id='duration'
                     type='number'
@@ -904,9 +880,7 @@ const CourseCreate = () => {
                   <TextField
                     autoComplete='off'
                     margin='normal'
-                    required
                     fullWidth
-                    error={(error && error.priceDiscount) ?? false}
                     id='priceDiscount'
                     type='number'
                     label='Price with discount'
@@ -917,7 +891,6 @@ const CourseCreate = () => {
                     onChange={(e) => {
                       setForm({ ...form, priceDiscount: Number(e.target.value) })
                       setEditTrigger(true)
-                      setError({})
                     }}
                     value={form.priceDiscount || ''}
                     sx={{ ...textFieldColors }}
@@ -982,6 +955,28 @@ const CourseCreate = () => {
                       }}
                       value={form.lector}
                       sx={{ ...textFieldColors }}
+                    />
+                  )}
+                  {type == 'with-lector' && (
+                    <TextField
+                      autoComplete='off'
+                      margin='normal'
+                      required
+                      fullWidth
+                      id='date'
+                      type='date'
+                      label='Date'
+                      name='date'
+                      onChange={(e) => {
+                        setForm({ ...form, date: e.target.value })
+                        setEditTrigger(true)
+                        setError({})
+                      }}
+                      value={form.date || new Date().toISOString().split('T')[0]}
+                      sx={{
+                        ...textFieldColors,
+                        marginTop: 3,
+                      }}
                     />
                   )}
                   <Box sx={{ marginTop: 2 }}>
@@ -1160,7 +1155,7 @@ const CourseCreate = () => {
                         onClick={(e) => {
                           setForm({
                             title: '',
-                            date: '2024-01-01',
+                            date: new Date().toISOString().split('T')[0],
                             duration: null,
                             lector: '',
                             price: null,
@@ -1385,7 +1380,7 @@ const CourseCreate = () => {
                                   justifyContent: 'center',
                                 }}
                               >
-                                <Box sx={{ width: '70%' }}>
+                                <Box sx={{ width: '100%' }}>
                                   {element.lessons.map((lesson, index) => {
                                     return (
                                       <div

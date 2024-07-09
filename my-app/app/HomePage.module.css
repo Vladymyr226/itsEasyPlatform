@@ -41,7 +41,7 @@
 
   text-align: center;
 
-  margin-top: 80px;
+  margin-top: 40px;
 
   color: var(--main-color);
 }
@@ -85,6 +85,6 @@
   .coursesTitle {
     font-size: 56px;
     line-height: 69px;
-    margin-top: 159px;
+    margin-top: 100px;
   }
 }

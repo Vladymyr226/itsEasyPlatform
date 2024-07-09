@@ -16,9 +16,11 @@ const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 const CourseLessonMaterials = ({
   modules,
   selectedLesson,
+  setId,
 }: {
   modules: any
   selectedLesson: number
+  setId: any
 }) => {
   const [selected, setSelected] = useState<number | null>(null)
 
@@ -86,11 +88,8 @@ const CourseLessonMaterials = ({
                   key={idx}
                   onClick={(e) => {
                     localStorage.setItem('SelectedModuleIndex', index + '')
-                    router.push('/lesson?id=' + lesson.id)
-
-                    setTimeout(() => {
-                      router.refresh()
-                    }, 100)
+                    router.replace('/lesson?id=' + lesson.id)
+                    setId(lesson.id)
                   }}
                   style={{
                     background: selectedLesson == lesson.id ? 'rgba(197, 142, 254, 0.1)' : '',

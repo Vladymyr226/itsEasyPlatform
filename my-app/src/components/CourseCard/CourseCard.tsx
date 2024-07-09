@@ -14,6 +14,7 @@ interface CourseCardProps {
   toLeft: boolean
   id: string
   mediaValue: any
+  createdAt: string
 }
 const CourseCard = (props: CourseCardProps) => {
   const [width, setWidth] = useState(0)
@@ -38,6 +39,7 @@ const CourseCard = (props: CourseCardProps) => {
         rating={props.rating}
         id={props.id}
         mediaValue={props.mediaValue}
+        createdAt={props.createdAt}
       />
 
       {width >= 1200 && <CourseImage mediaValue={props.mediaValue} rating={props.rating} />}
