@@ -11,7 +11,7 @@ import PlayButton from '@/components/PlayButton/PlayButton'
 import { PauseButton } from '@/components/PlayButton/PlayButton'
 
 import PopularCourses from '@/components/PopularCourses/PopularCourses'
-import Rating from '@/components/Rating/Rating'
+import Rating from '@mui/material/Rating'
 import SkillsList from '@/components/SkillsList/SkillsList'
 import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
@@ -22,12 +22,13 @@ import YouTube, { YouTubeProps } from 'react-youtube'
 
 import { YouTubeProp } from '@/utils/interfaces'
 import { useRouter } from 'next/navigation'
-import { Accordion, AccordionDetails, AccordionSummary, Checkbox } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
-
+import StarBorderIcon from '@mui/icons-material/StarBorder'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 interface CourseData {
   title: string
   language: string
@@ -54,6 +55,7 @@ interface Module {
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
+const urlFeedback = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback`
 interface LessonData {
   title: string
   link: string
@@ -73,7 +75,6 @@ const LessonDetails = () => {
   const [id, setId] = useState<number>()
   const videoRef = useRef(null)
   const [userData, setUserData] = useState<any>()
-
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
@@ -285,16 +286,66 @@ const LessonDetails = () => {
         {data && (
           <Box
             sx={{
-              width: '380px',
               height: '140vb',
+              paddingLeft: 1,
               overflowY: 'scroll',
               scrollbarWidth: 'none',
-              paddingLeft: 1,
+              width: '380px',
             }}
           >
-            {modules && (
-              <CourseLessonMaterials setId={setId} modules={modules} selectedLesson={id ?? -1} />
-            )}
+            <Box
+              sx={{
+                borderRadius: 2,
+                background: 'rgba(197, 142, 254, 0.1)',
+                color: '#fff',
+                padding: 2,
+                display: 'flex',
+                justifyContent: 'space-around',
+              }}
+            >
+              <h3>Your rate:</h3>
+              <Rating
+                onChange={async (event, newValue) => {
+                  if (newValue) {
+                    if (newValue < 5) {
+                      const { value: text } = await Swal.fire({
+                        input: 'textarea',
+                        inputLabel: 'Message',
+                        inputPlaceholder: 'Type your message here...',
+                        inputAttributes: {
+                          'aria-label': 'Type your message here',
+                        },
+                        showCancelButton: true,
+                      })
+                      const response = await axios.post(
+                        urlFeedback +
+                          '?userId=' +
+                          userData.id +
+                          '&lessonId=' +
+                          id +
+                          '&feedbackName=' +
+                          text
+                      )
+                      Swal.fire('Thank you for your feedback!')
+                    } else {
+                      Swal.fire('Thank you for your feedback!')
+                    }
+                  }
+                }}
+                emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
+                sx={{
+                  fontSize: 22,
+                  '& .MuiRating-iconFilled': {
+                    color: '#fff', // Color of selected stars
+                  },
+                }}
+              />
+            </Box>
+            <Box sx={{ marginTop: 2 }}>
+              {modules && (
+                <CourseLessonMaterials setId={setId} modules={modules} selectedLesson={id ?? -1} />
+              )}
+            </Box>
           </Box>
         )}
       </Box>

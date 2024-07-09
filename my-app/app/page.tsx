@@ -133,6 +133,8 @@ export default function HomePage() {
       background: '#45444e',
     },
   }))
+  const [isShownHints, setIsShownHints] = useState(false)
+  console.log(searchField)
   return (
     <Layout>
       <div className={s.homePage}>
@@ -151,7 +153,16 @@ export default function HomePage() {
               id='standard-name'
               fullWidth
               placeholder='Find course'
+              value={searchField}
               onChange={(e) => setSearchField(e.target.value)}
+              onBlur={(e) => {
+                setTimeout(() => {
+                  setIsShownHints(false)
+                }, 100)
+              }}
+              onFocus={(e) => {
+                setIsShownHints(true)
+              }}
               InputProps={{
                 endAdornment: (
                   <IconButton
@@ -185,7 +196,7 @@ export default function HomePage() {
                 },
               }}
             />
-            {searchField.trim().length >= 2 && (
+            {searchField.trim().length >= 2 && isShownHints && (
               <div
                 style={{
                   width: '100%',
@@ -195,6 +206,21 @@ export default function HomePage() {
                   border: '1px solid #28263a',
                 }}
               >
+                {dataDisplay.filter((dataFilter: any) =>
+                  dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase())
+                ).length === 0 && (
+                  <Box
+                    sx={{
+                      padding: '10px',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        background: '#28263a',
+                      },
+                    }}
+                  >
+                    Nothing was found
+                  </Box>
+                )}
                 {dataDisplay
                   .filter((dataFilter: any) =>
                     dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase())
@@ -205,7 +231,6 @@ export default function HomePage() {
                         key={result.id}
                         onClick={(e) => {
                           setSearchField(result.data.title)
-                          handleApply()
                         }}
                         sx={{
                           padding: '10px',

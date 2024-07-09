@@ -1,15 +1,11 @@
 'use client'
+
 import { useEffect, useState } from 'react'
-import { Box, Button } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import LinearProgress from '@mui/material/LinearProgress'
-import IconButton from '@mui/material/IconButton'
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
 import Link from 'next/link'
-import axios from 'axios'
-import Swal from 'sweetalert2'
 import { deleteCookie } from 'cookies-next'
-import '../../app/globals.css'
+import '../../../app/globals.css'
 
 const tableColumn = {
   minWidth: '10rem',
@@ -18,110 +14,87 @@ const tableColumn = {
   fontWeight: 'bold',
   background: '#cccccc',
 }
-
-const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
-const urlFeedback = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback`
+const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedbacks`
+const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 
 const TableColumns = () => {
   return (
     <>
-      <Box sx={{ ...tableColumn }}>Title</Box>
-
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Language
+        Lesson
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Level
+        Message
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Type
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Price
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Status
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Control buttons
+        Created at
       </Box>
     </>
   )
 }
-const AdminTable = () => {
+const AdminFeedbackTable = () => {
   const [data, setData] = useState<Array<any>>()
+  function getUniqueValues(array: any) {
+    const uniqueValues: any = []
+    const seenValues: any = {}
+
+    for (const value of array) {
+      if (!seenValues[value.lesson_id]) {
+        uniqueValues.push(value.lesson_id)
+        seenValues[value.lesson_id] = true
+      }
+    }
+
+    return uniqueValues
+  }
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
-      const response = await fetch(url + 's', {
+      const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
       const result = await response.json()
-      console.log(
-        result.getCourses.sort(function (a: any, b: any) {
-          return (new Date(b.created_at) as any) - (new Date(a.created_at) as any)
-        })
-      )
+      const responseLesson = await fetch(urlLesson + 's', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultLesson = await responseLesson.json()
       setData(
-        result.getCourses.sort(function (a: any, b: any) {
-          return (new Date(b.created_at) as any) - (new Date(a.created_at) as any)
+        result.getFeedbacks.map((feedback: any) => {
+          return {
+            ...feedback,
+            lesson_id: resultLesson.getLessons.filter(
+              (less: any) => less.id == feedback.lesson_id
+            )[0],
+          }
         })
       )
     }
   }
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       getPageData()
     }
   }, [])
 
-  // sweetalert
-  function showDeleteAlert(id: number) {
-    Swal.fire({
-      title: 'Do you want to delete the course?',
-
-      showCancelButton: true,
-      confirmButtonText: 'Delete',
-      confirmButtonColor: '#d8342c',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const response = await axios.delete(url + '?id=' + id)
-        const resultResponse = response.data
-        if (resultResponse) {
-          setData(data?.filter((course) => course.id != id))
-          Swal.fire('Deleted!', '', 'success')
-        }
-      }
-    })
-  }
-
   return (
-    <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
+    <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
       <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
         <Link href={'/admin/login'}>
           <Button
@@ -137,7 +110,6 @@ const AdminTable = () => {
       </Box>
       <Box
         sx={{
-          marginTop: 8,
           paddingLeft: '2rem',
           paddingRight: '2rem',
           width: '100%',
@@ -153,7 +125,7 @@ const AdminTable = () => {
                 paddingLeft: 2,
                 paddingRight: 2,
                 color: '#000',
-                borderLeft: '2px solid #000',
+
                 fontSize: 20,
               }}
             >
@@ -167,6 +139,7 @@ const AdminTable = () => {
                 paddingLeft: 2,
                 paddingRight: 2,
                 color: '#000',
+
                 fontSize: 20,
               }}
             >
@@ -180,6 +153,7 @@ const AdminTable = () => {
                 paddingLeft: 2,
                 paddingRight: 2,
                 color: '#000',
+                borderLeft: '2px solid #000',
                 fontSize: 20,
               }}
             >
@@ -195,22 +169,6 @@ const AdminTable = () => {
             flexDirection: 'column',
           }}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'end', marginBottom: 2 }}>
-            <Link href={'./admin/create'}>
-              <Button
-                variant='contained'
-                sx={{
-                  padding: 1,
-                  borderRadius: '10px',
-                  paddingLeft: 2,
-                  paddingRight: 2,
-                  fontWeight: 'bold',
-                }}
-              >
-                Add
-              </Button>
-            </Link>
-          </Box>
           <Box
             sx={{
               width: '100%',
@@ -220,6 +178,7 @@ const AdminTable = () => {
 
               border: '1px solid #000',
               borderTop: '4px solid #000',
+              overflowX: 'auto',
             }}
           >
             <Box
@@ -231,7 +190,7 @@ const AdminTable = () => {
                 paddingTop: 1,
                 paddingBottom: 1,
                 width: '100%',
-                minWidth: '70rem',
+                minWidth: '30rem',
               }}
             >
               <TableColumns />
@@ -239,13 +198,13 @@ const AdminTable = () => {
             {data ? (
               data.map((element) => {
                 return (
-                  <div key={'MainelementContainer_' + element.id}>
+                  <div key={'MainelementContainerUsers'}>
                     <Box
                       key={'rowDividerWide_'}
                       sx={{
                         width: '100%',
                         background: '#000',
-                        minWidth: '70rem',
+                        minWidth: '30rem',
                         height: '2px',
                       }}
                     ></Box>
@@ -256,102 +215,47 @@ const AdminTable = () => {
                         paddingTop: '0.5rem',
                         paddingBottom: '0.5rem',
                         width: '100%',
-                        color: '#000',
                       }}
                     >
                       <Box
                         sx={{
                           borderRight: '2px solid #000',
                           minWidth: '10rem',
+                          width: '100%',
                           textAlign: 'center',
                           paddingTop: 1,
                           paddingBottom: 1,
-                          width: '100%',
                         }}
                       >
-                        {element.data.title}
-                      </Box>
-
-                      <Box
-                        sx={{
-                          borderRight: '2px solid #000',
-                          minWidth: '10rem',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          width: '100%',
-                        }}
-                      >
-                        {element.data.language}
+                        {element.lesson_id.data.title}
                       </Box>
                       <Box
                         sx={{
                           borderRight: '2px solid #000',
                           minWidth: '10rem',
+                          width: '100%',
                           textAlign: 'center',
                           paddingTop: 1,
                           paddingBottom: 1,
-                          width: '100%',
+                          maxHeight: '80px',
+                          overflowY: 'auto',
+                          scrollbarWidth: 'none',
                         }}
                       >
-                        {element.data.level}
+                        {element.feedback_name}
                       </Box>
                       <Box
                         sx={{
-                          borderRight: '2px solid #000',
                           minWidth: '10rem',
+                          width: '100%',
                           textAlign: 'center',
                           paddingTop: 1,
                           paddingBottom: 1,
-                          width: '100%',
                         }}
                       >
-                        {element.data.type}
-                      </Box>
-                      <Box
-                        sx={{
-                          borderRight: '2px solid #000',
-                          minWidth: '10rem',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          width: '100%',
-                        }}
-                      >
-                        {element.data.price}
-                      </Box>
-                      <Box
-                        sx={{
-                          borderRight: '2px solid #000',
-                          minWidth: '10rem',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          width: '100%',
-                        }}
-                      >
-                        {element.is_active ? 'active' : 'archived'}
-                      </Box>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-around',
-                          minWidth: '10rem',
-                          width: '100%',
-                        }}
-                      >
-                        <Link href={'./admin/create?_id=' + element.id}>
-                          <IconButton key={'editButton_'} aria-label='edit'>
-                            <EditIcon key={'editIcon_'} color='primary' />
-                          </IconButton>
-                        </Link>
-                        <IconButton
-                          key={'deleteButton_'}
-                          aria-label='delete'
-                          onClick={(e) => showDeleteAlert(element.id)}
-                        >
-                          <DeleteIcon key={'deleteIcon_'} color='primary' />
-                        </IconButton>
+                        {new Date(element.created_at).toLocaleDateString() +
+                          ' , ' +
+                          new Date(element.created_at).toLocaleTimeString()}
                       </Box>
                     </Box>
                   </div>
@@ -361,7 +265,7 @@ const AdminTable = () => {
               <div>
                 <LinearProgress
                   sx={{
-                    minWidth: '70rem',
+                    minWidth: '110rem',
                   }}
                 />
                 <Box
@@ -382,4 +286,4 @@ const AdminTable = () => {
   )
 }
 
-export default AdminTable
+export default AdminFeedbackTable

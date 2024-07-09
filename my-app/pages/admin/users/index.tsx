@@ -53,7 +53,7 @@ const AdminTable = () => {
         },
       })
       const result = await response.json()
-      setData(result.getLessons)
+      setData(result.getUsers)
     }
   }
 
@@ -102,7 +102,7 @@ const AdminTable = () => {
               Courses
             </Box>
           </Link>
-          <Link href={'/users'}>
+          <Link href={'/admin/users'}>
             <Box
               sx={{
                 fontWeight: 'bold',
@@ -114,6 +114,19 @@ const AdminTable = () => {
               }}
             >
               Users
+            </Box>
+          </Link>
+          <Link href={'/admin/feedback'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+                fontSize: 20,
+              }}
+            >
+              Feedback
             </Box>
           </Link>
         </Box>

@@ -759,6 +759,21 @@ const CourseCreate = () => {
           >
             Users
           </Box>
+          <Box
+            sx={{
+              fontWeight: 'bold',
+              paddingLeft: 2,
+              paddingRight: 2,
+              color: '#000',
+              fontSize: 20,
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {
+              showPushAction('/admin/feedback')
+            }}
+          >
+            Feedback
+          </Box>
         </Box>
         <Box sx={{ width: '100%' }}>
           <Box
