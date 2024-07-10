@@ -230,33 +230,35 @@ const LessonDetails = () => {
                   ></Button>
                 )}
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                  {userData && userData.comleted_lessons_id.indexOf(id) == -1 && (
-                    <Button
-                      variant='contained'
-                      sx={{ maxWidth: '500px', width: '50%' }}
-                      onClick={async (e) => {
-                        const response = await axios.put(urlUser + '?id=' + userData.id, {
-                          purchasedCoursesId: [...userData.purchased_courses_id],
-                          favouriteCoursesId: [...userData.favourite_courses_id],
-                          comletedLessonsId: [...userData.comleted_lessons_id, id],
-                        })
-                        const resultResponse = response.data
-                        if (
-                          resultResponse &&
-                          moduleLessons &&
-                          getLessonIndx() >= 0 &&
-                          getLessonIndx() < moduleLessons?.length - 1
-                        ) {
-                          if (moduleLessons) {
-                            router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
-                            setId(Number(moduleLessons[getLessonIndx() + 1]))
+                  {typeof userData.comleted_lessons_id !== 'undefined' &&
+                    userData.comleted_lessons_id.length > 0 &&
+                    userData.comleted_lessons_id.indexOf(id) == -1 && (
+                      <Button
+                        variant='contained'
+                        sx={{ maxWidth: '500px', width: '50%' }}
+                        onClick={async (e) => {
+                          const response = await axios.put(urlUser + '?id=' + userData.id, {
+                            purchasedCoursesId: [...userData.purchased_courses_id],
+                            favouriteCoursesId: [...userData.favourite_courses_id],
+                            comletedLessonsId: [...userData.comleted_lessons_id, id],
+                          })
+                          const resultResponse = response.data
+                          if (
+                            resultResponse &&
+                            moduleLessons &&
+                            getLessonIndx() >= 0 &&
+                            getLessonIndx() < moduleLessons?.length - 1
+                          ) {
+                            if (moduleLessons) {
+                              router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
+                              setId(Number(moduleLessons[getLessonIndx() + 1]))
+                            }
                           }
-                        }
-                      }}
-                    >
-                      Complete
-                    </Button>
-                  )}
+                        }}
+                      >
+                        Complete
+                      </Button>
+                    )}
                 </Box>
 
                 {moduleLessons &&
@@ -305,28 +307,44 @@ const LessonDetails = () => {
             >
               <h3>Your rate:</h3>
               <Rating
+                disabled={
+                  !(
+                    localStorage.getItem('SelectedCourse') &&
+                    typeof userData.purchased_courses_id !== 'undefined' &&
+                    userData.purchased_courses_id.indexOf(localStorage.getItem('SelectedCourse')) !=
+                      -1
+                  )
+                }
                 onChange={async (event, newValue) => {
                   if (newValue) {
                     if (newValue < 5) {
-                      const { value: text } = await Swal.fire({
-                        input: 'textarea',
-                        inputLabel: 'Message',
-                        inputPlaceholder: 'Type your message here...',
-                        inputAttributes: {
-                          'aria-label': 'Type your message here',
-                        },
-                        showCancelButton: true,
-                      })
-                      const response = await axios.post(
-                        urlFeedback +
-                          '?userId=' +
-                          userData.id +
-                          '&lessonId=' +
-                          id +
-                          '&feedbackName=' +
-                          text
-                      )
-                      Swal.fire('Thank you for your feedback!')
+                      if (
+                        localStorage.getItem('SelectedCourse') &&
+                        typeof userData.purchased_courses_id !== 'undefined' &&
+                        userData.purchased_courses_id.indexOf(
+                          localStorage.getItem('SelectedCourse')
+                        ) != -1
+                      ) {
+                        const { value: text } = await Swal.fire({
+                          input: 'textarea',
+                          inputLabel: 'Message',
+                          inputPlaceholder: 'Type your message here...',
+                          inputAttributes: {
+                            'aria-label': 'Type your message here',
+                          },
+                          showCancelButton: true,
+                        })
+                        const response = await axios.post(
+                          urlFeedback +
+                            '?userId=' +
+                            userData.id +
+                            '&lessonId=' +
+                            id +
+                            '&feedbackName=' +
+                            text
+                        )
+                        Swal.fire('Thank you for your feedback!')
+                      }
                     } else {
                       Swal.fire('Thank you for your feedback!')
                     }

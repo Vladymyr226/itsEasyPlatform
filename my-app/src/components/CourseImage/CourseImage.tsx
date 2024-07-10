@@ -33,8 +33,22 @@ const CourseImage = ({ rating, mediaValue }: { rating: number; mediaValue: any }
 
               {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
               <div className={s.courseStatsWrapper}>
-                <Rating rating={rating} />
-                <ViewsCount />
+                <div
+                  style={{
+                    position: 'absolute',
+                    background: '#000',
+                    borderRadius: '12px',
+                    width: '100%',
+                    height: '100%',
+                    opacity: '0.3',
+                  }}
+                >
+                  &nbsp;
+                </div>
+                <div style={{ padding: '10px', zIndex: 99 }}>
+                  <Rating rating={rating} />
+                  <ViewsCount />
+                </div>
               </div>
               <Image className={s.shadow} src={courseShadow} alt='shadow' />
             </>
@@ -52,8 +66,22 @@ const CourseImage = ({ rating, mediaValue }: { rating: number; mediaValue: any }
                 {!play && <PlayButton onClickPlay={setPlay} videoRef={videoRef} />}
                 {play && <PauseButton onClickPlay={setPlay} videoRef={videoRef} />}
                 <div className={s.courseStatsWrapper}>
-                  <Rating rating={rating} />
-                  <ViewsCount />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      background: '#000',
+                      borderRadius: '12px',
+                      width: '100%',
+                      height: '100%',
+                      opacity: '0.3',
+                    }}
+                  >
+                    &nbsp;
+                  </div>
+                  <div style={{ padding: '10px', zIndex: 99 }}>
+                    <Rating isSmall={true} rating={rating} />
+                    <ViewsCount />
+                  </div>
                 </div>
                 <Image className={s.shadow} src={courseShadow} alt='shadow' />
               </Box>

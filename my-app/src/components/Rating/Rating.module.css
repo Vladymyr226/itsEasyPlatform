@@ -3,7 +3,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 2px;
-
+  min-width: 200px;
   font-weight: 400;
   font-size: 14px;
   line-height: 19px;
@@ -43,7 +43,6 @@
   }
 
   .ratingWrapper {
-    flex-wrap: nowrap;
     gap: 10px;
 
     font-size: 16px;

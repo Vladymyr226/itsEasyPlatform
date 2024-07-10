@@ -149,8 +149,22 @@ const CourseDetails = () => {
                       />
                       {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
                       <div className={s.courseStatsWrapper}>
-                        {data && <Rating rating={data?.data.rating} />}
-                        <ViewsCount />
+                        <div
+                          style={{
+                            position: 'absolute',
+                            background: '#000',
+                            borderRadius: '12px',
+                            width: '100%',
+                            height: '100%',
+                            opacity: '0.3',
+                          }}
+                        >
+                          &nbsp;
+                        </div>
+                        <div style={{ padding: '10px', zIndex: 99 }}>
+                          {data && <Rating rating={data?.data.rating} />}
+                          <ViewsCount />
+                        </div>
                       </div>
                     </Box>
                   </>
@@ -310,7 +324,14 @@ const CourseDetails = () => {
               >
                 Вас может <span className={s.accentuated}>заинтересовать</span>
               </p>
-              <PopularCourses data={popularCoursesData} />
+              <div
+                style={{
+                  maxWidth: '100%',
+                  width: '100%',
+                }}
+              >
+                <PopularCourses data={popularCoursesData} />
+              </div>
             </>
           )}
         </div>

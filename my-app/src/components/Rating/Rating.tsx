@@ -15,8 +15,9 @@ const Rating = ({
 }) => {
   return (
     <div className={`${s.ratingWrapper} ${isSmall ? s.small : ''} ${isBig ? s.big : ''}`}>
-      Рейтинг курса
-      <ul className={s.starsList}>
+      <p>Рейтинг курса</p>
+
+      <div>
         <RatingMui
           readOnly
           name='rating'
@@ -28,7 +29,7 @@ const Rating = ({
             paddingBottom: 1,
           }}
         />
-      </ul>
+      </div>
       {rating}
     </div>
   )

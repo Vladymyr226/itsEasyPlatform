@@ -100,7 +100,10 @@ const CourseLessonMaterials = ({
                   <div className={s.materialItemTitle}>
                     {userData && (
                       <Checkbox
-                        checked={userData && userData.comleted_lessons_id.indexOf(lesson.id) != -1}
+                        checked={
+                          typeof userData.comleted_lessons_id !== 'undefined' &&
+                          userData.comleted_lessons_id.indexOf(lesson.id) != -1
+                        }
                         inputProps={{ 'aria-label': 'controlled' }}
                         sx={{
                           color: 'inherit',

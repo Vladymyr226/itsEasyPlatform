@@ -18,13 +18,14 @@
 
 .courseStatsWrapper {
   display: flex;
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
   flex-direction: column;
   align-items: flex-start;
-  max-width: 120px;
-
+  max-width: none;
   position: absolute;
   left: 4%;
-  top: 65%;
+  top: 74%;
 }
 
 @media screen and (min-width: 1200px) {
