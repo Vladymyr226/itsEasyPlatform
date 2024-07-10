@@ -123,7 +123,7 @@ export default function HomePage() {
     setDataDisplay(filteredRes)
   }
   const [isShownHints, setIsShownHints] = useState(false)
-  console.log(searchField)
+
   return (
     <Layout>
       <div className={s.homePage}>
