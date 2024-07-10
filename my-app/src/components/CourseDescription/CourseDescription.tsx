@@ -118,7 +118,6 @@ const CourseDescription = (props: CourseDescriptionProps) => {
             maxWidth: '90rem',
             maxHeight: '10rem',
             overflowY: 'auto',
-            scrollbarWidth: 'thin',
           }}
         >
           <SlateView value={props.description} />
