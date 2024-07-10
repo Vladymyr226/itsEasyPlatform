@@ -178,8 +178,22 @@ const CourseDetails = () => {
                     {!play && <PlayButton onClickPlay={setPlay} videoRef={videoRef} />}
                     {play && <PauseButton onClickPlay={setPlay} videoRef={videoRef} />}
                     <div className={s.courseStatsWrapper}>
-                      {data && <Rating rating={data?.data.rating} />}
-                      <ViewsCount />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          background: '#000',
+                          borderRadius: '12px',
+                          width: '100%',
+                          height: '100%',
+                          opacity: '0.3',
+                        }}
+                      >
+                        &nbsp;
+                      </div>
+                      <div style={{ padding: '10px', zIndex: 99 }}>
+                        {data && <Rating rating={data?.data.rating} />}
+                        <ViewsCount />
+                      </div>
                     </div>
                   </>
                 )}
