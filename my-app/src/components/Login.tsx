@@ -1,6 +1,3 @@
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -8,6 +5,9 @@ import { useState } from 'react'
 import axios from 'axios'
 import { setCookie } from 'cookies-next'
 import Swal from 'sweetalert2'
+import { Box, Button, TextField, IconButton } from '@mui/material'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 const textFieldColors = {
   '& label.Mui-focused': {
@@ -49,7 +49,7 @@ const Login = () => {
       Swal.fire('Login failure!', '', 'error')
     }
   }
-
+  const [showPass, setShowPass] = useState(false)
   return (
     <Box sx={{ background: 'none', width: '100%' }}>
       <Typography component='h1' variant='h5' sx={{ color: '#ffec3e' }}>
@@ -85,7 +85,7 @@ const Login = () => {
           fullWidth
           name='password'
           label='Password'
-          type='password'
+          type={showPass ? 'text' : 'password'}
           id='password'
           autoComplete='current-password'
           onChange={(e) => setPassword(e.target.value)}
@@ -93,6 +93,21 @@ const Login = () => {
             sx: {
               color: '#ffec3e',
             },
+          }}
+          InputProps={{
+            endAdornment: (
+              <IconButton
+                onClick={(e) => {
+                  setShowPass(!showPass)
+                }}
+              >
+                {showPass ? (
+                  <VisibilityOffIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
+                ) : (
+                  <VisibilityIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
+                )}
+              </IconButton>
+            ),
           }}
           sx={{ ...textFieldColors }}
         />
