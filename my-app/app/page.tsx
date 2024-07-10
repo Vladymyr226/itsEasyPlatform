@@ -89,6 +89,9 @@ export default function HomePage() {
   useEffect(() => {
     handleApply()
   }, [selectedTag])
+  useEffect(() => {
+    handleApply()
+  }, [searchField])
   function arraysHaveCommonElements(array1: any, array2: any) {
     return array1.some((element: any) => array2.includes(element))
   }
@@ -119,20 +122,6 @@ export default function HomePage() {
     }
     setDataDisplay(filteredRes)
   }
-  const CustomPopper = (props: any) => {
-    return <Popper {...props} placement='bottom-start' />
-  }
-
-  // Custom Paper Component
-  const CustomPaper = styled(Paper)(({ theme }) => ({
-    '& .MuiAutocomplete-listbox': {
-      padding: 0,
-    },
-    '&& .Mui-selected': {
-      color: '#fff',
-      background: '#45444e',
-    },
-  }))
   const [isShownHints, setIsShownHints] = useState(false)
   console.log(searchField)
   return (
@@ -158,7 +147,7 @@ export default function HomePage() {
               onBlur={(e) => {
                 setTimeout(() => {
                   setIsShownHints(false)
-                }, 100)
+                }, 500)
               }}
               onFocus={(e) => {
                 setIsShownHints(true)
