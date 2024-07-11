@@ -9,6 +9,7 @@ import Swal from 'sweetalert2'
 import { Box, Button, TextField, IconButton } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import { getLocale } from '@/utils/getLocale'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/auth/register`
 
@@ -84,10 +85,11 @@ const Registration = () => {
     }
   }
   const [showPass, setShowPass] = useState(false)
+  const t = getLocale()
   return (
     <Box sx={{ background: 'none', width: '100%' }}>
       <Typography component='h1' variant='h5' sx={{ color: '#ffec3e' }}>
-        Sign up
+        {t.sign_up}
       </Typography>
       <Box component='form' id='formSignIn' onSubmit={handleSubmit} sx={{ mt: 1 }}>
         <TextField
@@ -96,7 +98,7 @@ const Registration = () => {
           fullWidth
           id='username'
           type='text'
-          label='Username'
+          label={t.username}
           name='username'
           autoComplete='login'
           autoFocus
@@ -114,7 +116,7 @@ const Registration = () => {
           fullWidth
           id='email'
           type='email'
-          label='Email Address'
+          label='Email'
           name='email'
           autoComplete='email'
           autoFocus
@@ -131,7 +133,7 @@ const Registration = () => {
           required
           fullWidth
           name='password'
-          label='Password'
+          label={t.password}
           type={showPass ? 'text' : 'password'}
           id='password'
           autoComplete='current-password'
@@ -177,7 +179,7 @@ const Registration = () => {
             },
           }}
         >
-          Sign Up
+          {t.sign_up}
         </Button>
         <Link href={'./login'}>
           <Box
@@ -191,7 +193,7 @@ const Registration = () => {
               },
             }}
           >
-            Login now
+            {t.login_now}
           </Box>
         </Link>
       </Box>

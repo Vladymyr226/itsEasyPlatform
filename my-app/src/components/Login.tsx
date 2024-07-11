@@ -8,6 +8,7 @@ import Swal from 'sweetalert2'
 import { Box, Button, TextField, IconButton } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import { getLocale } from '@/utils/getLocale'
 
 const textFieldColors = {
   '& label.Mui-focused': {
@@ -50,10 +51,11 @@ const Login = () => {
     }
   }
   const [showPass, setShowPass] = useState(false)
+  const t = getLocale()
   return (
     <Box sx={{ background: 'none', width: '100%' }}>
       <Typography component='h1' variant='h5' sx={{ color: '#ffec3e' }}>
-        Sign in
+        {t.sign_in}
       </Typography>
       <Box component='form' id='formSignIn' onSubmit={handleSubmit} sx={{ mt: 1 }}>
         <TextField
@@ -62,7 +64,7 @@ const Login = () => {
           fullWidth
           id='email'
           type='email'
-          label='Email Address'
+          label='Email'
           name='email'
           autoComplete='email'
           autoFocus
@@ -84,7 +86,7 @@ const Login = () => {
           required
           fullWidth
           name='password'
-          label='Password'
+          label={t.password}
           type={showPass ? 'text' : 'password'}
           id='password'
           autoComplete='current-password'
@@ -130,7 +132,7 @@ const Login = () => {
             },
           }}
         >
-          Sign In
+          {t.sign_in}
         </Button>
         <Link href={'./register'}>
           <Box
@@ -144,7 +146,7 @@ const Login = () => {
               },
             }}
           >
-            Register now
+            {t.register_now}
           </Box>
         </Link>
       </Box>

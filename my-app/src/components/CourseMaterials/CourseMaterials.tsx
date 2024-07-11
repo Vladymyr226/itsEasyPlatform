@@ -10,6 +10,7 @@ import closedLock from '../../assets/closedLock.svg'
 import video from '../../assets/greyVideo.svg'
 import Image from 'next/image'
 import Link from 'next/link'
+import { getLocale } from '@/utils/getLocale'
 
 const CourseMaterials = ({ modules }: { modules: any }) => {
   const [selected, setSelected] = useState<number | null>(null)
@@ -21,7 +22,7 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
 
     setSelected(i)
   }
-
+  const t = getLocale()
   return (
     <div className={s.materialsAccordion}>
       {modules.map((module: any, index: number) => (
@@ -40,7 +41,7 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
               <div className={s.titleRight}>
                 <div>
                   <Image src={notebook} alt='notebook' />
-                  {module.lessons.length} лекций
+                  {module.lessons.length} {t.lectures}
                 </div>
                 {/* <div>
                   <Image src={clock} alt='clock' />
@@ -68,7 +69,7 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
                         <span
                           style={{ cursor: 'pointer', textDecoration: 'none', color: '#ffec3e' }}
                         >
-                          Предосмотр
+                          {t.preview}
                         </span>
                       </Link>
                     </div>

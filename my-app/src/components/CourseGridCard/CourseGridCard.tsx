@@ -8,6 +8,7 @@ import Image from 'next/image'
 
 import Rating from '../Rating/Rating'
 import { useRouter } from 'next/navigation'
+import { getLocale } from '@/utils/getLocale'
 
 const CourseGridCard = ({ course }: { course: any }) => {
   const router = useRouter()
@@ -17,6 +18,7 @@ const CourseGridCard = ({ course }: { course: any }) => {
       tmpSum += 1
     })
   })
+  const t = getLocale()
   return (
     <li className={s.courseItem}>
       <div style={{ maxWidth: '330px' }}>
@@ -31,7 +33,7 @@ const CourseGridCard = ({ course }: { course: any }) => {
           </p>
           <ul className={s.courseInfo}>
             <li style={{ display: 'flex', gap: '10px' }}>
-              <span className={s.accentuated}>Язык</span>
+              <span className={s.accentuated}>{t.language}</span>
               {course.data.language == 'RU' && (
                 <div style={{ height: '20px', width: '10px' }}>
                   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 6' width='20' height='10'>
@@ -79,8 +81,8 @@ const CourseGridCard = ({ course }: { course: any }) => {
               )}
             </li>
             <li>
-              <span className={s.accentuated}>Тип</span>
-              {course.data.type == 'with-lector' ? ' С лектором' : ' Самообучение'}
+              <span className={s.accentuated}>{t.type}</span>
+              {course.data.type == 'with-lector' ? ' ' + t.with_lector : ' ' + t.self_education}
             </li>
             {course.data.type == 'with-lector' ? (
               <li>
@@ -93,7 +95,7 @@ const CourseGridCard = ({ course }: { course: any }) => {
           <Rating isBig={true} isSmall={true} rating={course.data.rating} />
           <ul className={s.courseDetails}>
             <li>
-              <Image src={notebook} alt='notebook' /> {tmpSum} лекций
+              <Image src={notebook} alt='notebook' /> {tmpSum} {t.lectures}
             </li>
             <li>
               <Image src={stat} alt='stat' /> {course.data.level}
@@ -107,7 +109,7 @@ const CourseGridCard = ({ course }: { course: any }) => {
                 router.push('/course-details?id=' + course.id)
               }}
             >
-              Узнать больше
+              {t.learn_more}
             </button>
             <div className={s.priceWrapper}>
               {course.data.priceDiscount && course.data.priceDiscount > 0 ? (

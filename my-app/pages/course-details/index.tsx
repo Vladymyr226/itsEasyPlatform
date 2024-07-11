@@ -19,6 +19,7 @@ import '../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
 import { Box } from '@mui/material'
 import { useRouter } from 'next/navigation'
+import { getLocale } from '@/utils/getLocale'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
@@ -123,6 +124,7 @@ const CourseDetails = () => {
   }, [])
 
   const imgRef = useRef(null)
+  const t = getLocale()
   return (
     <Layout>
       <div className={s.coursePage}>
@@ -213,12 +215,12 @@ const CourseDetails = () => {
           )}
 
           <p className={s.courseSubTitle}>
-            <span className={s.accentuated}>Описание</span> курса
+            <span className={s.accentuated}>{t.course_description}</span>
           </p>
 
           <ul className={s.descInfo}>
             <li className={s.infoItem}>
-              <p className={s.infoItemTitle}>Язык</p>
+              <p className={s.infoItemTitle}>{t.language}</p>
               <p className={s.infoItemContent}>
                 {data && (
                   <>
@@ -277,11 +279,11 @@ const CourseDetails = () => {
               </p>
             </li>
             <li className={s.infoItem}>
-              <p className={s.infoItemTitle}>Уровень</p>
+              <p className={s.infoItemTitle}>{t.level}</p>
               <p className={s.infoItemContent}>{data && data.data.level}</p>
             </li>
             <li className={s.infoItem}>
-              <p className={s.infoItemTitle}>Дата начала курса</p>
+              <p className={s.infoItemTitle}>{t.start_date}</p>
               <p className={s.infoItemContent}>{data && data.data.date}</p>
             </li>
           </ul>
@@ -295,12 +297,12 @@ const CourseDetails = () => {
             style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}
             className={s.courseSubTitle}
           >
-            <span className={s.accentuated}>Материалы</span> курса
+            <span className={s.accentuated}>{t.course_materials}</span>
           </p>
           {data && <CourseMaterials modules={data.data.modules} />}
 
           <p className={s.courseSubTitle}>
-            <span className={s.accentuated}>Набор</span> навыков
+            <span className={s.accentuated}>{t.skill_settings}</span>
           </p>
 
           <div
@@ -314,7 +316,7 @@ const CourseDetails = () => {
           </div>
 
           <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>
-            <span className={s.accentuated}>Что говорят</span> выпускники
+            <span className={s.accentuated}>{t.what_alumni_say}</span>
           </p>
 
           <Comments />
@@ -323,7 +325,7 @@ const CourseDetails = () => {
             style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}
             className={s.courseSubTitle}
           >
-            Чему вы <span className={s.accentuated}>научитесь</span>
+            <span className={s.accentuated}>{t.what_you_learn}</span>
           </p>
           <SkillsList />
 
@@ -336,7 +338,7 @@ const CourseDetails = () => {
                 }}
                 className={s.courseSubTitle}
               >
-                Вас может <span className={s.accentuated}>заинтересовать</span>
+                <span className={s.accentuated}>{t.you_interested}</span>
               </p>
               <div
                 style={{

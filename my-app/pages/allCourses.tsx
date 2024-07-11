@@ -22,6 +22,7 @@ import YouTube, { YouTubeProps } from 'react-youtube'
 
 import { YouTubeProp } from '@/utils/interfaces'
 import { useRouter } from 'next/navigation'
+import { useRouter as detailedRouter } from 'next/router'
 import Drawer from '@mui/material/Drawer'
 import List from '@mui/material/List'
 import Divider from '@mui/material/Divider'
@@ -49,6 +50,7 @@ import Paper from '@mui/material/Paper'
 import GridViewIcon from '@mui/icons-material/GridView'
 import ViewStreamIcon from '@mui/icons-material/ViewStream'
 import CourseGridCard from '@/components/CourseGridCard/CourseGridCard'
+import { getLocale } from '@/utils/getLocale'
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
@@ -139,6 +141,9 @@ const AllCoursesDetails = () => {
   }, [])
 
   const router = useRouter()
+  const routerLocale = detailedRouter()
+
+  console.log(routerLocale.locale)
 
   const [open, setOpen] = useState(false)
 
@@ -226,7 +231,7 @@ const AllCoursesDetails = () => {
     },
   }))
   const [view, setView] = useState('list')
-
+  const t = getLocale()
   const DrawerList = (
     // <Box sx={{ width: 250 }} role='presentation'>
     <Box
@@ -333,7 +338,7 @@ const AllCoursesDetails = () => {
           renderInput={(params) => (
             <TextField
               {...params}
-              label='Category'
+              label={t.category_label}
               sx={{
                 '.MuiInputBase-input': {
                   height: '1.5rem',
@@ -421,7 +426,7 @@ const AllCoursesDetails = () => {
         /> */}
       </Box>
       <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
-        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>Level</InputLabel>
+        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.level}</InputLabel>
         <Select
           multiple
           fullWidth
@@ -476,7 +481,7 @@ const AllCoursesDetails = () => {
         </Select>
       </Box>
       <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
-        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>Language</InputLabel>
+        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.language}</InputLabel>
         <Select
           multiple
           fullWidth
@@ -630,7 +635,7 @@ const AllCoursesDetails = () => {
       </Box>
 
       <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
-        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>Type</InputLabel>
+        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.type}</InputLabel>
         <Select
           multiple
           fullWidth
@@ -697,7 +702,7 @@ const AllCoursesDetails = () => {
           setDataDisplay(data)
         }}
       >
-        <b>Clear</b>
+        <b>{t.clear}</b>
       </Button>
     </Box>
     // </Box>

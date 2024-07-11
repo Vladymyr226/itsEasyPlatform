@@ -10,6 +10,7 @@ import Image from 'next/image'
 import { deleteCookie } from 'cookies-next'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
+import { getLocale } from '@/utils/getLocale'
 
 const Usermenu = () => {
   const [isUsermenuShown, setIsUsermenuShown] = useState(false)
@@ -24,7 +25,7 @@ const Usermenu = () => {
 
     setIsModalOpen(isModalOpen)
   }, [isModalOpen])
-
+  const t = getLocale()
   return (
     <div className={s.userAvatarWrapper}>
       <div onClick={() => setIsUsermenuShown(true)} className={s.userAvatar}>
@@ -36,12 +37,12 @@ const Usermenu = () => {
           <Link href={'/personal-cabinet/my-courses'}>
             <div className={s.usermenuItem}>
               <Image src={study} alt='study' />
-              <p>Мое обучение</p>
+              <p>{t.my_education}</p>
             </div>
           </Link>
           <div className={s.usermenuItem}>
             <Image src={heart} alt='heart' />
-            <p>Избранные</p>
+            <p>{t.my_favorites}</p>
           </div>
           <div
             onClick={() => {
@@ -51,17 +52,18 @@ const Usermenu = () => {
             className={s.usermenuItem}
           >
             <Image src={teacher} alt='teacher' />
-            <p>Стать преподавателем</p>
+            <p>{t.become_a_lector}</p>
           </div>
           <div
             className={s.usermenuItem}
             onClick={(e) => {
               deleteCookie('jwt')
+              localStorage.removeItem('UserID')
               Swal.fire('You logged out successfully', '', 'success')
             }}
           >
             <Image src={logout} alt='logout' />
-            <p>Выйти</p>
+            <p>{t.logout}</p>
           </div>
         </DropModal>
       )}

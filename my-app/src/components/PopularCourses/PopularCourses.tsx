@@ -21,6 +21,7 @@ import 'swiper/css/pagination'
 // import required modules
 import { A11y, Navigation, Pagination } from 'swiper/modules'
 import { Box } from '@mui/material'
+import { getLocale } from '@/utils/getLocale'
 const PopularCourses = ({ data }: { data: any }) => {
   const router = useRouter()
   return (
@@ -60,6 +61,7 @@ const PopularCourses = ({ data }: { data: any }) => {
               tmpSum += 1
             })
           })
+          const t = getLocale()
           return (
             <SwiperSlide className={s.courseItem} key={'popularCourse_' + course.id}>
               <div style={{ maxWidth: '330px' }}>
@@ -74,7 +76,7 @@ const PopularCourses = ({ data }: { data: any }) => {
                   </p>
                   <ul className={s.courseInfo}>
                     <li style={{ display: 'flex', gap: '10px' }}>
-                      <span className={s.accentuated}>Язык</span>
+                      <span className={s.accentuated}>{t.language}</span>
                       {course.data.language == 'RU' && (
                         <div style={{ height: '20px', width: '10px' }}>
                           <svg
@@ -127,8 +129,10 @@ const PopularCourses = ({ data }: { data: any }) => {
                       )}
                     </li>
                     <li>
-                      <span className={s.accentuated}>Тип</span>
-                      {course.data.type == 'with-lector' ? ' С лектором' : ' Самообучение'}
+                      <span className={s.accentuated}>{t.type}</span>
+                      {course.data.type == 'with-lector'
+                        ? ' ' + t.with_lector
+                        : ' ' + t.self_education}
                     </li>
                     {course.data.type == 'with-lector' ? (
                       <li>
@@ -141,7 +145,7 @@ const PopularCourses = ({ data }: { data: any }) => {
                   <Rating isBig={true} isSmall={true} rating={course.data.rating} />
                   <ul className={s.courseDetails}>
                     <li>
-                      <Image src={notebook} alt='notebook' /> {tmpSum} лекций
+                      <Image src={notebook} alt='notebook' /> {tmpSum} {t.lectures}
                     </li>
                     <li>
                       <Image src={stat} alt='stat' /> {course.data.level}
@@ -158,7 +162,7 @@ const PopularCourses = ({ data }: { data: any }) => {
                         }, 1)
                       }}
                     >
-                      Узнать больше
+                      {t.learn_more}
                     </button>
                     <div className={s.priceWrapper}>
                       {course.data.priceDiscount && course.data.priceDiscount > 0 ? (

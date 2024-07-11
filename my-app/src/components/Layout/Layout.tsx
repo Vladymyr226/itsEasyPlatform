@@ -13,6 +13,7 @@ import { ReactNode, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Container from '../Container/Container'
 import Link from 'next/link'
+import { getLocale } from '@/utils/getLocale'
 
 type LayoutProps = {
   children: ReactNode
@@ -37,7 +38,7 @@ const Layout = ({ children }: LayoutProps) => {
     const pageUrl = getPageUrl()
     setTargetSite(pageUrl[0])
   }, [])
-
+  const t = getLocale()
   return (
     <Container>
       {/* блок контент чтобы прижать футер к низу странички */}
@@ -54,7 +55,7 @@ const Layout = ({ children }: LayoutProps) => {
                       targetSite == '' ? s.headerActiveNavigationLink : s.headerNavigationLink
                     }
                   >
-                    Главная
+                    {t.home}
                   </div>
                   <Link href={'/allCourses'}>
                     <div
@@ -64,11 +65,11 @@ const Layout = ({ children }: LayoutProps) => {
                           : s.headerNavigationLink
                       }
                     >
-                      Курсы
+                      {t.courses}
                     </div>
                   </Link>
-                  <div className={s.headerNavigationLink}>Про нас</div>
-                  <div className={s.headerNavigationLink}>Карьера</div>
+                  <div className={s.headerNavigationLink}>{t.about_us}</div>
+                  <div className={s.headerNavigationLink}>{t.career}</div>
                 </div>
 
                 <div className={s.headerControlls}>
@@ -99,49 +100,48 @@ const Layout = ({ children }: LayoutProps) => {
             }}
           >
             <div className={s.footerInfoCard}>
-              <p className={s.footerInfoTitle}>Направления</p>
+              <p className={s.footerInfoTitle}>{t.activities}</p>
               <div className={s.listWrapper}>
                 <ul className={s.footerInfoList}>
-                  <li className={s.footerInfoItem}>Программирование</li>
-                  <li className={s.footerInfoItem}>Дизайн</li>
-                  <li className={s.footerInfoItem}>Аналитика</li>
-                  <li className={s.footerInfoItem}>Маркетинг</li>
+                  <li className={s.footerInfoItem}>{t.programming}</li>
+                  <li className={s.footerInfoItem}>{t.design}</li>
+                  <li className={s.footerInfoItem}>{t.analytics}</li>
+                  <li className={s.footerInfoItem}>{t.marketing}</li>
                 </ul>
                 <ul className={s.footerInfoList}>
-                  <li className={s.footerInfoItem}>Управление</li>
-                  <li className={s.footerInfoItem}>Английский язык</li>
-                  <li className={s.footerInfoItem}>Все курсы</li>
+                  <li className={s.footerInfoItem}>{t.project_management}</li>
+                  <li className={s.footerInfoItem}>{t.all_courses}</li>
                 </ul>
               </div>
             </div>
 
             <div className={s.footerInfoCard}>
-              <p className={s.footerInfoTitle}>Служба_поддержки</p>
+              <p className={s.footerInfoTitle}>{t.support}</p>
               <ul className={s.footerInfoList}>
-                <li className={s.footerInfoItem}>Связаться с отделом продаж</li>
-                <li className={s.footerInfoItem}>Получить помощь</li>
+                <li className={s.footerInfoItem}>{t.contact}</li>
+                <li className={s.footerInfoItem}>{t.get_help}</li>
               </ul>
             </div>
 
             <div className={s.footerInfoCard}>
-              <p className={s.footerInfoTitle}>Компания</p>
+              <p className={s.footerInfoTitle}>{t.company}</p>
 
               {width >= 1200 ? (
                 <ul className={s.footerInfoList}>
-                  <li className={s.footerInfoItem}>Про нас</li>
-                  <li className={s.footerInfoItem}>Работа</li>
-                  <li className={s.footerInfoItem}>Карьера</li>
-                  <li className={s.footerInfoItem}>Партнёрам</li>
+                  <li className={s.footerInfoItem}>{t.about_us}</li>
+                  <li className={s.footerInfoItem}>{t.job}</li>
+                  <li className={s.footerInfoItem}>{t.career}</li>
+                  <li className={s.footerInfoItem}>{t.for_partners}</li>
                 </ul>
               ) : (
                 <div className={s.listWrapper}>
                   <ul className={s.footerInfoList}>
-                    <li className={s.footerInfoItem}>Про нас</li>
-                    <li className={s.footerInfoItem}>Работа</li>
+                    <li className={s.footerInfoItem}>{t.about_us}</li>
+                    <li className={s.footerInfoItem}>{t.job}</li>
                   </ul>
                   <ul className={s.footerInfoList}>
-                    <li className={s.footerInfoItem}>Карьера</li>
-                    <li className={s.footerInfoItem}>Партнёрам</li>
+                    <li className={s.footerInfoItem}>{t.career}</li>
+                    <li className={s.footerInfoItem}>{t.for_partners}</li>
                   </ul>
                 </div>
               )}

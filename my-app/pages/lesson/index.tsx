@@ -75,8 +75,11 @@ const LessonDetails = () => {
   const [id, setId] = useState<number>()
   const videoRef = useRef(null)
   const [userData, setUserData] = useState<any>()
+  const [selectedCourse, setSelectedCourse] = useState<any>()
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
+      setSelectedCourse(localStorage.getItem('SelectedCourse'))
       const fullUrl = window.location.href
       const userId = localStorage.getItem('UserID')
       const responseUser = await fetch(urlUser + '/' + userId, {
@@ -97,12 +100,14 @@ const LessonDetails = () => {
         const result = await response.json()
         setData(result)
         if (localStorage.getItem('SelectedCourse') && localStorage.getItem('SelectedModuleIndex')) {
+          console.log(123)
           const responseCourse = await fetch(url + '/' + localStorage.getItem('SelectedCourse'), {
             headers: {
               'Content-Type': 'application/json',
             },
           })
           const resultCourse = await responseCourse.json()
+          console.log(resultCourse)
           setModuleLessons(
             resultCourse.data.modules[Number(localStorage.getItem('SelectedModuleIndex'))].lessons
           )
@@ -125,6 +130,7 @@ const LessonDetails = () => {
               }
             })
           )
+          console.log(modules)
           setModules(modules)
         }
       } else {
@@ -180,6 +186,8 @@ const LessonDetails = () => {
     return moduleLessons?.indexOf(data ? data.id : '-1') ?? -1
   }
   const router = useRouter()
+  const [completedLessonTrigger, setCompletedLessonTrigger] = useState(false)
+  console.log(userData)
 
   return (
     <Layout>
@@ -230,9 +238,11 @@ const LessonDetails = () => {
                   ></Button>
                 )}
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                  {typeof userData.comleted_lessons_id !== 'undefined' &&
-                    userData.comleted_lessons_id.length > 0 &&
-                    userData.comleted_lessons_id.indexOf(id) == -1 && (
+                  {userData &&
+                    userData?.purchased_courses_id &&
+                    userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 &&
+                    userData?.comleted_lessons_id &&
+                    userData?.comleted_lessons_id.indexOf(id) == -1 && (
                       <Button
                         variant='contained'
                         sx={{ maxWidth: '500px', width: '50%' }}
@@ -243,12 +253,17 @@ const LessonDetails = () => {
                             comletedLessonsId: [...userData.comleted_lessons_id, id],
                           })
                           const resultResponse = response.data
+                          setCompletedLessonTrigger(!completedLessonTrigger)
                           if (
                             resultResponse &&
                             moduleLessons &&
                             getLessonIndx() >= 0 &&
                             getLessonIndx() < moduleLessons?.length - 1
                           ) {
+                            setUserData({
+                              ...userData,
+                              comleted_lessons_id: [...userData.comleted_lessons_id, id],
+                            })
                             if (moduleLessons) {
                               router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
                               setId(Number(moduleLessons[getLessonIndx() + 1]))
@@ -274,6 +289,7 @@ const LessonDetails = () => {
                         ) {
                           if (moduleLessons) {
                             router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
+
                             setId(Number(moduleLessons[getLessonIndx() + 1]))
                           }
                         }
@@ -309,21 +325,20 @@ const LessonDetails = () => {
               <Rating
                 disabled={
                   !(
-                    localStorage.getItem('SelectedCourse') &&
-                    typeof userData.purchased_courses_id !== 'undefined' &&
-                    userData.purchased_courses_id.indexOf(localStorage.getItem('SelectedCourse')) !=
-                      -1
+                    selectedCourse &&
+                    userData &&
+                    userData?.purchased_courses_id &&
+                    userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
                   )
                 }
                 onChange={async (event, newValue) => {
                   if (newValue) {
                     if (newValue < 5) {
                       if (
-                        localStorage.getItem('SelectedCourse') &&
-                        typeof userData.purchased_courses_id !== 'undefined' &&
-                        userData.purchased_courses_id.indexOf(
-                          localStorage.getItem('SelectedCourse')
-                        ) != -1
+                        selectedCourse &&
+                        userData &&
+                        userData?.purchased_courses_id &&
+                        userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
                       ) {
                         const { value: text } = await Swal.fire({
                           input: 'textarea',
@@ -361,7 +376,12 @@ const LessonDetails = () => {
             </Box>
             <Box sx={{ marginTop: 2 }}>
               {modules && (
-                <CourseLessonMaterials setId={setId} modules={modules} selectedLesson={id ?? -1} />
+                <CourseLessonMaterials
+                  setId={setId}
+                  modules={modules}
+                  selectedLesson={id ?? -1}
+                  completedLessonTrigger={completedLessonTrigger}
+                />
               )}
             </Box>
           </Box>

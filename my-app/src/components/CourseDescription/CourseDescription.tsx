@@ -9,6 +9,7 @@ import en from '../../assets/en.svg'
 import ua from '../../assets/ua.svg'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { getLocale } from '@/utils/getLocale'
 interface CourseDescriptionProps {
   title: string
   language: string
@@ -32,7 +33,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
       window.removeEventListener('resize', handleResize)
     }
   }, [])
-
+  const t = getLocale()
   return (
     <div className={s.courseDescription}>
       <div className={s.descHeader}>
@@ -44,7 +45,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
       </div>
       <ul className={s.descInfo}>
         <li className={s.infoItem}>
-          <p className={s.infoItemTitle}>Язык</p>
+          <p className={s.infoItemTitle}>{t.language}</p>
           <p className={s.infoItemContent}>
             {props.language == 'RU' && (
               <div style={{ height: '20px', width: '20px' }}>
@@ -89,21 +90,21 @@ const CourseDescription = (props: CourseDescriptionProps) => {
           </p>
         </li>
         <li className={s.infoItem}>
-          <p className={s.infoItemTitle}>Уровень</p>
+          <p className={s.infoItemTitle}>{t.level}</p>
           <p className={s.infoItemContent}>{props.level}</p>
         </li>
         <li className={s.infoItem}>
-          <p className={s.infoItemTitle}>Создан</p>
+          <p className={s.infoItemTitle}>{t.created_date}</p>
           <p className={s.infoItemContent}>{new Date().toISOString().split('T')[0]}</p>
         </li>
         {props.type == 'with-lector' && (
           <li className={s.infoItem}>
-            <p className={s.infoItemTitle}>Старт группы</p>
+            <p className={s.infoItemTitle}>{t.start_date}</p>
             <p className={s.infoItemContent}>{props.date}</p>
           </li>
         )}
         <li className={s.infoItem}>
-          <p className={s.infoItemTitle}>Тип</p>
+          <p className={s.infoItemTitle}>{t.type}</p>
           <p className={s.infoItemContent}>{props.type}</p>
         </li>
       </ul>
@@ -142,7 +143,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
           localStorage.setItem('SelectedCourseIndex', props.id + '')
         }}
       >
-        <Button text='Узнать больше' />
+        <Button text={t.learn_more} />
       </Link>
     </div>
   )

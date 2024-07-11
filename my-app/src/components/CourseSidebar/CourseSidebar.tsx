@@ -14,6 +14,7 @@ import ViewsCount from '../ViewsCount/ViewsCount'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { getLocale } from '@/utils/getLocale'
 
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
@@ -43,9 +44,10 @@ const Prices = ({
   useEffect(() => {
     getPageData()
   }, [])
+  const t = getLocale()
   return (
     <>
-      <h3 className={s.sidebarTitle}>Самообучение</h3>
+      <h3 className={s.sidebarTitle}>{t.self_education}</h3>
       <div className={s.priceWrapper}>
         {priceDiscount && priceDiscount > 0 ? <span className={s.prevPrice}>${price}</span> : <></>}
         <span className={s.currentPrice}>
@@ -118,10 +120,11 @@ const CourseSidebar = ({
       number % 100 > 4 && number % 100 < 20 ? 2 : cases[number % 10 < 5 ? number % 10 : 5]
     ]
   }
+  const t = getLocale()
   return (
     <div className={s.sidebar}>
       {width >= 1200 && <Prices price={price} priceDiscount={priceDiscount} />}
-      <p className={s.sidebarSubTitle}>Этот курс включает</p>
+      <p className={s.sidebarSubTitle}>{t.this_course_includes}</p>
       {/* <div className={s.courseContent}>
         <Image src={video} alt='video' /> 22 часа видео лекций
       </div> */}
@@ -129,15 +132,15 @@ const CourseSidebar = ({
         <Image src={certificate} alt='certificate' /> Сертификат об окончании курсов
       </div> */}
       <div className={s.courseContent}>
-        <Image src={calendar} alt='calendar' /> Длительность курса {duration}
-        {declOfNum(duration, [' день', ' дня', ' дней'])}
+        <Image src={calendar} alt='calendar' /> {t.course_duration} {duration}
+        {declOfNum(duration, [t.day1, t.day2, t.day3])}
       </div>
       <div className={s.courseContent}>
         <Image src={notes} alt='notes' />
-        {lessonsNum} урока
+        {lessonsNum} {t.lessons}
       </div>
       <div className={s.courseContent}>
-        <Image src={USB} alt='USB' /> {modules && modules.length} разделов
+        <Image src={USB} alt='USB' /> {modules && modules.length} {t.sections}
       </div>
       {/* <div className={s.courseContent}>
         <Image src={exercises} alt='exercises' /> 42 текстовых заданий

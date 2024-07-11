@@ -4,6 +4,7 @@ import fillStar from '../../assets/fillStar.svg'
 import almostFillStar from '../../assets/almostFillStar.svg'
 import Image from 'next/image'
 import RatingMui from '@mui/material/Rating'
+import { getLocale } from '@/utils/getLocale'
 const Rating = ({
   isSmall,
   isBig,
@@ -13,9 +14,10 @@ const Rating = ({
   isBig?: boolean
   rating: number
 }) => {
+  const t = getLocale()
   return (
     <div className={`${s.ratingWrapper} ${isSmall ? s.small : ''} ${isBig ? s.big : ''}`}>
-      <p>Рейтинг курса</p>
+      <p>{t.rating}</p>
 
       <div>
         <RatingMui

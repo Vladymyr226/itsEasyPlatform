@@ -12,15 +12,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Accordion, AccordionDetails, AccordionSummary, Checkbox } from '@mui/material'
 import { useRouter } from 'next/navigation'
+import { getLocale } from '@/utils/getLocale'
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 const CourseLessonMaterials = ({
   modules,
   selectedLesson,
   setId,
+  completedLessonTrigger,
 }: {
   modules: any
   selectedLesson: number
   setId: any
+  completedLessonTrigger: boolean
 }) => {
   const [selected, setSelected] = useState<number | null>(null)
 
@@ -53,8 +56,17 @@ const CourseLessonMaterials = ({
       setSelected(Number(SelectedModuleIndex))
     }
   }, [])
+  useEffect(() => {
+    console.log('hop')
+    getPageData()
+    const SelectedModuleIndex = localStorage.getItem('SelectedModuleIndex')
+    if (SelectedModuleIndex) {
+      setSelected(Number(SelectedModuleIndex))
+    }
+  }, [completedLessonTrigger])
 
   const router = useRouter()
+  const t = getLocale()
   return (
     <div className={s.materialsAccordion} style={{ marginTop: '0px' }}>
       {modules.map((module: any, index: number) => (
@@ -73,7 +85,7 @@ const CourseLessonMaterials = ({
               <div className={s.titleRight}>
                 <div>
                   <Image src={notebook} alt='notebook' />
-                  {module.lessons.length} лекций
+                  {module.lessons.length} {t.lectures}
                 </div>
               </div>
             </div>

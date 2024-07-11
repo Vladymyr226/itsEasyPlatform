@@ -9,7 +9,7 @@ import PromoSlider from '@/components/PromoSlider/PromoSlider'
 import plus from '../src/assets/plus.svg'
 import loadMoreButton from '../src/assets/loadMoreButton.png'
 import Layout from '@/components/Layout/Layout'
-import './globals.css'
+import '../app/globals.css'
 import Link from 'next/link'
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 import Autocomplete from '@mui/material/Autocomplete'
@@ -21,6 +21,9 @@ import { styled } from '@mui/material/styles'
 
 import Popper from '@mui/material/Popper'
 import Paper from '@mui/material/Paper'
+import { useRouter } from 'next/router'
+import { getLocale } from '@/utils/getLocale'
+
 interface CourseData {
   title: string
   language: string
@@ -47,6 +50,9 @@ interface Course {
 }
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 export default function HomePage() {
+  const t = getLocale()
+  const router = useRouter()
+
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Array<Course>>()
   const [dataDisplay, setDataDisplay] = useState<any>()
@@ -128,7 +134,7 @@ export default function HomePage() {
     <Layout>
       <div className={s.homePage}>
         <PromoSlider />
-        <h1 className={s.coursesTitle}>Курсы</h1>
+        <h1 className={s.coursesTitle}>{t.courses}</h1>
         <Box sx={{ paddingTop: 4, display: 'flex', justifyContent: 'center' }}>
           <form
             style={{ maxWidth: '700px', width: '100%', position: 'relative' }}
@@ -141,7 +147,7 @@ export default function HomePage() {
               autoComplete={'off'}
               id='standard-name'
               fullWidth
-              placeholder='Find course'
+              placeholder={t.find_course}
               value={searchField}
               onChange={(e) => setSearchField(e.target.value)}
               onBlur={(e) => {
@@ -207,7 +213,7 @@ export default function HomePage() {
                       },
                     }}
                   >
-                    Nothing was found
+                    {t.nothing_found}
                   </Box>
                 )}
                 {dataDisplay
@@ -329,14 +335,15 @@ export default function HomePage() {
           })
         ) : (
           <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '150px' }}>
-            Nothing was found
+            {t.nothing_found}
           </h1>
         )}
 
         {width >= 1200 ? (
           <Link href={'/allCourses'}>
             <button className={s.loadMoreButton}>
-              Смотреть ещё курсы <Image src={plus} alt='plus' />
+              {t.see_more}
+              <Image src={plus} alt='plus' />
             </button>
           </Link>
         ) : (

@@ -5,6 +5,7 @@ import minusCircle from '../../assets/minus-circle.svg'
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { getLocale } from '@/utils/getLocale'
 
 const data = [
   {
@@ -49,13 +50,11 @@ const FaqSection = () => {
 
     setSelected(i)
   }
-
+  const t = getLocale()
   return (
     <div className={s.faqSection}>
-      <h1 className={s.faqTitle}>
-        Часто задаваемые <span className={s.accentuated}>вопросы</span>
-      </h1>
-      <p className={s.faqSubTitle}>Все, что вам нужно знать о продукте и выставлении счетов.</p>
+      <h1 className={s.faqTitle}>{t.faq}</h1>
+      <p className={s.faqSubTitle}>{t.faq2}</p>
 
       <div className={s.accordion}>
         {data.map((item, index, arr) => (

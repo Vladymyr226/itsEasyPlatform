@@ -2,13 +2,13 @@ import s from './PopularArticles.module.css'
 
 import popularArticleImage from '../../assets/popularArticle.png'
 import Image from 'next/image'
+import { getLocale } from '@/utils/getLocale'
 
 const PopularArticles = () => {
+  const t = getLocale()
   return (
     <div className={s.popularArticlesSection}>
-      <h1 className={s.popularArticlesTitle}>
-        Вас также могут <span className={s.accentuated}>заинтересовать</span>
-      </h1>
+      <h1 className={s.popularArticlesTitle}>{t.you_may_also_be_interested_in}</h1>
       <ul className={s.popularArticlesList}>
         <li className={s.articleItem}>
           <div className={s.articleItemHeader}>
@@ -22,7 +22,7 @@ const PopularArticles = () => {
               Но это не совсем так. Его корни уходят в один фрагмент классической латыни 45 года
               н.э., то есть более двух тысячелетий назад.
             </p>
-            <button className={s.articleButton}>Узнать больше</button>
+            <button className={s.articleButton}>{t.learn_more}</button>
           </div>
         </li>
         <li className={s.articleItem}>
@@ -37,7 +37,7 @@ const PopularArticles = () => {
               Но это не совсем так. Его корни уходят в один фрагмент классической латыни 45 года
               н.э., то есть более двух тысячелетий назад.
             </p>
-            <button className={s.articleButton}>Узнать больше</button>
+            <button className={s.articleButton}>{t.learn_more}</button>
           </div>
         </li>
         <li className={s.articleItem}>
@@ -52,7 +52,7 @@ const PopularArticles = () => {
               Но это не совсем так. Его корни уходят в один фрагмент классической латыни 45 года
               н.э., то есть более двух тысячелетий назад.
             </p>
-            <button className={s.articleButton}>Узнать больше</button>
+            <button className={s.articleButton}>{t.learn_more}</button>
           </div>
         </li>
       </ul>

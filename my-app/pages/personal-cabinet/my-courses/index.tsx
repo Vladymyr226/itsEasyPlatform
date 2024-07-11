@@ -124,11 +124,11 @@ const MyCourses = () => {
       })
       const result = await responseCourse.json()
       console.log(resultUser)
-      const resultData = result.getCourses.filter(
-        (course: any) => resultUser.purchased_courses_id.indexOf(course.id) != -1
-      )
-      setData(resultData)
-      setDataDisplay(resultData)
+      // const resultData = result.getCourses.filter(
+      //   (course: any) => resultUser?.purchased_courses_id.indexOf(course.id) != -1
+      // )
+      // setData(resultData)
+      // setDataDisplay(resultData)
     }
   }
 
