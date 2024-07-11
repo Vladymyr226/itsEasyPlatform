@@ -85,4 +85,6 @@ export const ru = {
   register_now: 'Зарегистрироваться',
   login_now: 'Войти сейчас',
   username: 'Имя пользователя',
+  your_rating: 'Ваша оценка:',
+  complete: 'Завершить',
 }

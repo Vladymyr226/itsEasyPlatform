@@ -85,4 +85,6 @@ export const ua = {
   register_now: 'Зареєструватися зараз',
   login_now: 'Увійдіть зараз',
   username: 'Логін',
+  your_rating: 'Ваша оцінка:',
+  complete: 'Завершити',
 }

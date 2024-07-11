@@ -29,6 +29,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import axios from 'axios'
 import Swal from 'sweetalert2'
+import { getLocale } from '@/utils/getLocale'
 interface CourseData {
   title: string
   language: string
@@ -187,8 +188,8 @@ const LessonDetails = () => {
   }
   const router = useRouter()
   const [completedLessonTrigger, setCompletedLessonTrigger] = useState(false)
-  console.log(userData)
 
+  const t = getLocale()
   return (
     <Layout>
       <Box sx={{ display: 'flex', justifyContent: 'center', height: '140vb' }}>
@@ -321,7 +322,7 @@ const LessonDetails = () => {
                 justifyContent: 'space-around',
               }}
             >
-              <h3>Your rate:</h3>
+              <h3>{t.your_rating}</h3>
               <Rating
                 disabled={
                   !(
