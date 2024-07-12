@@ -344,9 +344,18 @@ const CourseDetails = () => {
                 style={{
                   maxWidth: '100%',
                   width: '100%',
+                  height: '700px',
                 }}
               >
-                <PopularCourses data={popularCoursesData} />
+                <Box
+                  sx={{
+                    position: { xs: 'absolute', md: 'relative' },
+                    left: { xs: 0, md: null },
+                    right: { xs: 0, md: null },
+                  }}
+                >
+                  <PopularCourses data={popularCoursesData} />
+                </Box>
               </div>
             </>
           )}

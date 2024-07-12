@@ -63,7 +63,7 @@ export const en = {
   get_help: 'Get help',
   company: 'Company',
   job: 'Job',
-  my_education: 'My training',
+  my_education: 'My trainings',
   become_teacher: 'Become a teacher',
   self_study: 'Self-study',
   day1: ' day',

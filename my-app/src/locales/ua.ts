@@ -28,7 +28,7 @@ export const ua = {
   faq: 'Часті запитання',
   faq2: 'Все, що вам потрібно знати про продукт та виставлення рахунків.',
   you_may_also_be_interested_in: 'Вас також може зацікавити',
-  activities: 'Заходи',
+  activities: 'Напрямки',
   programming: 'Програмування',
   design: 'Дизайн',
   project_management: 'Управління проектами',

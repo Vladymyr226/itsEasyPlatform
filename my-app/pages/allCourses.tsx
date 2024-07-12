@@ -246,31 +246,10 @@ const AllCoursesDetails = () => {
         gap: 2,
       }}
     >
-      <ToggleButtonGroup
-        orientation='vertical'
-        value={view}
-        exclusive
-        onChange={(e, newView) => {
-          setView(newView)
-        }}
-        sx={{ height: '60px' }}
-      >
-        <ToggleButton value='list' aria-label='list' sx={{}}>
-          <ViewStreamIcon
-            sx={{ fontSize: 20, color: view == 'list' ? '#fff' : 'rgba(255, 255, 255, 0.2)' }}
-          />
-        </ToggleButton>
-        <ToggleButton value='grid' aria-label='grid' sx={{}}>
-          <GridViewIcon
-            sx={{ fontSize: 20, color: view == 'grid' ? '#fff' : 'rgba(255, 255, 255, 0.2)' }}
-          />
-        </ToggleButton>
-      </ToggleButtonGroup>
       <Box sx={{ width: '100%', minWidth: '15rem' }}>
-        <InputLabel>&nbsp;</InputLabel>
+        <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.category_label}</InputLabel>
         <Autocomplete
           disablePortal
-          limitTags={3}
           multiple
           id='combo-box-demo'
           value={categorySelect}
@@ -283,10 +262,12 @@ const AllCoursesDetails = () => {
               return tag
             }
           })}
-          fullWidth
           PopperComponent={CustomPopper}
           PaperComponent={CustomPaper}
           sx={{
+            minWidth: '15rem',
+            width: 'fit-content',
+            maxWidth: '100%',
             color: '#fff',
             '&[aria-selected="true"]': {
               borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -315,6 +296,19 @@ const AllCoursesDetails = () => {
             '&:hover .MuiOutlinedInput-notchedOutline': {
               borderColor: 'rgba(255, 255, 255, 0.2)',
             },
+            '& .MuiInputBase-root': {
+              height: categorySelect.length == 0 ? '40px' : 'auto', // Set the height of the input base
+            },
+            '& .MuiOutlinedInput-root': {
+              height: categorySelect.length == 0 ? '40px' : 'auto',
+            },
+            '& .MuiAutocomplete-inputRoot': {
+              height: categorySelect.length == 0 ? '40px' : 'auto',
+            },
+            '&.Mui-focused .MuiInputBase-root, &.Mui-focused .MuiOutlinedInput-root, &.Mui-focused .MuiAutocomplete-inputRoot':
+              {
+                height: 'auto', // Set the height to auto when focused
+              },
           }}
           renderTags={(value, getTagProps) =>
             value.map((item, index) => (
@@ -325,6 +319,7 @@ const AllCoursesDetails = () => {
                 sx={{
                   color: '#fff',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
+                  '& .MuiChip-label': {},
                   '& .MuiChip-deleteIcon': {
                     color: 'rgba(255, 255, 255, 0.2)',
                   },
@@ -338,10 +333,9 @@ const AllCoursesDetails = () => {
           renderInput={(params) => (
             <TextField
               {...params}
-              label={t.category_label}
               sx={{
                 '.MuiInputBase-input': {
-                  height: '1.5rem',
+                  height: '8px',
                   color: '#fff',
                 },
               }}
@@ -368,68 +362,11 @@ const AllCoursesDetails = () => {
             </Box>
           )}
         />
-        {/* <Autocomplete
-          disablePortal
-          limitTags={3}
-          multiple
-          id='combo-box-demo'
-          value={categorySelect}
-          onChange={(event, value: any) => {
-            setCategorySelect(value)
-          }}
-          getOptionLabel={(option: any) => option.name_of_tag}
-          options={allCategorySelect}
-          fullWidth
-          sx={{
-            color: '#fff',
-            '& .MuiInputLabel-root': {
-              color: 'rgba(255, 255, 255, 0.3)', // Label color
-            },
-            '.MuiInputBase-input': {
-              height: '1.5rem',
-            },
-            '& [aria-expanded=true]': {
-              background: 'rgba(255, 255, 255, 0.1)',
-            },
-            '& .MuiSvgIcon-root': {
-              color: 'rgba(255, 255, 255, 0.3)',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-            },
-            '.MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(255, 255, 255, 0.2)',
-            },
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label='Category'
-              sx={{
-                '.MuiInputBase-input': {
-                  height: '1.5rem',
-                },
-              }}
-            />
-          )}
-          renderOption={(props: object, option: any, state: object) => (
-            <div
-              {...props}
-              style={{ display: 'flex', justifyContent: 'space-between', background: '#123' }}
-            >
-              <div>{option.name_of_tag}</div>
-            </div>
-          )}
-        /> */}
       </Box>
       <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
         <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.level}</InputLabel>
         <Select
           multiple
-          fullWidth
           id='levelSelect'
           value={level}
           onChange={handleChangeLevel}
@@ -459,7 +396,10 @@ const AllCoursesDetails = () => {
             },
           }}
           sx={{
+            minWidth: '10rem',
+            maxWidth: '100%',
             color: '#fff',
+            height: 40,
             '& .MuiSvgIcon-root': {
               color: 'rgba(255, 255, 255, 0.3)',
             },
@@ -484,7 +424,6 @@ const AllCoursesDetails = () => {
         <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.language}</InputLabel>
         <Select
           multiple
-          fullWidth
           id='languageSelect'
           value={language}
           onChange={handleChangeLanguage}
@@ -514,7 +453,10 @@ const AllCoursesDetails = () => {
             },
           }}
           sx={{
+            minWidth: '10rem',
+            maxWidth: '100%',
             color: '#fff',
+            height: 40,
             '& .MuiSvgIcon-root': {
               color: 'rgba(255, 255, 255, 0.3)',
             },
@@ -638,7 +580,6 @@ const AllCoursesDetails = () => {
         <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.type}</InputLabel>
         <Select
           multiple
-          fullWidth
           value={type}
           onChange={handleChangeType}
           id='typeSelect'
@@ -668,7 +609,10 @@ const AllCoursesDetails = () => {
             },
           }}
           sx={{
+            minWidth: '10rem',
+            maxWidth: '100%',
             color: '#fff',
+            height: 40,
             '& .MuiSvgIcon-root': {
               color: 'rgba(255, 255, 255, 0.3)',
             },
@@ -737,54 +681,89 @@ const AllCoursesDetails = () => {
     <Layout>
       <Box sx={{ display: 'inline' }}>
         {DrawerList}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'end',
+            marginTop: 2,
+          }}
+        >
+          <ToggleButtonGroup
+            value={view}
+            exclusive
+            onChange={(e, newView) => {
+              setView(newView)
+            }}
+            sx={{ height: '60px', background: '#171622', borderRadius: 2 }}
+          >
+            <ToggleButton value='list' aria-label='list' sx={{}}>
+              <ViewStreamIcon
+                sx={{ fontSize: 20, color: view == 'list' ? '#fff' : 'rgba(255, 255, 255, 0.2)' }}
+              />
+            </ToggleButton>
+            <ToggleButton value='grid' aria-label='grid' sx={{}}>
+              <GridViewIcon
+                sx={{ fontSize: 20, color: view == 'grid' ? '#fff' : 'rgba(255, 255, 255, 0.2)' }}
+              />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
         <Box sx={{ width: '100%', color: '#fff', minHeight: '40rem' }}>
           {view == 'list' && (
             <>
-              {dataDisplay && dataDisplay.length > 0 ? (
-                dataDisplay.map((course: Course, index: number) => {
-                  return (
-                    <>
-                      <CourseCard
-                        title={course.data.title}
-                        language={course.data.language}
-                        level={course.data.level}
-                        date={course.data.date}
-                        type={course.data.type}
-                        description={course.data.description}
-                        rating={course.data.rating}
-                        toLeft={index % 2 == 1 ? true : false}
-                        id={course.id}
-                        mediaValue={course.data.mediaValue}
-                        createdAt={course.created_at}
-                      />
-                    </>
-                  )
-                })
+              {dataDisplay ? (
+                dataDisplay.length > 0 ? (
+                  dataDisplay.map((course: Course, index: number) => {
+                    return (
+                      <>
+                        <CourseCard
+                          title={course.data.title}
+                          language={course.data.language}
+                          level={course.data.level}
+                          date={course.data.date}
+                          type={course.data.type}
+                          description={course.data.description}
+                          rating={course.data.rating}
+                          toLeft={index % 2 == 1 ? true : false}
+                          id={course.id}
+                          mediaValue={course.data.mediaValue}
+                          createdAt={course.created_at}
+                        />
+                      </>
+                    )
+                  })
+                ) : (
+                  <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                    Nothing was found
+                  </h1>
+                )
               ) : (
-                <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
-                  Nothing was found
-                </h1>
+                <></>
               )}
             </>
           )}
           {view == 'grid' && (
             <>
-              {dataDisplay && dataDisplay.length > 0 ? (
-                <Grid container sx={{ gap: 20, justifyContent: 'center', paddingTop: 10 }}>
-                  {dataDisplay.map((course: Course, index: number) => {
-                    return (
-                      <>
-                        <Grid item sx={{}}>
-                          <CourseGridCard course={course} />
-                        </Grid>
-                      </>
-                    )
-                  })}
-                </Grid>
+              {dataDisplay ? (
+                dataDisplay.length > 0 ? (
+                  <Grid container sx={{ gap: 20, justifyContent: 'center', paddingTop: 10 }}>
+                    {dataDisplay.map((course: Course, index: number) => {
+                      return (
+                        <>
+                          <Grid item sx={{}}>
+                            <CourseGridCard course={course} />
+                          </Grid>
+                        </>
+                      )
+                    })}
+                  </Grid>
+                ) : (
+                  <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                    Nothing was found
+                  </h1>
+                )
               ) : (
-                <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
-                  Nothing was found
-                </h1>
+                <></>
               )}
             </>
           )}

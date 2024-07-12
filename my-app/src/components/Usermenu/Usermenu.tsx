@@ -11,6 +11,7 @@ import { deleteCookie } from 'cookies-next'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
 import { getLocale } from '@/utils/getLocale'
+import { useRouter } from 'next/navigation'
 
 const Usermenu = () => {
   const [isUsermenuShown, setIsUsermenuShown] = useState(false)
@@ -26,6 +27,7 @@ const Usermenu = () => {
     setIsModalOpen(isModalOpen)
   }, [isModalOpen])
   const t = getLocale()
+  const router = useRouter()
   return (
     <div className={s.userAvatarWrapper}>
       <div onClick={() => setIsUsermenuShown(true)} className={s.userAvatar}>
@@ -57,13 +59,17 @@ const Usermenu = () => {
           <div
             className={s.usermenuItem}
             onClick={(e) => {
-              deleteCookie('jwt')
-              localStorage.removeItem('UserID')
-              Swal.fire('You logged out successfully', '', 'success')
+              if (localStorage.getItem('UserID')) {
+                deleteCookie('jwt')
+                localStorage.removeItem('UserID')
+                Swal.fire('You logged out successfully', '', 'success')
+              } else {
+                router.push('/admin/login')
+              }
             }}
           >
             <Image src={logout} alt='logout' />
-            <p>{t.logout}</p>
+            <p>{localStorage.getItem('UserID') ? t.logout : t.login}</p>
           </div>
         </DropModal>
       )}

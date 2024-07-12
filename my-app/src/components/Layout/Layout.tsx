@@ -50,13 +50,15 @@ const Layout = ({ children }: LayoutProps) => {
             {width >= 1200 ? (
               <>
                 <div className={s.headerNavigation}>
-                  <div
-                    className={
-                      targetSite == '' ? s.headerActiveNavigationLink : s.headerNavigationLink
-                    }
-                  >
-                    {t.home}
-                  </div>
+                  <Link href={'/'}>
+                    <div
+                      className={
+                        targetSite == '' ? s.headerActiveNavigationLink : s.headerNavigationLink
+                      }
+                    >
+                      {t.home}
+                    </div>
+                  </Link>
                   <Link href={'/allCourses'}>
                     <div
                       className={

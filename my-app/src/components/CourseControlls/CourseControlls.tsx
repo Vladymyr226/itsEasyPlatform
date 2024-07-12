@@ -36,7 +36,7 @@ const CourseControlls = () => {
         src={isFavorite || isFavoriteHover ? heart : emptyHeart}
         alt='heart'
       />
-      <Image
+      {/* <Image
         onMouseEnter={() => width >= 1200 && setIsShareHover(true)}
         onMouseLeave={() => width >= 1200 && setIsShareHover(false)}
         onClick={() => setIsShareModalShown((prev) => !prev)}
@@ -67,7 +67,7 @@ const CourseControlls = () => {
             <p>Копировать ссылку</p>
           </div>
         </DropModal>
-      )}
+      )} */}
     </div>
   )
 }
