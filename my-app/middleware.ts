@@ -8,5 +8,5 @@ export function middleware(request: NextRequest) {
   return NextResponse.redirect(new URL('/admin/login', request.url))
 }
 export const config = {
-  matcher: ['/admin/', '/create/:path*'],
+  matcher: ['/admin/', '/personal-cabinet/:path*', '/create/:path*'],
 }

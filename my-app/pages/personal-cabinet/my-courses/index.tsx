@@ -123,12 +123,11 @@ const MyCourses = () => {
         },
       })
       const result = await responseCourse.json()
-      console.log(resultUser)
-      // const resultData = result.getCourses.filter(
-      //   (course: any) => resultUser?.purchased_courses_id.indexOf(course.id) != -1
-      // )
-      // setData(resultData)
-      // setDataDisplay(resultData)
+      const resultData = result.getCourses.filter(
+        (course: any) => resultUser?.purchased_courses_id.indexOf(course.id) != -1
+      )
+      setData(resultData)
+      setDataDisplay(resultData)
     }
   }
 
@@ -184,113 +183,119 @@ const MyCourses = () => {
     <Layout>
       <Box sx={{ display: 'inline' }}>
         <Box sx={{ width: '100%', color: '#fff', minHeight: '40rem' }}>
-          {dataDisplay && dataDisplay.length > 0 ? (
-            dataDisplay.map((course: Course, index: number) => {
-              return (
-                <>
-                  <div key={'MainelementContainer_' + course.id}>
-                    {index != 0 && (
+          {dataDisplay ? (
+            dataDisplay.length > 0 ? (
+              dataDisplay.map((course: Course, index: number) => {
+                return (
+                  <>
+                    <div key={'MainelementContainer_' + course.id}>
+                      {index != 0 && (
+                        <Box
+                          key={'rowDividerWide_'}
+                          sx={{
+                            width: '100%',
+                            background: 'rgba(255, 255, 255, 0.3)',
+                            minWidth: '60rem',
+                            height: '2px',
+                          }}
+                        ></Box>
+                      )}
                       <Box
-                        key={'rowDividerWide_'}
+                        key={'rowContainerWide_'}
                         sx={{
-                          width: '100%',
-                          background: 'rgba(255, 255, 255, 0.3)',
-                          minWidth: '60rem',
-                          height: '2px',
-                        }}
-                      ></Box>
-                    )}
-                    <Box
-                      key={'rowContainerWide_'}
-                      sx={{
-                        display: 'flex',
-                        paddingTop: '0.5rem',
-                        paddingBottom: '0.5rem',
-                        width: '100%',
-                        color: '#fff',
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                          minWidth: '10rem',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          width: '100%',
-                        }}
-                      >
-                        {course.data.title}
-                      </Box>
-
-                      <Box
-                        sx={{
-                          borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                          minWidth: '10rem',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          width: '100%',
-                        }}
-                      >
-                        {course.data.language}
-                      </Box>
-                      <Box
-                        sx={{
-                          borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                          minWidth: '10rem',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          width: '100%',
-                        }}
-                      >
-                        {course.data.level}
-                      </Box>
-                      <Box
-                        sx={{
-                          borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                          minWidth: '10rem',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          width: '100%',
-                        }}
-                      >
-                        {course.data.type}
-                      </Box>
-
-                      <Box
-                        sx={{
-                          minWidth: '10rem',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                          width: '100%',
                           display: 'flex',
-                          justifyContent: 'center',
+                          paddingTop: '0.5rem',
+                          paddingBottom: '0.5rem',
+                          width: '100%',
+                          color: '#fff',
                         }}
                       >
-                        <CircularProgress
-                          variant='determinate'
-                          size={20}
-                          sx={{ color: '#0B6623' }}
-                          value={getProgress(course.data)}
-                        />
-                        <Box sx={{ marginLeft: 2 }}>{countLessons(course.data)}</Box>
-                        <Link href={'/course-details?id=' + course.id}>
-                          <ForwardIcon sx={{ marginLeft: 2, color: 'rgba(255, 255, 255, 0.3)' }} />
-                        </Link>
+                        <Box
+                          sx={{
+                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                            minWidth: '10rem',
+                            textAlign: 'center',
+                            paddingTop: 1,
+                            paddingBottom: 1,
+                            width: '100%',
+                          }}
+                        >
+                          {course.data.title}
+                        </Box>
+
+                        <Box
+                          sx={{
+                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                            minWidth: '10rem',
+                            textAlign: 'center',
+                            paddingTop: 1,
+                            paddingBottom: 1,
+                            width: '100%',
+                          }}
+                        >
+                          {course.data.language}
+                        </Box>
+                        <Box
+                          sx={{
+                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                            minWidth: '10rem',
+                            textAlign: 'center',
+                            paddingTop: 1,
+                            paddingBottom: 1,
+                            width: '100%',
+                          }}
+                        >
+                          {course.data.level}
+                        </Box>
+                        <Box
+                          sx={{
+                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
+                            minWidth: '10rem',
+                            textAlign: 'center',
+                            paddingTop: 1,
+                            paddingBottom: 1,
+                            width: '100%',
+                          }}
+                        >
+                          {course.data.type}
+                        </Box>
+
+                        <Box
+                          sx={{
+                            minWidth: '10rem',
+                            textAlign: 'center',
+                            paddingTop: 1,
+                            paddingBottom: 1,
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <CircularProgress
+                            variant='determinate'
+                            size={20}
+                            sx={{ color: '#0B6623' }}
+                            value={getProgress(course.data)}
+                          />
+                          <Box sx={{ marginLeft: 2 }}>{countLessons(course.data)}</Box>
+                          <Link href={'/course-details?id=' + course.id}>
+                            <ForwardIcon
+                              sx={{ marginLeft: 2, color: 'rgba(255, 255, 255, 0.3)' }}
+                            />
+                          </Link>
+                        </Box>
                       </Box>
-                    </Box>
-                  </div>
-                </>
-              )
-            })
+                    </div>
+                  </>
+                )
+              })
+            ) : (
+              <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                Nothing was found
+              </h1>
+            )
           ) : (
-            <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
-              Nothing was found
-            </h1>
+            <></>
           )}
         </Box>
       </Box>
