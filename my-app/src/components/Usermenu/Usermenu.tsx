@@ -46,7 +46,7 @@ const Usermenu = () => {
             <Image src={heart} alt='heart' />
             <p>{t.my_favorites}</p>
           </div>
-          <div
+          {/* <div
             onClick={() => {
               setIsModalOpen(true)
               setIsUsermenuShown(false)
@@ -55,7 +55,7 @@ const Usermenu = () => {
           >
             <Image src={teacher} alt='teacher' />
             <p>{t.become_a_lector}</p>
-          </div>
+          </div> */}
           <div
             className={s.usermenuItem}
             onClick={(e) => {

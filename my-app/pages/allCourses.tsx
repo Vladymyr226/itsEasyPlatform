@@ -143,8 +143,6 @@ const AllCoursesDetails = () => {
   const router = useRouter()
   const routerLocale = detailedRouter()
 
-  console.log(routerLocale.locale)
-
   const [open, setOpen] = useState(false)
 
   const toggleDrawer = (newOpen: any) => () => {
@@ -217,10 +215,14 @@ const AllCoursesDetails = () => {
     setDataDisplay(filteredRes)
   }
   const CustomPopper = (props: any) => {
-    return <Popper {...props} placement='bottom-start' />
+    return (
+      <Popper
+        {...props}
+        sx={{ width: { xs: '', md: 'fit-content !important' } }}
+        placement='bottom-start'
+      />
+    )
   }
-
-  // Custom Paper Component
   const CustomPaper = styled(Paper)(({ theme }) => ({
     '& .MuiAutocomplete-listbox': {
       padding: 0,
@@ -240,6 +242,7 @@ const AllCoursesDetails = () => {
         paddingTop: 1,
 
         display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
         background: '#171622',
         borderRadius: 2,
         width: '100%',
@@ -250,6 +253,7 @@ const AllCoursesDetails = () => {
         <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.category_label}</InputLabel>
         <Autocomplete
           disablePortal
+          fullWidth
           multiple
           id='combo-box-demo'
           value={categorySelect}
@@ -265,8 +269,6 @@ const AllCoursesDetails = () => {
           PopperComponent={CustomPopper}
           PaperComponent={CustomPaper}
           sx={{
-            minWidth: '15rem',
-            width: 'fit-content',
             maxWidth: '100%',
             color: '#fff',
             '&[aria-selected="true"]': {
@@ -363,10 +365,11 @@ const AllCoursesDetails = () => {
           )}
         />
       </Box>
-      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
+      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: { xs: '100%', md: '14rem' } }}>
         <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.level}</InputLabel>
         <Select
           multiple
+          fullWidth
           id='levelSelect'
           value={level}
           onChange={handleChangeLevel}
@@ -396,7 +399,6 @@ const AllCoursesDetails = () => {
             },
           }}
           sx={{
-            minWidth: '10rem',
             maxWidth: '100%',
             color: '#fff',
             height: 40,
@@ -420,10 +422,11 @@ const AllCoursesDetails = () => {
           <MenuItem value={'Senior'}>Senior</MenuItem>
         </Select>
       </Box>
-      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
+      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: { xs: '100%', md: '14rem' } }}>
         <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.language}</InputLabel>
         <Select
           multiple
+          fullWidth
           id='languageSelect'
           value={language}
           onChange={handleChangeLanguage}
@@ -453,7 +456,6 @@ const AllCoursesDetails = () => {
             },
           }}
           sx={{
-            minWidth: '10rem',
             maxWidth: '100%',
             color: '#fff',
             height: 40,
@@ -576,10 +578,11 @@ const AllCoursesDetails = () => {
         </Select>
       </Box>
 
-      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: '14rem' }}>
+      <Box sx={{ width: '100%', minWidth: '10rem', maxWidth: { xs: '100%', md: '14rem' } }}>
         <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>{t.type}</InputLabel>
         <Select
           multiple
+          fullWidth
           value={type}
           onChange={handleChangeType}
           id='typeSelect'
@@ -609,7 +612,6 @@ const AllCoursesDetails = () => {
             },
           }}
           sx={{
-            minWidth: '10rem',
             maxWidth: '100%',
             color: '#fff',
             height: 40,
@@ -631,23 +633,31 @@ const AllCoursesDetails = () => {
           <MenuItem value={'with-lector'}>With lector</MenuItem>
         </Select>
       </Box>
-
-      <Button
-        variant='text'
-        sx={{ borderRadius: 0, marginTop: 3, width: '20rem', color: '#fff' }}
-        onClick={(e) => {
-          setDate('')
-          setPrice([0, maxPrice ?? 1000])
-          setLanguage([])
-          setLevel([])
-          setType([])
-          setCategorySelect([])
-
-          setDataDisplay(data)
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: { xs: '100%', md: '20rem' },
+          display: 'flex',
+          justifyContent: 'center',
         }}
       >
-        <b>{t.clear}</b>
-      </Button>
+        <Button
+          variant='text'
+          sx={{ borderRadius: 0, marginTop: 3, width: '20rem', color: '#fff' }}
+          onClick={(e) => {
+            setDate('')
+            setPrice([0, maxPrice ?? 1000])
+            setLanguage([])
+            setLevel([])
+            setType([])
+            setCategorySelect([])
+
+            setDataDisplay(data)
+          }}
+        >
+          <b>{t.clear}</b>
+        </Button>
+      </Box>
     </Box>
     // </Box>
   )

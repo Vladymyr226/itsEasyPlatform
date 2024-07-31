@@ -23,6 +23,7 @@ import Popper from '@mui/material/Popper'
 import Paper from '@mui/material/Paper'
 import { useRouter } from 'next/router'
 import { getLocale } from '@/utils/getLocale'
+import PopularCourses from '@/components/PopularCourses/PopularCourses'
 
 interface CourseData {
   title: string
@@ -55,6 +56,7 @@ export default function HomePage() {
 
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Array<Course>>()
+
   const [dataDisplay, setDataDisplay] = useState<any>()
   const [selectedTag, setSelectedTag] = useState<Array<String>>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
@@ -72,7 +74,6 @@ export default function HomePage() {
           return tag
         })
       )
-
       const response = await fetch(url + 's?isActive=true', {
         headers: {
           'Content-Type': 'application/json',
@@ -353,8 +354,29 @@ export default function HomePage() {
         )}
 
         <FaqSection />
+        {dataDisplay && (
+          <>
+            <div
+              style={{
+                maxWidth: '100%',
+                width: '100%',
+                height: '700px',
+              }}
+            >
+              <Box
+                sx={{
+                  position: { xs: 'absolute', md: 'relative' },
+                  left: { xs: 0, md: null },
+                  right: { xs: 0, md: null },
+                }}
+              >
+                <PopularCourses data={dataDisplay} />
+              </Box>
+            </div>
+          </>
+        )}
 
-        <PopularArticles />
+        {/* <PopularArticles /> */}
       </div>
     </Layout>
   )

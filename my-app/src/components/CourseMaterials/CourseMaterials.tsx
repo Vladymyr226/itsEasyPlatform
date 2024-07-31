@@ -13,7 +13,7 @@ import Link from 'next/link'
 import { getLocale } from '@/utils/getLocale'
 
 const CourseMaterials = ({ modules }: { modules: any }) => {
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | null>(0)
 
   const toggle = (i: number) => {
     if (selected === i) {

@@ -17,7 +17,7 @@ import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
-import { Box, Button } from '@mui/material'
+import { Box, Button, Grid } from '@mui/material'
 import YouTube, { YouTubeProps } from 'react-youtube'
 
 import { YouTubeProp } from '@/utils/interfaces'
@@ -46,9 +46,13 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Link from 'next/link'
 import ForwardIcon from '@mui/icons-material/Forward'
 import { styled } from '@mui/material/styles'
-
+import popularCourseImage from '../../../src/assets/popularCourse.png'
 import Popper from '@mui/material/Popper'
 import Paper from '@mui/material/Paper'
+import sBlock from '../../../src/components/PopularCourses/PopularCourses.module.css'
+
+import { getLocale } from '@/utils/getLocale'
+import CourseGridCard from '@/components/CourseGridCard/CourseGridCard'
 
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
@@ -90,7 +94,83 @@ interface Course {
 const MyCourses = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<any>()
-  const [dataDisplay, setDataDisplay] = useState<any>()
+  const t = getLocale()
+  const jsonData = [
+    {
+      id: '1',
+      data: {
+        title: '1',
+        language: 'RU',
+        level: 'beginner',
+        date: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
+        type: 'self-education',
+        description: [
+          {
+            type: 'paragaph',
+            children: [{ text: '' }],
+          },
+        ],
+        rating: 4.2,
+        duration: 100,
+        lector: 'Ivanovich',
+        modules: [],
+        price: 90,
+        mediaValue: '',
+      },
+      is_active: true,
+      created_at: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
+    },
+    {
+      id: '1',
+      data: {
+        title: '1',
+        language: 'RU',
+        level: 'beginner',
+        date: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
+        type: 'self-education',
+        description: [
+          {
+            type: 'paragaph',
+            children: [{ text: '' }],
+          },
+        ],
+        rating: 4.2,
+        duration: 100,
+        lector: 'Ivanovich',
+        modules: [],
+        price: 90,
+        mediaValue: '',
+      },
+      is_active: true,
+      created_at: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
+    },
+    {
+      id: '1',
+      data: {
+        title: '1',
+        language: 'RU',
+        level: 'beginner',
+        date: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
+        type: 'self-education',
+        description: [
+          {
+            type: 'paragaph',
+            children: [{ text: '' }],
+          },
+        ],
+        rating: 4.2,
+        duration: 100,
+        lector: 'Ivanovich',
+        modules: [],
+        price: 90,
+        mediaValue: '',
+      },
+      is_active: true,
+      created_at: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
+    },
+  ]
+
+  const [dataDisplay, setDataDisplay] = useState<any>(jsonData)
 
   const [moduleLessons, setModuleLessons] = useState<Array<string>>()
   const [play, setPlay] = useState(false)
@@ -164,139 +244,35 @@ const MyCourses = () => {
     })
     return summCompleted + '/' + summ
   }
-  function getProgress(course: any) {
-    let summ = 0
-    let summCompleted = 0
-    course.modules.map((module: Module) => {
-      module.lessons.map((lesson) => {
-        summ += 1
-        if (userData.comleted_lessons_id.indexOf(lesson) != -1) {
-          summCompleted += 1
-        }
-      })
-    })
-
-    return summ == 0 ? 0 : (summCompleted * 100) / summ
-  }
 
   return (
     <Layout>
       <Box sx={{ display: 'inline' }}>
         <Box sx={{ width: '100%', color: '#fff', minHeight: '40rem' }}>
-          {dataDisplay ? (
-            dataDisplay.length > 0 ? (
-              dataDisplay.map((course: Course, index: number) => {
-                return (
-                  <>
-                    <div key={'MainelementContainer_' + course.id}>
-                      {index != 0 && (
-                        <Box
-                          key={'rowDividerWide_'}
-                          sx={{
-                            width: '100%',
-                            background: 'rgba(255, 255, 255, 0.3)',
-                            minWidth: '60rem',
-                            height: '2px',
-                          }}
-                        ></Box>
-                      )}
-                      <Box
-                        key={'rowContainerWide_'}
-                        sx={{
-                          display: 'flex',
-                          paddingTop: '0.5rem',
-                          paddingBottom: '0.5rem',
-                          width: '100%',
-                          color: '#fff',
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                            width: '100%',
-                          }}
-                        >
-                          {course.data.title}
-                        </Box>
-
-                        <Box
-                          sx={{
-                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                            width: '100%',
-                          }}
-                        >
-                          {course.data.language}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                            width: '100%',
-                          }}
-                        >
-                          {course.data.level}
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRight: '2px solid rgba(255, 255, 255, 0.3)',
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                            width: '100%',
-                          }}
-                        >
-                          {course.data.type}
-                        </Box>
-
-                        <Box
-                          sx={{
-                            minWidth: '10rem',
-                            textAlign: 'center',
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                            width: '100%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <CircularProgress
-                            variant='determinate'
-                            size={20}
-                            sx={{ color: '#0B6623' }}
-                            value={getProgress(course.data)}
-                          />
-                          <Box sx={{ marginLeft: 2 }}>{countLessons(course.data)}</Box>
-                          <Link href={'/course-details?id=' + course.id}>
-                            <ForwardIcon
-                              sx={{ marginLeft: 2, color: 'rgba(255, 255, 255, 0.3)' }}
-                            />
-                          </Link>
-                        </Box>
-                      </Box>
-                    </div>
-                  </>
-                )
-              })
+          <Grid container sx={{ gap: 20, justifyContent: 'center', paddingTop: 10 }}>
+            {dataDisplay ? (
+              dataDisplay.length > 0 ? (
+                dataDisplay.map((course: Course, index: number) => {
+                  return (
+                    <>
+                      <Grid item sx={{}}>
+                        <CourseGridCard course={course} />
+                      </Grid>
+                    </>
+                  )
+                })
+              ) : (
+                <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                  Nothing was found
+                </h1>
+              )
             ) : (
-              <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
-                Nothing was found
-              </h1>
-            )
-          ) : (
-            <></>
-          )}
+              <></>
+            )}
+            {dataDisplay.map((course: Course, index: number) => {
+              return <></>
+            })}
+          </Grid>
         </Box>
       </Box>
     </Layout>

@@ -37,7 +37,6 @@ const Prices = ({
         },
       })
       const resultUser = await responseUser.json()
-
       setUserData(resultUser)
     }
   }
@@ -67,7 +66,6 @@ const Prices = ({
           })
 
           const resultResponse = response.data
-          console.log(resultResponse)
         }}
       >
         Купить сейчас
@@ -123,7 +121,7 @@ const CourseSidebar = ({
   const t = getLocale()
   return (
     <div className={s.sidebar}>
-      {width >= 1200 && <Prices price={price} priceDiscount={priceDiscount} />}
+      <Prices price={price} priceDiscount={priceDiscount} />
       <p className={s.sidebarSubTitle}>{t.this_course_includes}</p>
       {/* <div className={s.courseContent}>
         <Image src={video} alt='video' /> 22 часа видео лекций

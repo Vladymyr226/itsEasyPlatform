@@ -15,6 +15,7 @@ const Rating = ({
   rating: number
 }) => {
   const t = getLocale()
+
   return (
     <div className={`${s.ratingWrapper} ${isSmall ? s.small : ''} ${isBig ? s.big : ''}`}>
       <p>{t.rating}</p>

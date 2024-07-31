@@ -20,9 +20,11 @@ import SlateView from '@/components/SlateEditor/View'
 import { Box } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { getLocale } from '@/utils/getLocale'
+import CourseLessonMaterials from '@/components/CourseMaterials/CourseLessonMaterials'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 interface CourseData {
   title: string
@@ -44,9 +46,23 @@ interface Course {
   data: CourseData
   is_active: boolean
 }
+interface Module {
+  title: string
+  lessons: Array<Lesson>
+}
+interface Lesson {
+  id: string
+  data: LessonData
+}
+interface LessonData {
+  title: string
+  link: string
+  description: any
+}
 const CourseDetails = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Course>()
+  const [userData, setUserData] = useState<any>()
   const [popularCoursesData, setPopularCoursesData] = useState<Array<any>>()
   const [lessSum, setLessSum] = useState<number>()
   const [play, setPlay] = useState(false)
@@ -57,6 +73,18 @@ const CourseDetails = () => {
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
+
+      const userId = localStorage.getItem('UserID')
+      if (userId) {
+        const responseUser = await fetch(urlUser + '/' + userId, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        const resultUser = await responseUser.json()
+
+        setUserData(resultUser)
+      }
 
       if (fullUrl.split('id=')[1]) {
         const responseAll = await fetch(url + 's?isActive=true', {
@@ -75,6 +103,28 @@ const CourseDetails = () => {
         if (!result.is_active) {
           router.push('./')
         }
+        const modulesTmp = await Promise.all(
+          result.data.modules.map(async (module: any) => {
+            const lessons = await Promise.all(
+              module.lessons.map(async (lessonId: string) => {
+                const responseLesson = await fetch(urlLesson + '/' + lessonId, {
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                })
+                const resultLesson = await responseLesson.json()
+                return { id: resultLesson.id, data: resultLesson.data }
+              })
+            )
+            return {
+              title: module.title,
+              lessons: lessons,
+            }
+          })
+        )
+
+        setModules(modulesTmp)
+
         let lessonsSum = 0
         const modules = await Promise.all(
           result.data.modules.map(async (module: any) => {
@@ -125,6 +175,9 @@ const CourseDetails = () => {
 
   const imgRef = useRef(null)
   const t = getLocale()
+
+  const [modules, setModules] = useState<Array<Module>>()
+
   return (
     <Layout>
       <div className={s.coursePage}>
@@ -300,7 +353,7 @@ const CourseDetails = () => {
             <span className={s.accentuated}>{t.course_materials}</span>
           </p>
           {data && <CourseMaterials modules={data.data.modules} />}
-
+          {/* 
           <p className={s.courseSubTitle}>
             <span className={s.accentuated}>{t.skill_settings}</span>
           </p>
@@ -312,8 +365,7 @@ const CourseDetails = () => {
             className={s.courseImageWrapper}
           >
             <Image className={s.courseImage} src={skillsImage} alt='skills' />
-            {/* <PlayButton /> */}
-          </div>
+          </div> */}
 
           <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>
             <span className={s.accentuated}>{t.what_alumni_say}</span>
@@ -363,14 +415,28 @@ const CourseDetails = () => {
 
         {width >= 1200 && (
           <div className={s.rightSide}>
-            <CourseSidebar
-              duration={data?.data.duration ?? 0}
-              lessonsNum={lessSum ?? 0}
-              price={data?.data.price ?? 0}
-              priceDiscount={data?.data.priceDiscount ?? 0}
-              modules={data?.data.modules}
-              rating={data?.data.rating ?? 0}
-            />
+            {userData?.purchased_courses_id.filter((courseId: any) => courseId == data?.id).length >
+            0 ? (
+              <Box sx={{ marginTop: 2, minWidth: '375px', width: '100%' }}>
+                {modules && (
+                  <CourseLessonMaterials
+                    setId={-1}
+                    modules={modules}
+                    selectedLesson={-1}
+                    completedLessonTrigger={false}
+                  />
+                )}
+              </Box>
+            ) : (
+              <CourseSidebar
+                duration={data?.data.duration ?? 0}
+                lessonsNum={lessSum ?? 0}
+                price={data?.data.price ?? 0}
+                priceDiscount={data?.data.priceDiscount ?? 0}
+                modules={data?.data.modules}
+                rating={data?.data.rating ?? 0}
+              />
+            )}
           </div>
         )}
       </div>

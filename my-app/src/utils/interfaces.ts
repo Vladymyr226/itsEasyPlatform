@@ -8,6 +8,7 @@ export interface TabPanelProps {
 }
 export interface Lesson {
   id?: string
+  image?: string
   title: string
   description: any
   link: string

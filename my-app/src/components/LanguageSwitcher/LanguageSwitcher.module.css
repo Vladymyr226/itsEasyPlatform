@@ -1,7 +1,7 @@
 .languageSwitcher {
   color: var(--text-color);
   font-weight: 700;
-
+  max-width: 90px;
   display: flex;
   align-items: center;
   justify-content: center;

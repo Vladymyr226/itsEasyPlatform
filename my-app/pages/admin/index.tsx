@@ -10,6 +10,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import { deleteCookie } from 'cookies-next'
 import '../../app/globals.css'
+import Logo from '@/components/Logo/Logo'
 
 const tableColumn = {
   minWidth: '10rem',
@@ -82,11 +83,7 @@ const AdminTable = () => {
         },
       })
       const result = await response.json()
-      console.log(
-        result.getCourses.sort(function (a: any, b: any) {
-          return (new Date(b.created_at) as any) - (new Date(a.created_at) as any)
-        })
-      )
+
       setData(
         result.getCourses.sort(function (a: any, b: any) {
           return (new Date(b.created_at) as any) - (new Date(a.created_at) as any)
@@ -122,7 +119,11 @@ const AdminTable = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'between', padding: 4, background: '#000' }}>
+        <Box sx={{ width: '100%' }}>
+          <Logo />
+        </Box>
+
         <Link href={'/admin/login'}>
           <Button
             variant='contained'
@@ -143,6 +144,7 @@ const AdminTable = () => {
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
+          flexDirection: { xs: 'column', md: 'row' },
         }}
       >
         <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -191,6 +193,7 @@ const AdminTable = () => {
           sx={{
             width: '100%',
             display: 'flex',
+
             justifyContent: 'center',
             flexDirection: 'column',
           }}
@@ -214,10 +217,9 @@ const AdminTable = () => {
           <Box
             sx={{
               width: '100%',
-
+              overflow: 'auto',
               boxShadow: 2,
               borderRadius: '10px',
-
               border: '1px solid #000',
               borderTop: '4px solid #000',
             }}

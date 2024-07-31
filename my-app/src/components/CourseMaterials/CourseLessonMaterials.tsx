@@ -10,9 +10,10 @@ import closedLock from '../../assets/closedLock.svg'
 import video from '../../assets/greyVideo.svg'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Accordion, AccordionDetails, AccordionSummary, Checkbox } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Checkbox, Box } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { getLocale } from '@/utils/getLocale'
+
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 const CourseLessonMaterials = ({
   modules,
@@ -25,7 +26,7 @@ const CourseLessonMaterials = ({
   setId: any
   completedLessonTrigger: boolean
 }) => {
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | null>(0)
 
   const toggle = (i: number) => {
     if (selected === i) {
@@ -57,7 +58,6 @@ const CourseLessonMaterials = ({
     }
   }, [])
   useEffect(() => {
-    console.log('hop')
     getPageData()
     const SelectedModuleIndex = localStorage.getItem('SelectedModuleIndex')
     if (SelectedModuleIndex) {
@@ -101,7 +101,9 @@ const CourseLessonMaterials = ({
                   onClick={(e) => {
                     localStorage.setItem('SelectedModuleIndex', index + '')
                     router.replace('/lesson?id=' + lesson.id)
-                    setId(lesson.id)
+                    if (setId != -1) {
+                      setId(lesson.id)
+                    }
                   }}
                   style={{
                     background: selectedLesson == lesson.id ? 'rgba(197, 142, 254, 0.1)' : '',
@@ -125,7 +127,9 @@ const CourseLessonMaterials = ({
                         }}
                       />
                     )}
-                    <span>{lesson && lesson.data.title}</span>
+                    <Box sx={{ marginTop: { xs: '10px', md: '0px' } }}>
+                      {lesson && lesson.data.title}
+                    </Box>
                   </div>
                 </li>
               ))}

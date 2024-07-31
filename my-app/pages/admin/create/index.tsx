@@ -57,6 +57,7 @@ import * as AWS from 'aws-sdk'
 import { isEqual } from 'lodash-es'
 import { deleteCookie } from 'cookies-next'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
+import Logo from '@/components/Logo/Logo'
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
@@ -161,6 +162,7 @@ const CourseCreate = () => {
   const [lessonForm, setLessonForm] = useState({
     title: '',
     link: '',
+    image: '',
   })
   const [preview, setPreview] = useState('-1')
   const [editTrigger, setEditTrigger] = useState(false)
@@ -172,6 +174,7 @@ const CourseCreate = () => {
     setLessonForm({
       title: '',
       link: '',
+      image: '',
     })
     setRichValueLesson([
       {
@@ -366,7 +369,6 @@ const CourseCreate = () => {
           Swal.fire('Created!', '', 'success')
           setEditTrigger(true)
           setError({})
-          console.log(resultResponse)
           setAllSkillSelect([
             ...allSkillSelect,
             {
@@ -410,7 +412,7 @@ const CourseCreate = () => {
           Swal.fire('Created!', '', 'success')
           setEditTrigger(true)
           setError({})
-          console.log(resultResponse)
+
           setAllCategorySelect([
             ...allCategorySelect,
             {
@@ -459,7 +461,7 @@ const CourseCreate = () => {
           },
         })
         const result = await response.json()
-        console.log(result)
+
         const responseLesson = await fetch(urlLesson + 's', {
           headers: {
             'Content-Type': 'application/json',
@@ -703,8 +705,12 @@ const CourseCreate = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
+    <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'between', padding: 4, background: '#000' }}>
+        <Box sx={{ width: '100%' }}>
+          <Logo />
+        </Box>
+
         <Link href={'/admin/login'}>
           <Button
             variant='contained'
@@ -721,9 +727,11 @@ const CourseCreate = () => {
         sx={{
           paddingLeft: '2rem',
           paddingRight: '2rem',
+          marginTop: '2rem',
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
+          flexDirection: { xs: 'column', md: 'row' },
         }}
       >
         <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -775,7 +783,7 @@ const CourseCreate = () => {
             Feedback
           </Box>
         </Box>
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', marginTop: 4 }}>
           <Box
             sx={{
               width: '100%',
@@ -791,7 +799,7 @@ const CourseCreate = () => {
                 value={value}
                 onChange={handleChange}
                 aria-label='basic tabs example'
-                sx={{}}
+                variant='scrollable'
                 TabIndicatorProps={{
                   style: {
                     backgroundColor: '#000',
@@ -1179,6 +1187,7 @@ const CourseCreate = () => {
                           setLessonForm({
                             title: '',
                             link: '',
+                            image: '',
                           })
                           let selectedModulesArr: Array<Lesson> = []
                           modules.map((module: Module) => {
@@ -1444,6 +1453,7 @@ const CourseCreate = () => {
                                               setLessonForm({
                                                 title: lesson.title,
                                                 link: lesson.link,
+                                                image: lesson.image ?? '',
                                               })
                                               setRichValueLesson(lesson.description)
                                               setCreateLessonIndx(i)
@@ -1599,6 +1609,40 @@ const CourseCreate = () => {
                     value={lessonForm.link}
                     sx={{ ...textFieldColors }}
                   />
+
+                  <Box sx={{ display: 'flex' }}>
+                    <Button
+                      variant='contained'
+                      component='label'
+                      onClick={() => {
+                        setLessonForm({ ...lessonForm, image: '' })
+                      }}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      Remove
+                    </Button>
+
+                    <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
+                      <input
+                        type='file'
+                        accept='image/png, image/jpeg'
+                        onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+                          if (event.target.files) {
+                            try {
+                              setLessonForm({
+                                ...lessonForm,
+                                image:
+                                  ((await uploadFileToS3(event.target.files[0])) as string) ?? '',
+                              })
+                            } catch (error) {
+                              Swal.fire('Some error has occurred', '' + error, 'error')
+                            }
+                          }
+                        }}
+                      />
+                    </Button>
+                  </Box>
+
                   <Button
                     variant='contained'
                     fullWidth
@@ -1630,6 +1674,7 @@ const CourseCreate = () => {
                               title: lessonForm.title,
                               description: richValueLesson,
                               link: lessonForm.link,
+                              image: lessonForm.image,
                             })
                             const resultResponse = response.data
                             if (resultResponse) {
@@ -1656,6 +1701,7 @@ const CourseCreate = () => {
                               setLessonForm({
                                 title: '',
                                 link: '',
+                                image: '',
                               })
                               setRichValueLesson([
                                 {
@@ -1684,6 +1730,7 @@ const CourseCreate = () => {
                               title: lessonForm.title,
                               description: richValueLesson,
                               link: lessonForm.link,
+                              image: lessonForm.image,
                             })
                             const resultResponse = response.data
                             if (resultResponse) {
@@ -1713,6 +1760,7 @@ const CourseCreate = () => {
                               setLessonForm({
                                 title: '',
                                 link: '',
+                                image: '',
                               })
                             }
                             setCreateLessonIndx(-1)

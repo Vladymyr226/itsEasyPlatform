@@ -6,6 +6,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Link from 'next/link'
 import { deleteCookie } from 'cookies-next'
 import '../../../app/globals.css'
+import Logo from '@/components/Logo/Logo'
 
 const tableColumn = {
   minWidth: '10rem',
@@ -64,8 +65,12 @@ const AdminTable = () => {
   }, [])
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#fff', paddingTop: 8, paddingBottom: 8 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'end', padding: 4 }}>
+    <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'between', padding: 4, background: '#000' }}>
+        <Box sx={{ width: '100%' }}>
+          <Logo />
+        </Box>
+
         <Link href={'/admin/login'}>
           <Button
             variant='contained'
@@ -80,14 +85,18 @@ const AdminTable = () => {
       </Box>
       <Box
         sx={{
+          marginTop: '2rem',
           paddingLeft: '2rem',
           paddingRight: '2rem',
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
+          flexDirection: { xs: 'column', md: 'row' },
         }}
       >
-        <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box
+          sx={{ marginRight: 4, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
           <Link href={'/admin'}>
             <Box
               sx={{
@@ -141,13 +150,12 @@ const AdminTable = () => {
           <Box
             sx={{
               width: '100%',
-
+              overflow: 'auto',
               boxShadow: 2,
               borderRadius: '10px',
 
               border: '1px solid #000',
               borderTop: '4px solid #000',
-              overflowX: 'auto',
             }}
           >
             <Box
@@ -229,11 +237,7 @@ const AdminTable = () => {
               })
             ) : (
               <div>
-                <LinearProgress
-                  sx={{
-                    minWidth: '110rem',
-                  }}
-                />
+                <LinearProgress sx={{}} />
                 <Box
                   sx={{
                     color: '#ffec3e',

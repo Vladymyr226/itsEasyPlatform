@@ -81,6 +81,7 @@ const Layout = ({ children }: LayoutProps) => {
               </>
             ) : (
               <>
+                <LanguageSwitcher />
                 <Usermenu />
                 <BurgerMenu />
               </>

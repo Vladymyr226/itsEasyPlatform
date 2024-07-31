@@ -101,14 +101,13 @@ const LessonDetails = () => {
         const result = await response.json()
         setData(result)
         if (localStorage.getItem('SelectedCourse') && localStorage.getItem('SelectedModuleIndex')) {
-          console.log(123)
           const responseCourse = await fetch(url + '/' + localStorage.getItem('SelectedCourse'), {
             headers: {
               'Content-Type': 'application/json',
             },
           })
           const resultCourse = await responseCourse.json()
-          console.log(resultCourse)
+
           setModuleLessons(
             resultCourse.data.modules[Number(localStorage.getItem('SelectedModuleIndex'))].lessons
           )
@@ -131,7 +130,7 @@ const LessonDetails = () => {
               }
             })
           )
-          console.log(modules)
+
           setModules(modules)
         }
       } else {
@@ -192,8 +191,16 @@ const LessonDetails = () => {
   const t = getLocale()
   return (
     <Layout>
-      <Box sx={{ display: 'flex', justifyContent: 'center', height: '140vb' }}>
-        {data && (
+      {data && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+
+            flexDirection: { xs: 'column-reverse', md: 'row' },
+            gap: { xs: '50px', md: null },
+          }}
+        >
           <Box
             sx={{
               width: '100%',
@@ -203,7 +210,9 @@ const LessonDetails = () => {
               borderRadius: 2,
             }}
           >
-            <Box sx={{ height: '140vb', display: 'flex', flexDirection: 'column' }}>
+            <Box
+              sx={{ height: { xs: null, md: '140vb' }, display: 'flex', flexDirection: 'column' }}
+            >
               <Box sx={{ width: '100%' }}>
                 <ExampleYouTube url={data.data.link.split('?v=')[1]} />
               </Box>
@@ -301,15 +310,14 @@ const LessonDetails = () => {
               </Box>
             </Box>
           </Box>
-        )}
-        {data && (
+
           <Box
             sx={{
-              height: '140vb',
+              height: { xs: null, md: '140vb' },
               paddingLeft: 1,
               overflowY: 'scroll',
               scrollbarWidth: 'none',
-              width: '380px',
+              width: { xs: '100%', md: '380px' },
             }}
           >
             <Box
@@ -386,8 +394,8 @@ const LessonDetails = () => {
               )}
             </Box>
           </Box>
-        )}
-      </Box>
+        </Box>
+      )}
     </Layout>
   )
 }
