@@ -87,4 +87,11 @@ export const en = {
   username: 'Username',
   your_rating: 'Your rate:',
   complete: 'Complete',
+  feedbackTitle: 'Could you please provide more details?',
+  submit: 'Submit',
+  skip: 'Skip',
+  thanks: 'Thank you for your feedback!',
+  typeMessage: 'Type your message here',
+  next: 'Next',
+  previous: 'Previous',
 }

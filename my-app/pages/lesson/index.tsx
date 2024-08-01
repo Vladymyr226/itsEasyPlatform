@@ -61,6 +61,7 @@ interface LessonData {
   title: string
   link: string
   description: any
+  image: any
 }
 interface Lesson {
   id: string
@@ -189,6 +190,7 @@ const LessonDetails = () => {
   const [completedLessonTrigger, setCompletedLessonTrigger] = useState(false)
 
   const t = getLocale()
+  console.log(data && data.data.link)
   return (
     <Layout>
       {data && (
@@ -214,7 +216,15 @@ const LessonDetails = () => {
               sx={{ height: { xs: null, md: '140vb' }, display: 'flex', flexDirection: 'column' }}
             >
               <Box sx={{ width: '100%' }}>
-                <ExampleYouTube url={data.data.link.split('?v=')[1]} />
+                {data.data.link ? (
+                  <>
+                    <ExampleYouTube url={data.data.link.split('?v=')[1]} />
+                  </>
+                ) : data.data.image ? (
+                  <img src={data.data.image}></img>
+                ) : (
+                  <></>
+                )}
               </Box>
               <h1 style={{ textAlign: 'left', color: '#ffec3e', marginBottom: '20px' }}>
                 <b>{data && data.data.title}</b>
@@ -245,7 +255,10 @@ const LessonDetails = () => {
                       }
                     }}
                     startIcon={<ArrowBackIosIcon />}
-                  ></Button>
+                    sx={{ color: '#fff' }}
+                  >
+                    {t.previous}
+                  </Button>
                 )}
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                   {userData &&
@@ -281,7 +294,7 @@ const LessonDetails = () => {
                           }
                         }}
                       >
-                        Complete
+                        {t.complete}
                       </Button>
                     )}
                 </Box>
@@ -305,7 +318,10 @@ const LessonDetails = () => {
                         }
                       }}
                       endIcon={<ArrowForwardIosIcon />}
-                    ></Button>
+                      sx={{ color: '#fff' }}
+                    >
+                      {t.next}
+                    </Button>
                   )}
               </Box>
             </Box>
@@ -351,12 +367,14 @@ const LessonDetails = () => {
                       ) {
                         const { value: text } = await Swal.fire({
                           input: 'textarea',
-                          inputLabel: 'Message',
-                          inputPlaceholder: 'Type your message here...',
+                          title: t.feedbackTitle,
+                          inputPlaceholder: t.typeMessage,
                           inputAttributes: {
-                            'aria-label': 'Type your message here',
+                            'aria-label': t.typeMessage,
                           },
                           showCancelButton: true,
+                          confirmButtonText: t.submit,
+                          cancelButtonText: t.skip,
                         })
                         const response = await axios.post(
                           urlFeedback +
@@ -367,10 +385,10 @@ const LessonDetails = () => {
                             '&feedbackName=' +
                             text
                         )
-                        Swal.fire('Thank you for your feedback!')
+                        Swal.fire(t.thanks)
                       }
                     } else {
-                      Swal.fire('Thank you for your feedback!')
+                      Swal.fire(t.thanks)
                     }
                   }
                 }}

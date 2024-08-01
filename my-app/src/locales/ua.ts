@@ -87,4 +87,11 @@ export const ua = {
   username: 'Логін',
   your_rating: 'Ваша оцінка:',
   complete: 'Завершити',
+  feedbackTitle: 'Не могли б ви надати більше деталей?',
+  submit: 'Відправити',
+  skip: 'Пропустити',
+  thanks: 'Дякуємо за ваш відгук!',
+  typeMessage: 'Введіть своє повідомлення тут',
+  next: 'Далі',
+  previous: 'Попередній',
 }

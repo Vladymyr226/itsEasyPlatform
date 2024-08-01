@@ -127,7 +127,7 @@ const CourseLessonMaterials = ({
                         }}
                       />
                     )}
-                    <Box sx={{ marginTop: { xs: '10px', md: '0px' } }}>
+                    <Box sx={{ marginTop: { xs: '10px', lg: '0px' } }}>
                       {lesson && lesson.data.title}
                     </Box>
                   </div>
