@@ -22,7 +22,7 @@ import YouTube, { YouTubeProps } from 'react-youtube'
 
 import { YouTubeProp } from '@/utils/interfaces'
 import { useRouter } from 'next/navigation'
-import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, CircularProgress } from '@mui/material'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
@@ -162,6 +162,7 @@ const LessonDetails = () => {
     height: '390',
     width: '100%',
     playerVars: {
+      controls: 0,
       // https://developers.google.com/youtube/player_parameters
       autoplay: 1,
     },
@@ -169,15 +170,16 @@ const LessonDetails = () => {
   function ExampleYouTube(props: YouTubeProp) {
     const onPlayerReady: YouTubeProps['onReady'] = (event) => {
       // access to player in all event handlers via event.target
-      event.target.pauseVideo()
     }
 
     const opts: YouTubeProps['opts'] = {
       height: '500',
       width: '100%',
       playerVars: {
+        rel: 0,
+        iv_load_policy: 0,
         // https://developers.google.com/youtube/player_parameters
-        autoplay: 1,
+        autoplay: 0,
       },
     }
 
@@ -193,25 +195,25 @@ const LessonDetails = () => {
   console.log(data && data.data.link)
   return (
     <Layout>
-      {data && (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+
+          flexDirection: { xs: 'column-reverse', md: 'row' },
+          gap: { xs: '50px', md: null },
+        }}
+      >
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
+            width: '100%',
 
-            flexDirection: { xs: 'column-reverse', md: 'row' },
-            gap: { xs: '50px', md: null },
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 2,
           }}
         >
-          <Box
-            sx={{
-              width: '100%',
-
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 2,
-            }}
-          >
+          {data ? (
             <Box
               sx={{ height: { xs: null, md: '140vb' }, display: 'flex', flexDirection: 'column' }}
             >
@@ -325,95 +327,107 @@ const LessonDetails = () => {
                   )}
               </Box>
             </Box>
-          </Box>
+          ) : (
+            <Box
+              sx={{ display: 'flex', justifyContent: 'center', marginTop: 40, marginBottom: 70 }}
+            >
+              <CircularProgress sx={{ color: '#ffec3e' }} />
+            </Box>
+          )}
+        </Box>
 
+        <Box
+          sx={{
+            height: { xs: null, md: '140vb' },
+            paddingLeft: 1,
+            overflowY: 'scroll',
+            scrollbarWidth: 'none',
+            width: { xs: '100%', md: '380px' },
+          }}
+        >
           <Box
             sx={{
-              height: { xs: null, md: '140vb' },
-              paddingLeft: 1,
-              overflowY: 'scroll',
-              scrollbarWidth: 'none',
-              width: { xs: '100%', md: '380px' },
+              borderRadius: 2,
+              background: 'rgba(197, 142, 254, 0.1)',
+              color: '#fff',
+              padding: 2,
+              display: 'flex',
+              justifyContent: 'space-around',
             }}
           >
-            <Box
-              sx={{
-                borderRadius: 2,
-                background: 'rgba(197, 142, 254, 0.1)',
-                color: '#fff',
-                padding: 2,
-                display: 'flex',
-                justifyContent: 'space-around',
-              }}
-            >
-              <h3>{t.your_rating}</h3>
-              <Rating
-                disabled={
-                  !(
-                    selectedCourse &&
-                    userData &&
-                    userData?.purchased_courses_id &&
-                    userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
-                  )
-                }
-                onChange={async (event, newValue) => {
-                  if (newValue) {
-                    if (newValue < 5) {
-                      if (
-                        selectedCourse &&
-                        userData &&
-                        userData?.purchased_courses_id &&
-                        userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
-                      ) {
-                        const { value: text } = await Swal.fire({
-                          input: 'textarea',
-                          title: t.feedbackTitle,
-                          inputPlaceholder: t.typeMessage,
-                          inputAttributes: {
-                            'aria-label': t.typeMessage,
-                          },
-                          showCancelButton: true,
-                          confirmButtonText: t.submit,
-                          cancelButtonText: t.skip,
-                        })
-                        const response = await axios.post(
-                          urlFeedback +
-                            '?userId=' +
-                            userData.id +
-                            '&lessonId=' +
-                            id +
-                            '&feedbackName=' +
-                            text
-                        )
-                        Swal.fire(t.thanks)
-                      }
-                    } else {
+            <h3>{t.your_rating}</h3>
+            <Rating
+              disabled={
+                !(
+                  selectedCourse &&
+                  userData &&
+                  userData?.purchased_courses_id &&
+                  userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                )
+              }
+              onChange={async (event, newValue) => {
+                if (newValue) {
+                  if (newValue < 5) {
+                    if (
+                      selectedCourse &&
+                      userData &&
+                      userData?.purchased_courses_id &&
+                      userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                    ) {
+                      const { value: text } = await Swal.fire({
+                        input: 'textarea',
+                        title: t.feedbackTitle,
+                        inputPlaceholder: t.typeMessage,
+                        inputAttributes: {
+                          'aria-label': t.typeMessage,
+                        },
+                        showCancelButton: true,
+                        confirmButtonText: t.submit,
+                        cancelButtonText: t.skip,
+                      })
+                      const response = await axios.post(
+                        urlFeedback +
+                          '?userId=' +
+                          userData.id +
+                          '&lessonId=' +
+                          id +
+                          '&feedbackName=' +
+                          text
+                      )
                       Swal.fire(t.thanks)
                     }
+                  } else {
+                    Swal.fire(t.thanks)
                   }
-                }}
-                emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
-                sx={{
-                  fontSize: 22,
-                  '& .MuiRating-iconFilled': {
-                    color: '#fff', // Color of selected stars
-                  },
-                }}
+                }
+              }}
+              emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
+              sx={{
+                fontSize: 22,
+                '& .MuiRating-iconFilled': {
+                  color: '#fff', // Color of selected stars
+                },
+              }}
+            />
+          </Box>
+          <Box sx={{ marginTop: 2 }}>
+            {modules ? (
+              <CourseLessonMaterials
+                setId={setId}
+                modules={modules}
+                selectedLesson={id ?? -1}
+                completedLessonTrigger={completedLessonTrigger}
               />
-            </Box>
-            <Box sx={{ marginTop: 2 }}>
-              {modules && (
-                <CourseLessonMaterials
-                  setId={setId}
-                  modules={modules}
-                  selectedLesson={id ?? -1}
-                  completedLessonTrigger={completedLessonTrigger}
-                />
-              )}
-            </Box>
+            ) : (
+              <Box
+                sx={{ display: 'flex', justifyContent: 'center', marginTop: 10, marginBottom: 70 }}
+              >
+                <CircularProgress sx={{ color: '#fff' }} />
+              </Box>
+            )}
           </Box>
         </Box>
-      )}
+      </Box>
     </Layout>
   )
 }

@@ -287,7 +287,8 @@ const AllCoursesDetails = () => {
               color: 'rgba(255, 255, 255, 0.3)', // Label color
             },
             '.MuiInputBase-input': {
-              height: '1.5rem',
+              height: '0px',
+              padding: '0px',
             },
             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
               borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -309,6 +310,7 @@ const AllCoursesDetails = () => {
             },
             '&.Mui-focused .MuiInputBase-root, &.Mui-focused .MuiOutlinedInput-root, &.Mui-focused .MuiAutocomplete-inputRoot':
               {
+                minHeight: '40px',
                 height: 'auto', // Set the height to auto when focused
               },
           }}
@@ -320,10 +322,12 @@ const AllCoursesDetails = () => {
                 label={item.name_of_tag}
                 sx={{
                   color: '#fff',
+                  height: '22px',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
                   '& .MuiChip-label': {},
                   '& .MuiChip-deleteIcon': {
                     color: 'rgba(255, 255, 255, 0.2)',
+                    height: '15px',
                   },
                 }}
                 onDelete={(e) => {
@@ -702,7 +706,9 @@ const AllCoursesDetails = () => {
             value={view}
             exclusive
             onChange={(e, newView) => {
-              setView(newView)
+              if (newView !== null) {
+                setView(newView)
+              }
             }}
             sx={{ height: '60px', background: '#171622', borderRadius: 2 }}
           >
@@ -756,7 +762,10 @@ const AllCoursesDetails = () => {
             <>
               {dataDisplay ? (
                 dataDisplay.length > 0 ? (
-                  <Grid container sx={{ gap: 20, justifyContent: 'center', paddingTop: 10 }}>
+                  <Grid
+                    container
+                    sx={{ gap: 20, justifyContent: { xs: 'center', md: 'left' }, paddingTop: 10 }}
+                  >
                     {dataDisplay.map((course: Course, index: number) => {
                       return (
                         <>

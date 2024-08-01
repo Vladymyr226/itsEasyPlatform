@@ -17,7 +17,7 @@ import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
-import { Box } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { getLocale } from '@/utils/getLocale'
 import CourseLessonMaterials from '@/components/CourseMaterials/CourseLessonMaterials'
@@ -180,29 +180,61 @@ const CourseDetails = () => {
 
   return (
     <Layout>
-      <div className={s.coursePage}>
-        <div className={s.leftSide}>
-          <div className={s.courseTitle}>
-            <h1>
-              {data && data.data.title}
-              {/* <span className={s.accentuated}>Frontend</span> разработчик */}
-            </h1>
-            <CourseControlls />
-          </div>
+      {data ? (
+        <div className={s.coursePage}>
+          <div className={s.leftSide}>
+            <div className={s.courseTitle}>
+              <h1>
+                {data && data.data.title}
+                {/* <span className={s.accentuated}>Frontend</span> разработчик */}
+              </h1>
+              <CourseControlls />
+            </div>
 
-          <div className={s.courseImageWrapper}>
-            {typeof data?.data.mediaValue?.content == 'string' && (
-              <>
-                {data?.data.mediaValue.type == 'image' ? (
-                  <>
-                    <Box sx={{ background: '#000000', display: 'flex', justifyContent: 'center' }}>
-                      <img
-                        className={s.courseImage}
+            <div className={s.courseImageWrapper}>
+              {typeof data?.data.mediaValue?.content == 'string' && (
+                <>
+                  {data?.data.mediaValue.type == 'image' ? (
+                    <>
+                      <Box
+                        sx={{ background: '#000000', display: 'flex', justifyContent: 'center' }}
+                      >
+                        <img
+                          className={s.courseImage}
+                          src={data?.data.mediaValue.content}
+                          style={{ maxHeight: '650px' }}
+                          alt='course'
+                        />
+                        {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
+                        <div className={s.courseStatsWrapper}>
+                          <div
+                            style={{
+                              position: 'absolute',
+                              background: '#000',
+                              borderRadius: '12px',
+                              width: '100%',
+                              height: '100%',
+                              opacity: '0.3',
+                            }}
+                          >
+                            &nbsp;
+                          </div>
+                          <div style={{ padding: '10px', zIndex: 99 }}>
+                            {data && <Rating rating={data?.data.rating} />}
+                            <ViewsCount />
+                          </div>
+                        </div>
+                      </Box>
+                    </>
+                  ) : (
+                    <>
+                      <video
+                        ref={videoRef}
                         src={data?.data.mediaValue.content}
-                        style={{ maxHeight: '650px' }}
-                        alt='course'
+                        style={{ width: '100%' }}
                       />
-                      {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
+                      {!play && <PlayButton onClickPlay={setPlay} videoRef={videoRef} />}
+                      {play && <PauseButton onClickPlay={setPlay} videoRef={videoRef} />}
                       <div className={s.courseStatsWrapper}>
                         <div
                           style={{
@@ -221,139 +253,110 @@ const CourseDetails = () => {
                           <ViewsCount />
                         </div>
                       </div>
-                    </Box>
-                  </>
-                ) : (
-                  <>
-                    <video
-                      ref={videoRef}
-                      src={data?.data.mediaValue.content}
-                      style={{ width: '100%' }}
-                    />
-                    {!play && <PlayButton onClickPlay={setPlay} videoRef={videoRef} />}
-                    {play && <PauseButton onClickPlay={setPlay} videoRef={videoRef} />}
-                    <div className={s.courseStatsWrapper}>
-                      <div
-                        style={{
-                          position: 'absolute',
-                          background: '#000',
-                          borderRadius: '12px',
-                          width: '100%',
-                          height: '100%',
-                          opacity: '0.3',
-                        }}
-                      >
-                        &nbsp;
-                      </div>
-                      <div style={{ padding: '10px', zIndex: 99 }}>
-                        {data && <Rating rating={data?.data.rating} />}
-                        <ViewsCount />
-                      </div>
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-
-          {width < 1200 && (
-            <CourseSidebar
-              duration={data?.data.duration ?? 0}
-              lessonsNum={lessSum ?? 0}
-              price={data?.data.price ?? 0}
-              priceDiscount={data?.data.priceDiscount ?? 0}
-              modules={data?.data.modules}
-              rating={data?.data.rating ?? 0}
-            />
-          )}
-
-          <p className={s.courseSubTitle}>
-            <span className={s.accentuated}>{t.course_description}</span>
-          </p>
-
-          <ul className={s.descInfo}>
-            <li className={s.infoItem}>
-              <p className={s.infoItemTitle}>{t.language}</p>
-              <p className={s.infoItemContent}>
-                {data && (
-                  <>
-                    {data.data.language == 'RU' && (
-                      <div style={{ height: '20px', width: '20px' }}>
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          viewBox='0 0 9 6'
-                          width='35'
-                          height='20'
-                        >
-                          <rect fill='#fff' width='9' height='3' />
-                          <rect fill='#d52b1e' y='3' width='9' height='3' />
-                          <rect fill='#0039a6' y='2' width='9' height='2' />
-                        </svg>
-                      </div>
-                    )}
-                    {data.data.language == 'UA' && (
-                      <div style={{ height: '20px', width: '20px', position: 'relative' }}>
-                        <svg xmlns='http://www.w3.org/2000/svg' width='35' height='20'>
-                          <rect width='1200' height='10' fill='#0057B7' />
-                          <rect width='1200' height='10' y='10' fill='#FFD700' />
-                        </svg>
-                      </div>
-                    )}
-                    {data.data.language == 'EN' && (
-                      <div style={{ height: '20px', width: '20px', position: 'relative' }}>
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          viewBox='0 0 50 30'
-                          width='35'
-                          height='20'
-                        >
-                          <clipPath id='t'>
-                            <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
-                          </clipPath>
-                          <path d='M0,0v30h50v-30z' fill='#012169' />
-                          <path d='M0,0 50,30M50,0 0,30' stroke='#fff' stroke-width='6' />
-                          <path
-                            d='M0,0 50,30M50,0 0,30'
-                            clip-path='url(#t)'
-                            stroke='#C8102E'
-                            stroke-width='4'
-                          />
-                          <path
-                            d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
-                            fill='#C8102E'
-                            stroke='#FFF'
-                            stroke-width='2'
-                          />
-                        </svg>
-                      </div>
-                    )}
-                  </>
-                )}
-              </p>
-            </li>
-            <li className={s.infoItem}>
-              <p className={s.infoItemTitle}>{t.level}</p>
-              <p className={s.infoItemContent}>{data && data.data.level}</p>
-            </li>
-            <li className={s.infoItem}>
-              <p className={s.infoItemTitle}>{t.start_date}</p>
-              <p className={s.infoItemContent}>{data && data.data.date}</p>
-            </li>
-          </ul>
-          {data && (
-            <div className={s.descText}>
-              <SlateView value={data && data.data.description} />
+                    </>
+                  )}
+                </>
+              )}
             </div>
-          )}
 
-          <p
-            style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}
-            className={s.courseSubTitle}
-          >
-            <span className={s.accentuated}>{t.course_materials}</span>
-          </p>
-          {data && <CourseMaterials modules={data.data.modules} />}
-          {/* 
+            {width < 1200 && (
+              <CourseSidebar
+                duration={data?.data.duration ?? 0}
+                lessonsNum={lessSum ?? 0}
+                price={data?.data.price ?? 0}
+                priceDiscount={data?.data.priceDiscount ?? 0}
+                modules={data?.data.modules}
+                rating={data?.data.rating ?? 0}
+              />
+            )}
+
+            <p className={s.courseSubTitle}>
+              <span className={s.accentuated}>{t.course_description}</span>
+            </p>
+
+            <ul className={s.descInfo}>
+              <li className={s.infoItem}>
+                <p className={s.infoItemTitle}>{t.language}</p>
+                <p className={s.infoItemContent}>
+                  {data && (
+                    <>
+                      {data.data.language == 'RU' && (
+                        <div style={{ height: '20px', width: '20px' }}>
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            viewBox='0 0 9 6'
+                            width='35'
+                            height='20'
+                          >
+                            <rect fill='#fff' width='9' height='3' />
+                            <rect fill='#d52b1e' y='3' width='9' height='3' />
+                            <rect fill='#0039a6' y='2' width='9' height='2' />
+                          </svg>
+                        </div>
+                      )}
+                      {data.data.language == 'UA' && (
+                        <div style={{ height: '20px', width: '20px', position: 'relative' }}>
+                          <svg xmlns='http://www.w3.org/2000/svg' width='35' height='20'>
+                            <rect width='1200' height='10' fill='#0057B7' />
+                            <rect width='1200' height='10' y='10' fill='#FFD700' />
+                          </svg>
+                        </div>
+                      )}
+                      {data.data.language == 'EN' && (
+                        <div style={{ height: '20px', width: '20px', position: 'relative' }}>
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            viewBox='0 0 50 30'
+                            width='35'
+                            height='20'
+                          >
+                            <clipPath id='t'>
+                              <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
+                            </clipPath>
+                            <path d='M0,0v30h50v-30z' fill='#012169' />
+                            <path d='M0,0 50,30M50,0 0,30' stroke='#fff' stroke-width='6' />
+                            <path
+                              d='M0,0 50,30M50,0 0,30'
+                              clip-path='url(#t)'
+                              stroke='#C8102E'
+                              stroke-width='4'
+                            />
+                            <path
+                              d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
+                              fill='#C8102E'
+                              stroke='#FFF'
+                              stroke-width='2'
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </p>
+              </li>
+              <li className={s.infoItem}>
+                <p className={s.infoItemTitle}>{t.level}</p>
+                <p className={s.infoItemContent}>{data && data.data.level}</p>
+              </li>
+              <li className={s.infoItem}>
+                <p className={s.infoItemTitle}>{t.start_date}</p>
+                <p className={s.infoItemContent}>{data && data.data.date}</p>
+              </li>
+            </ul>
+            {data && (
+              <div className={s.descText}>
+                <SlateView value={data && data.data.description} />
+              </div>
+            )}
+
+            <p
+              style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}
+              className={s.courseSubTitle}
+            >
+              <span className={s.accentuated}>{t.course_materials}</span>
+            </p>
+            {data && <CourseMaterials modules={data.data.modules} />}
+            {/* 
           <p className={s.courseSubTitle}>
             <span className={s.accentuated}>{t.skill_settings}</span>
           </p>
@@ -367,79 +370,84 @@ const CourseDetails = () => {
             <Image className={s.courseImage} src={skillsImage} alt='skills' />
           </div> */}
 
-          <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>
-            <span className={s.accentuated}>{t.what_alumni_say}</span>
-          </p>
+            <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>
+              <span className={s.accentuated}>{t.what_alumni_say}</span>
+            </p>
 
-          <Comments />
+            <Comments />
 
-          <p
-            style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}
-            className={s.courseSubTitle}
-          >
-            <span className={s.accentuated}>{t.what_you_learn}</span>
-          </p>
-          <SkillsList />
+            <p
+              style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}
+              className={s.courseSubTitle}
+            >
+              <span className={s.accentuated}>{t.what_you_learn}</span>
+            </p>
+            <SkillsList />
 
-          {popularCoursesData && popularCoursesData.length > 0 && (
-            <>
-              <p
-                style={{
-                  fontSize: '24px',
-                  textAlign: `${width < 1200 ? 'center' : 'left'}`,
-                }}
-                className={s.courseSubTitle}
-              >
-                <span className={s.accentuated}>{t.you_interested}</span>
-              </p>
-              <div
-                style={{
-                  maxWidth: '100%',
-                  width: '100%',
-                  height: '700px',
-                }}
-              >
-                <Box
-                  sx={{
-                    position: { xs: 'absolute', md: 'relative' },
-                    left: { xs: 0, md: null },
-                    right: { xs: 0, md: null },
+            {popularCoursesData && popularCoursesData.length > 0 && (
+              <>
+                <p
+                  style={{
+                    fontSize: '24px',
+                    textAlign: `${width < 1200 ? 'center' : 'left'}`,
+                  }}
+                  className={s.courseSubTitle}
+                >
+                  <span className={s.accentuated}>{t.you_interested}</span>
+                </p>
+                <div
+                  style={{
+                    maxWidth: '100%',
+                    width: '100%',
+                    height: '700px',
                   }}
                 >
-                  <PopularCourses data={popularCoursesData} />
-                </Box>
-              </div>
-            </>
-          )}
-        </div>
-
-        {width >= 1200 && (
-          <div className={s.rightSide}>
-            {userData?.purchased_courses_id.filter((courseId: any) => courseId == data?.id).length >
-            0 ? (
-              <Box sx={{ marginTop: 2, minWidth: '375px', width: '100%' }}>
-                {modules && (
-                  <CourseLessonMaterials
-                    setId={-1}
-                    modules={modules}
-                    selectedLesson={-1}
-                    completedLessonTrigger={false}
-                  />
-                )}
-              </Box>
-            ) : (
-              <CourseSidebar
-                duration={data?.data.duration ?? 0}
-                lessonsNum={lessSum ?? 0}
-                price={data?.data.price ?? 0}
-                priceDiscount={data?.data.priceDiscount ?? 0}
-                modules={data?.data.modules}
-                rating={data?.data.rating ?? 0}
-              />
+                  <Box
+                    sx={{
+                      position: { xs: 'absolute', md: 'relative' },
+                      left: { xs: 0, md: null },
+                      right: { xs: 0, md: null },
+                    }}
+                  >
+                    <PopularCourses data={popularCoursesData} />
+                  </Box>
+                </div>
+              </>
             )}
           </div>
-        )}
-      </div>
+
+          {width >= 1200 && (
+            <div className={s.rightSide}>
+              {userData?.purchased_courses_id.filter((courseId: any) => courseId == data?.id)
+                .length > 0 ? (
+                <Box sx={{ marginTop: 2, minWidth: '375px', width: '100%' }}>
+                  {modules && (
+                    <CourseLessonMaterials
+                      setId={-1}
+                      modules={modules}
+                      selectedLesson={-1}
+                      completedLessonTrigger={false}
+                    />
+                  )}
+                </Box>
+              ) : (
+                <CourseSidebar
+                  duration={data?.data.duration ?? 0}
+                  lessonsNum={lessSum ?? 0}
+                  price={data?.data.price ?? 0}
+                  priceDiscount={data?.data.priceDiscount ?? 0}
+                  modules={data?.data.modules}
+                  rating={data?.data.rating ?? 0}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 40, marginBottom: 70 }}>
+          <CircularProgress sx={{ color: '#ffec3e' }} />
+        </Box>
+      )}
     </Layout>
   )
 }

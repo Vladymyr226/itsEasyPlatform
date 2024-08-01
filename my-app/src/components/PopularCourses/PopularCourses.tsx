@@ -73,12 +73,15 @@ const PopularCourses = ({ data }: { data: any }) => {
                         className={s.courseItemHeader}
                         src={course.data.mediaValue.content}
                         alt='programmer'
+                        style={{
+                          objectFit: 'cover',
+                        }}
                       />
                     ) : (
                       <video
                         className={s.courseItemHeader}
                         src={course.data.mediaValue.content}
-                        style={{ width: '100%' }}
+                        style={{ width: '100%', objectFit: 'cover' }}
                       />
                     )}
                   </div>

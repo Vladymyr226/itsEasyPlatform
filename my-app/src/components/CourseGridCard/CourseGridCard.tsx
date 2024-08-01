@@ -10,13 +10,13 @@ import Rating from '../Rating/Rating'
 import { useRouter } from 'next/navigation'
 import { getLocale } from '@/utils/getLocale'
 import { TabPanelProps, Module, Tag } from '@/utils/interfaces'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LinearProgress } from '@mui/material'
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 
-const CourseGridCard = ({ course }: { course: any }) => {
+const CourseGridCard = ({ course, showProgress }: { course: any; showProgress?: boolean }) => {
   const router = useRouter()
   let tmpSum = 0
   course.data.modules.map(async (module: any) => {
@@ -65,21 +65,34 @@ const CourseGridCard = ({ course }: { course: any }) => {
 
     return summ == 0 ? 0 : (summCompleted * 100) / summ
   }
+  const refImg = useRef<any>(null)
+  const refContainer = useRef<any>(null)
+  console.log(refImg.current)
   return (
     <li className={s.courseItem}>
-      <div style={{ maxWidth: '330px' }}>
-        <div className={s.courseItemHeader} style={{ width: '100%' }}>
+      <div ref={refContainer} style={{ maxWidth: '330px' }}>
+        <div
+          className={s.courseItemHeader}
+          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+        >
           {course.data.mediaValue.type == 'image' ? (
             <img
+              ref={refImg}
               className={s.courseItemHeader}
               src={course.data.mediaValue.content}
+              style={{
+                objectFit: 'cover',
+              }}
               alt='programmer'
             />
           ) : (
             <video
               className={s.courseItemHeader}
               src={course.data.mediaValue.content}
-              style={{ width: '100%' }}
+              style={{
+                width: '100%',
+                objectFit: 'cover',
+              }}
             />
           )}
         </div>
@@ -159,7 +172,7 @@ const CourseGridCard = ({ course }: { course: any }) => {
               <Image src={stat} alt='stat' /> {course.data.level}
             </li>
           </ul>
-          {userData && (
+          {userData && showProgress && (
             <LinearProgress
               variant='determinate'
               sx={{

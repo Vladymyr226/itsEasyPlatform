@@ -13,7 +13,7 @@ import '../app/globals.css'
 import Link from 'next/link'
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 import Autocomplete from '@mui/material/Autocomplete'
-import { Box, Button, TextField, IconButton } from '@mui/material'
+import { Box, Button, TextField, IconButton, CircularProgress } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { Tag } from '@/utils/interfaces'
 import courseShadow from '../src/assets/shadows/courseHoverShadow.png'
@@ -314,30 +314,36 @@ export default function HomePage() {
             })}
           </Box>
         </Box>
-        {dataDisplay && dataDisplay.length > 0 ? (
-          dataDisplay.map((course: Course, index: number) => {
-            return (
-              <>
-                <CourseCard
-                  title={course.data.title}
-                  language={course.data.language}
-                  level={course.data.level}
-                  date={course.data.date}
-                  type={course.data.type}
-                  description={course.data.description}
-                  rating={course.data.rating}
-                  toLeft={index % 2 == 1 ? true : false}
-                  id={course.id}
-                  mediaValue={course.data.mediaValue}
-                  createdAt={course.created_at}
-                />
-              </>
-            )
-          })
+        {dataDisplay ? (
+          dataDisplay.length > 0 ? (
+            dataDisplay.map((course: Course, index: number) => {
+              return (
+                <>
+                  <CourseCard
+                    title={course.data.title}
+                    language={course.data.language}
+                    level={course.data.level}
+                    date={course.data.date}
+                    type={course.data.type}
+                    description={course.data.description}
+                    rating={course.data.rating}
+                    toLeft={index % 2 == 1 ? true : false}
+                    id={course.id}
+                    mediaValue={course.data.mediaValue}
+                    createdAt={course.created_at}
+                  />
+                </>
+              )
+            })
+          ) : (
+            <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '150px' }}>
+              {t.nothing_found}
+            </h1>
+          )
         ) : (
-          <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '150px' }}>
-            {t.nothing_found}
-          </h1>
+          <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+            <CircularProgress sx={{ color: '#ffec3e' }} />
+          </Box>
         )}
 
         {width >= 1200 ? (
@@ -348,9 +354,12 @@ export default function HomePage() {
             </button>
           </Link>
         ) : (
-          <div className={s.loadMoreImageWrapper}>
-            <Image className={s.mobileLoadMoreButton} src={loadMoreButton} alt='load more' />
-          </div>
+          <Link href={'/allCourses'}>
+            <button className={s.loadMoreButton}>
+              {t.see_more}
+              <Image src={plus} alt='plus' />
+            </button>
+          </Link>
         )}
 
         <FaqSection />

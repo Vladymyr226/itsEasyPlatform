@@ -95,82 +95,8 @@ const MyCourses = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<any>()
   const t = getLocale()
-  const jsonData = [
-    {
-      id: '1',
-      data: {
-        title: '1',
-        language: 'RU',
-        level: 'beginner',
-        date: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
-        type: 'self-education',
-        description: [
-          {
-            type: 'paragaph',
-            children: [{ text: '' }],
-          },
-        ],
-        rating: 4.2,
-        duration: 100,
-        lector: 'Ivanovich',
-        modules: [],
-        price: 90,
-        mediaValue: '',
-      },
-      is_active: true,
-      created_at: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
-    },
-    {
-      id: '1',
-      data: {
-        title: '1',
-        language: 'RU',
-        level: 'beginner',
-        date: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
-        type: 'self-education',
-        description: [
-          {
-            type: 'paragaph',
-            children: [{ text: '' }],
-          },
-        ],
-        rating: 4.2,
-        duration: 100,
-        lector: 'Ivanovich',
-        modules: [],
-        price: 90,
-        mediaValue: '',
-      },
-      is_active: true,
-      created_at: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
-    },
-    {
-      id: '1',
-      data: {
-        title: '1',
-        language: 'RU',
-        level: 'beginner',
-        date: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
-        type: 'self-education',
-        description: [
-          {
-            type: 'paragaph',
-            children: [{ text: '' }],
-          },
-        ],
-        rating: 4.2,
-        duration: 100,
-        lector: 'Ivanovich',
-        modules: [],
-        price: 90,
-        mediaValue: '',
-      },
-      is_active: true,
-      created_at: 'Wed Jul 28 1993 14:39:07 GMT+0200 (CEST)',
-    },
-  ]
 
-  const [dataDisplay, setDataDisplay] = useState<any>(jsonData)
+  const [dataDisplay, setDataDisplay] = useState<any>()
 
   const [moduleLessons, setModuleLessons] = useState<Array<string>>()
   const [play, setPlay] = useState(false)
@@ -207,6 +133,7 @@ const MyCourses = () => {
         (course: any) => resultUser?.purchased_courses_id.indexOf(course.id) != -1
       )
       setData(resultData)
+      console.log(resultData)
       setDataDisplay(resultData)
     }
   }
@@ -249,14 +176,17 @@ const MyCourses = () => {
     <Layout>
       <Box sx={{ display: 'inline' }}>
         <Box sx={{ width: '100%', color: '#fff', minHeight: '40rem' }}>
-          <Grid container sx={{ gap: 20, justifyContent: 'center', paddingTop: 10 }}>
+          <Grid
+            container
+            sx={{ gap: 20, justifyContent: { xs: 'center', md: 'left' }, paddingTop: 10 }}
+          >
             {dataDisplay ? (
               dataDisplay.length > 0 ? (
                 dataDisplay.map((course: Course, index: number) => {
                   return (
                     <>
                       <Grid item sx={{}}>
-                        <CourseGridCard course={course} />
+                        <CourseGridCard showProgress course={course} />
                       </Grid>
                     </>
                   )
@@ -267,11 +197,12 @@ const MyCourses = () => {
                 </h1>
               )
             ) : (
-              <></>
+              <Box
+                sx={{ display: 'flex', justifyContent: 'center', marginTop: 40, marginBottom: 70 }}
+              >
+                <CircularProgress sx={{ color: '#ffec3e' }} />
+              </Box>
             )}
-            {dataDisplay.map((course: Course, index: number) => {
-              return <></>
-            })}
           </Grid>
         </Box>
       </Box>

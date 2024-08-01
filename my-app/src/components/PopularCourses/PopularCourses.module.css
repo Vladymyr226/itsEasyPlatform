@@ -46,6 +46,8 @@
 }
 
 .courseItemHeader {
+  height: 190px;
+  width: 100%;
   border-top-right-radius: 14px;
   border-top-left-radius: 14px;
   background-color: var(--secondary-color);

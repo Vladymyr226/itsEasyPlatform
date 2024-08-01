@@ -15,7 +15,7 @@ import SkillsList from '@/components/SkillsList/SkillsList'
 import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../../app/globals.css'
-import { Box, Grid, Button, Typography } from '@mui/material'
+import { Box, Grid, Button, Typography, CircularProgress } from '@mui/material'
 import LinearProgress from '@mui/material/LinearProgress'
 
 import IconButton from '@mui/material/IconButton'
@@ -166,6 +166,7 @@ const CourseCreate = () => {
   })
   const [preview, setPreview] = useState('-1')
   const [editTrigger, setEditTrigger] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
   const [mediaValue, setMediaValue] = useState<{ type: string; content: File }>()
   const [error, setError] = useState<any>()
   // Handlers
@@ -562,6 +563,7 @@ const CourseCreate = () => {
           })
         )
       }
+      setIsLoaded(true)
     }
   }
   useEffect(() => {
@@ -783,1019 +785,1061 @@ const CourseCreate = () => {
             Feedback
           </Box>
         </Box>
-        <Box sx={{ width: '100%', marginTop: 4 }}>
-          <Box
-            sx={{
-              width: '100%',
-              boxShadow: 2,
-              borderRadius: '10px',
 
-              border: '1px solid #000',
-              borderTop: '4px solid #000',
-            }}
-          >
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label='basic tabs example'
-                variant='scrollable'
-                TabIndicatorProps={{
-                  style: {
-                    backgroundColor: '#000',
-                  },
+        <Box sx={{ width: '100%', marginTop: 4 }}>
+          {isLoaded ? (
+            <>
+              <Box
+                sx={{
+                  width: '100%',
+                  boxShadow: 2,
+                  borderRadius: '10px',
+
+                  border: '1px solid #000',
+                  borderTop: '4px solid #000',
                 }}
               >
-                <Tab
-                  value={0}
-                  label='General'
-                  sx={{
-                    minWidth: '50%',
-                    width: '100%',
-                    color: '#000',
-
-                    '&.Mui-selected': {
-                      color: '#000',
-                      fontWeight: 'bold',
-                    },
-                  }}
-                />
-                <Tab
-                  value={1}
-                  label='Structure'
-                  sx={{
-                    minWidth: '50%',
-                    width: '100%',
-                    color: '#000',
-                    '&.Mui-selected': {
-                      color: '#000',
-                      fontWeight: 'bold',
-                    },
-                  }}
-                />
-              </Tabs>
-              <CustomTabPanel value={value} index={0}>
-                <Box sx={{ color: '#fff' }}>
-                  <TextField
-                    autoComplete='off'
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='title'
-                    type='text'
-                    label='Title'
-                    name='title'
-                    error={(error && error.title) ?? false}
-                    autoFocus
-                    onChange={(e) => {
-                      setForm({ ...form, title: e.target.value })
-                      setEditTrigger(true)
-                      setError({})
-                    }}
-                    value={form.title}
-                    sx={{ ...textFieldColors }}
-                  />
-                  <Box sx={{ color: '#000000' }}>
-                    <MyEditor value={richValue} setValue={setRichValue} />
-                  </Box>
-                  <TextField
-                    autoComplete='off'
-                    margin='normal'
-                    required
-                    fullWidth
-                    error={(error && error.duration) ?? false}
-                    id='duration'
-                    type='number'
-                    label='Duration'
-                    name='duration'
-                    InputProps={{
-                      inputProps: { min: 1 },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, duration: Number(e.target.value) })
-                      setEditTrigger(true)
-                      setError({})
-                    }}
-                    value={form.duration || ''}
-                    sx={{ ...textFieldColors, marginTop: 3 }}
-                  />
-                  <TextField
-                    autoComplete='off'
-                    margin='normal'
-                    required
-                    fullWidth
-                    error={(error && error.price) ?? false}
-                    id='price'
-                    type='number'
-                    label='Price'
-                    name='price'
-                    InputProps={{
-                      inputProps: { min: 1 },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, price: Number(e.target.value) })
-                      setEditTrigger(true)
-                      setError({})
-                    }}
-                    value={form.price || ''}
-                    sx={{ ...textFieldColors }}
-                  />
-                  <TextField
-                    autoComplete='off'
-                    margin='normal'
-                    fullWidth
-                    id='priceDiscount'
-                    type='number'
-                    label='Price with discount'
-                    name='priceDiscount'
-                    InputProps={{
-                      inputProps: { min: 1 },
-                    }}
-                    onChange={(e) => {
-                      setForm({ ...form, priceDiscount: Number(e.target.value) })
-                      setEditTrigger(true)
-                    }}
-                    value={form.priceDiscount || ''}
-                    sx={{ ...textFieldColors }}
-                  />
-                  <Box sx={{ marginTop: 2 }}>
-                    <InputLabel>Language</InputLabel>
-                    <Select
-                      error={(error && error.language) ?? false}
-                      fullWidth
-                      id='languageSelect'
-                      value={language}
-                      onChange={handleChangeLanguage}
-                    >
-                      <MenuItem value={'RU'}>RU</MenuItem>
-                      <MenuItem value={'UA'}>UA</MenuItem>
-                      <MenuItem value={'EN'}>EN</MenuItem>
-                    </Select>
-                  </Box>
-                  <Box sx={{ marginTop: 2 }}>
-                    <InputLabel>Level</InputLabel>
-                    <Select
-                      error={(error && error.level) ?? false}
-                      fullWidth
-                      id='levelSelect'
-                      value={level}
-                      onChange={handleChangeLevel}
-                    >
-                      <MenuItem value={'Beginner'}>Beginner</MenuItem>
-                      <MenuItem value={'Junior'}>Junior</MenuItem>
-                      <MenuItem value={'Middle'}>Middle</MenuItem>
-                      <MenuItem value={'Senior'}>Senior</MenuItem>
-                    </Select>
-                  </Box>
-                  <Box sx={{ marginTop: 2 }}>
-                    <InputLabel>Type</InputLabel>
-                    <Select
-                      error={(error && error.type) ?? false}
-                      fullWidth
-                      id='typeSelect'
-                      value={type}
-                      onChange={handleChangeType}
-                    >
-                      <MenuItem value={'self-education'}>Self education</MenuItem>
-                      <MenuItem value={'with-lector'}>With lector</MenuItem>
-                    </Select>
-                  </Box>
-                  {type == 'with-lector' && (
-                    <TextField
-                      autoComplete='off'
-                      margin='normal'
-                      required
-                      fullWidth
-                      error={(error && error.lector) ?? false}
-                      id='lector'
-                      type='text'
-                      label='Lector'
-                      name='lector'
-                      onChange={(e) => {
-                        setForm({ ...form, lector: e.target.value })
-                        setEditTrigger(true)
-                        setError({})
-                      }}
-                      value={form.lector}
-                      sx={{ ...textFieldColors }}
-                    />
-                  )}
-                  {type == 'with-lector' && (
-                    <TextField
-                      autoComplete='off'
-                      margin='normal'
-                      required
-                      fullWidth
-                      id='date'
-                      type='date'
-                      label='Date'
-                      name='date'
-                      onChange={(e) => {
-                        setForm({ ...form, date: e.target.value })
-                        setEditTrigger(true)
-                        setError({})
-                      }}
-                      value={form.date || new Date().toISOString().split('T')[0]}
-                      sx={{
-                        ...textFieldColors,
-                        marginTop: 3,
-                      }}
-                    />
-                  )}
-                  <Box sx={{ marginTop: 2 }}>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      error={(error && error.status) ?? false}
-                      fullWidth
-                      id='statusSelect'
-                      value={status}
-                      onChange={handleChangeStatus}
-                    >
-                      <MenuItem value={'active'}>Active</MenuItem>
-                      <MenuItem value={'draft'}>Draft</MenuItem>
-                    </Select>
-                  </Box>
-                  <Box sx={{ display: 'flex', marginTop: 1 }}>
-                    <Box sx={{ marginTop: 1, fontWeight: 'bold', color: '#000' }}>Rating</Box>
-                    <Rating
-                      name='rating'
-                      precision={0.1}
-                      onChange={(event, newValue) => {
-                        setRating(newValue ?? 5.0)
-                        setEditTrigger(true)
-                        setError({})
-                      }}
-                      value={rating || 0}
-                      sx={{
-                        marginLeft: 4,
-                        paddingTop: 1,
-                        paddingBottom: 1,
-                      }}
-                    />
-                  </Box>
-                  <Autocomplete
-                    disablePortal
-                    multiple
-                    id='combo-box-demo'
-                    value={categorySelect}
-                    onChange={(event, value: any) => {
-                      setCategorySelect(value)
-                      setEditTrigger(true)
-                      setError({})
-                    }}
-                    getOptionLabel={(option: any) => option.name_of_tag}
-                    options={allCategorySelect}
-                    fullWidth
-                    renderInput={(params) => <TextField {...params} label='Category' />}
-                    renderOption={(props: object, option: any, state: object) => (
-                      <div {...props} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        {option.icon_url && (
-                          <img
-                            src={option.icon_url}
-                            alt={'tagIcon_' + option.id}
-                            style={{ width: 20, height: 20 }}
-                          ></img>
-                        )}
-                        <div style={{ textAlign: 'left', width: '100%', paddingLeft: '10px' }}>
-                          {option.name_of_tag}
-                        </div>
-                        <IconButton
-                          key={'deleteButton_' + option.id}
-                          aria-label='delete'
-                          onClick={async (e) => {
-                            const deletingOption = option
-                            const response = await axios.delete(urlTag + '?id=' + option.id)
-                            const resultResponse = response.data
-                            if (resultResponse) {
-                              setAllCategorySelect(
-                                allCategorySelect.filter(
-                                  (category) => category.id !== deletingOption.id
-                                )
-                              )
-                              setCategorySelect(
-                                categorySelect.filter(
-                                  (category) => category.id !== deletingOption.id
-                                )
-                              )
-                              Swal.fire('Deleted!', '', 'success')
-                            }
-                          }}
-                        >
-                          <DeleteIcon key={'deleteIcon_'} color='primary' />
-                        </IconButton>
-                      </div>
-                    )}
-                  />
-                  <Button onClick={showSwalTag}>Create Tag</Button>
-
-                  <Autocomplete
-                    disablePortal
-                    multiple
-                    id='skills'
-                    value={skillsSelect}
-                    onChange={(event, value: any) => {
-                      setSkillsSelect(value)
-                      setEditTrigger(true)
-                      setError({})
-                    }}
-                    getOptionLabel={(option: any) => option.name_skill}
-                    options={allSkillSelect}
-                    fullWidth
-                    renderInput={(params) => <TextField {...params} label='Skill' />}
-                    renderOption={(props: object, option: any, state: object) => (
-                      <div {...props} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <div>{option.name_skill}</div>
-                        <IconButton
-                          key={'deleteButtonSkill_' + option.id}
-                          aria-label='delete'
-                          onClick={async (e) => {
-                            const deletingOption = option
-                            const response = await axios.delete(urlSkill + '?id=' + option.id)
-                            const resultResponse = response.data
-                            if (resultResponse) {
-                              setAllSkillSelect(
-                                allSkillSelect.filter((skill) => skill.id !== deletingOption.id)
-                              )
-                              setSkillsSelect(
-                                skillsSelect.filter((skill) => skill.id !== deletingOption.id)
-                              )
-                              Swal.fire('Deleted!', '', 'success')
-                            }
-                          }}
-                        >
-                          <DeleteIcon key={'deleteIconSkill_'} color='primary' />
-                        </IconButton>
-                      </div>
-                    )}
-                  />
-                  <Button onClick={showSwalSkill}>Create skill</Button>
-
-                  {typeof mediaValue?.content == 'string' && (
-                    <>
-                      {mediaValue.type == 'image' ? (
-                        <>
-                          <img src={mediaValue?.content} />
-                        </>
-                      ) : (
-                        <>
-                          <video controls src={mediaValue?.content} style={{ width: '100%' }} />
-                        </>
-                      )}
-                    </>
-                  )}
-                  <Box sx={{ display: 'flex' }}>
-                    <Button
-                      variant='contained'
-                      component='label'
-                      onClick={() => {
-                        setEditTrigger(true)
-                        setError({})
-                        setMediaValue(undefined)
-                      }}
-                      sx={{ mt: 1, mr: 1 }}
-                    >
-                      Remove
-                    </Button>
-
-                    <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
-                      <input
-                        type='file'
-                        accept='video/mp4, image/png, image/jpeg'
-                        onChange={handlePreviewMediaChange}
-                      />
-                    </Button>
-                  </Box>
-                  <Box sx={{ display: 'flex' }}>
-                    {isEdited() && (
-                      <Button
-                        variant='contained'
-                        sx={{
-                          marginTop: 2,
-                          fontWeight: 'bold',
-                          width: '12rem',
-                          marginRight: 2,
-                        }}
-                        onClick={(e) => {
-                          setForm({
-                            title: '',
-                            date: new Date().toISOString().split('T')[0],
-                            duration: null,
-                            lector: '',
-                            price: null,
-                            priceDiscount: null,
-                          })
-                          setLessonForm({
-                            title: '',
-                            link: '',
-                            image: '',
-                          })
-                          let selectedModulesArr: Array<Lesson> = []
-                          modules.map((module: Module) => {
-                            module.lessons.map((less: Lesson) => {
-                              selectedModulesArr.push(less)
-                            })
-                          })
-                          setAllModules([...allModules, ...selectedModulesArr])
-                          setModules([])
-
-                          setRichValue([
-                            {
-                              type: 'paragaph',
-                              children: [{ text: '' }],
-                            },
-                          ])
-                          setRichValueLesson([
-                            {
-                              type: 'paragaph',
-                              children: [{ text: '' }],
-                            },
-                          ])
-                          setLanguage('')
-                          setLevel('')
-                          setType('')
-                          setStatus('')
-                          setRating(0.0)
-                          setCategorySelect([])
-                          setValue(1)
-                          setTimeout(() => {
-                            setValue(0)
-                          }, 10)
-                        }}
-                      >
-                        Clear draft
-                      </Button>
-                    )}
-                    <Button
-                      variant='contained'
-                      fullWidth
-                      sx={{
-                        marginTop: 2,
-                        fontWeight: 'bold',
-                      }}
-                      onClick={(e) => setValue(1)}
-                    >
-                      Go to structure
-                    </Button>
-                  </Box>
-                </Box>
-              </CustomTabPanel>
-              <CustomTabPanel value={value} index={1}>
-                <Box sx={{ width: '100%' }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {modules.map((element, i) => {
-                      return (
-                        <Box
-                          key={'mainModuleContainer_' + i}
-                          sx={{ boxShadow: 2, border: '1px solid' }}
-                        >
-                          <Accordion defaultExpanded={true} sx={{}}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{}}>
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  width: '100%',
-                                  gap: '10px',
-                                  justifyContent: 'space-between',
-                                }}
-                              >
-                                <TextField
-                                  autoComplete='off'
-                                  margin='normal'
-                                  required
-                                  error={countModuleNameMeet(element.title) > 1}
-                                  id={'module' + i}
-                                  type='text'
-                                  label={'Module ' + (i + 1) + ' name'}
-                                  name={'module' + i}
-                                  autoFocus
-                                  onChange={(e) => {
-                                    setEditTrigger(true)
-                                    setError({})
-                                    setModules(
-                                      modules.map((module, moduleIndex) => {
-                                        if (i == moduleIndex) {
-                                          return { ...module, title: e.target.value }
-                                        } else {
-                                          return module
-                                        }
-                                      })
-                                    )
-                                  }}
-                                  value={element.title}
-                                  sx={{ ...textFieldColors }}
-                                />
-
-                                <IconButton
-                                  color='error'
-                                  sx={{
-                                    marginTop: 3,
-                                    width: '40px',
-                                    height: '40px',
-                                    marginRight: 4,
-                                  }}
-                                  onClick={(e) => {
-                                    setEditTrigger(true)
-                                    setError({})
-                                    setModules(
-                                      modules.filter((moduleElem, index) => {
-                                        if (i !== index) {
-                                          return moduleElem
-                                        }
-                                        setAllModules([...allModules, ...moduleElem.lessons])
-                                      })
-                                    )
-                                  }}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </div>
-                            </AccordionSummary>
-
-                            <AccordionDetails
-                              style={{
-                                paddingLeft: '8px',
-                                paddingRight: '8px',
-                                borderTop: '2px solid',
-                              }}
-                            >
-                              <Box sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}>
-                                <Box sx={{ maxWidth: '40%', width: '100%' }}>
-                                  <Autocomplete
-                                    disablePortal
-                                    id='combo-box-demo'
-                                    getOptionLabel={(option: any) => option.title}
-                                    options={storedModules}
-                                    value={{ title: '' }}
-                                    fullWidth
-                                    renderInput={(params) => (
-                                      <TextField {...params} label='Stored lessons' />
-                                    )}
-                                    onChange={(event, value: any) => {
-                                      setEditTrigger(true)
-                                      setError({})
-                                      setModules(
-                                        modules.map((modulesElem, index) => {
-                                          if (
-                                            index == i &&
-                                            modulesElem.lessons.filter(
-                                              (reDropElem) => reDropElem.id === value.id
-                                            ).length === 0
-                                          ) {
-                                            setStoredModules(
-                                              storedModules.filter(
-                                                (storedModule) => storedModule.id != value.id
-                                              )
-                                            )
-                                            return {
-                                              title: modulesElem.title,
-                                              lessons: [
-                                                ...modulesElem.lessons,
-                                                {
-                                                  id: value.id,
-                                                  title: value.title,
-                                                  description: value.description,
-                                                  link: value.link,
-                                                  fields: value.fields,
-                                                },
-                                              ],
-                                            }
-                                          }
-                                          return modulesElem
-                                        })
-                                      )
-                                    }}
-                                    renderOption={(props: object, option: any, state: object) => (
-                                      <div
-                                        // {...props}
-                                        style={{ display: 'flex', justifyContent: 'space-between' }}
-                                      >
-                                        <div {...props} style={{ width: '100%' }}>
-                                          {option.title}
-                                        </div>
-                                        <IconButton
-                                          key={'deleteButton_' + option.id}
-                                          aria-label='delete'
-                                          onClick={async (e) => {
-                                            const response = await axios.delete(
-                                              urlLesson + '?id=' + option.id
-                                            )
-                                            const resultResponse = response.data
-                                            if (resultResponse) {
-                                              setStoredModules(
-                                                storedModules.filter(
-                                                  (lesson) => lesson.id != option.id
-                                                )
-                                              )
-                                            }
-                                          }}
-                                          sx={{}}
-                                        >
-                                          <DeleteIcon key={'deleteIcon_'} color='primary' />
-                                        </IconButton>
-                                      </div>
-                                    )}
-                                  />
-                                </Box>
-                              </Box>
-                              <Box
-                                sx={{
-                                  width: '100%',
-                                  display: 'flex',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <Box sx={{ width: '100%' }}>
-                                  {element.lessons.map((lesson, index) => {
-                                    return (
-                                      <div
-                                        key={'mainModuleContainer_' + i}
-                                        style={{
-                                          color: '#0f0e16',
-                                          width: '100%',
-                                          background: '#cccccc',
-                                          marginTop: '16px',
-                                          padding: '16px',
-                                          boxShadow:
-                                            '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
-                                        }}
-                                        draggable
-                                        onDragStart={() => (dragLesson.current = lesson.id)}
-                                        onDragEnter={() => (draggedOverLesson.current = index)}
-                                        onDragEnd={(e) => handleSort(element.lessons, i)}
-                                        onDragOver={(e) => e.preventDefault()}
-                                      >
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
-                                          <DragIndicatorIcon />
-                                          <Box sx={{ fontWeight: 'bold' }}>
-                                            {lesson.title ?? ''}
-                                          </Box>
-                                        </Box>
-
-                                        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-                                          <IconButton
-                                            onClick={(e) => {
-                                              setPreview(
-                                                lesson.id == preview ? '-1' : lesson.id ?? '-1'
-                                              )
-                                            }}
-                                          >
-                                            <PreviewIcon />
-                                          </IconButton>
-                                          <IconButton
-                                            onClick={(e) => {
-                                              setIdLessonEdit(
-                                                idLessonEdit == lesson.id
-                                                  ? null
-                                                  : lesson.id
-                                                  ? lesson.id
-                                                  : null
-                                              )
-                                              setLessonForm({
-                                                title: lesson.title,
-                                                link: lesson.link,
-                                                image: lesson.image ?? '',
-                                              })
-                                              setRichValueLesson(lesson.description)
-                                              setCreateLessonIndx(i)
-                                              setValue(2)
-                                            }}
-                                          >
-                                            <EditIcon />
-                                          </IconButton>
-                                          <IconButton
-                                            onClick={async (e) => {
-                                              setEditTrigger(true)
-                                              setError({})
-                                              setStoredModules([...storedModules, lesson])
-                                              setModules(
-                                                modules.map((elem, index) => {
-                                                  if (i === index) {
-                                                    return {
-                                                      title: elem.title,
-                                                      lessons: elem.lessons.filter(
-                                                        (lessonFilter, lessonIndex) => {
-                                                          if (lessonFilter.id !== lesson.id) {
-                                                            return lessonFilter
-                                                          }
-                                                          setStoredModules([
-                                                            ...storedModules,
-                                                            lessonFilter,
-                                                          ])
-                                                        }
-                                                      ),
-                                                    }
-                                                  }
-                                                  return elem
-                                                })
-                                              )
-                                            }}
-                                          >
-                                            <DeleteIcon color='error' />
-                                          </IconButton>
-                                        </Box>
-                                        {preview == lesson.id && idLessonEdit != lesson.id && (
-                                          <>
-                                            <Box
-                                              sx={{
-                                                paddingLeft: '16px',
-                                                maxHeight: '10rem',
-                                                overflow: 'auto',
-                                                scrollbarWidth: 'none',
-                                              }}
-                                            >
-                                              <SlateView value={lesson.description} />
-                                            </Box>
-                                            <Box
-                                              sx={{
-                                                overflow: 'auto',
-                                                scrollbarWidth: 'none',
-                                                marginTop: 2,
-                                              }}
-                                            >
-                                              <ExampleYouTube url={lesson.link.split('?v=')[1]} />
-                                            </Box>
-                                          </>
-                                        )}
-                                      </div>
-                                    )
-                                  })}
-                                </Box>
-                              </Box>
-
-                              <Box sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}>
-                                <Button
-                                  variant='contained'
-                                  onClick={() => {
-                                    setCreateLessonIndx(createLessonIndx === i ? -1 : i)
-
-                                    setRichValueLesson([
-                                      {
-                                        type: 'paragaph',
-                                        children: [{ text: '' }],
-                                      },
-                                    ])
-                                    setValue(2)
-                                  }}
-                                >
-                                  Create lesson
-                                </Button>
-                              </Box>
-                            </AccordionDetails>
-                          </Accordion>
-                        </Box>
-                      )
-                    })}
-                  </Box>
-                  <Button
-                    variant='contained'
-                    onClick={(e) => {
-                      setModules([...modules, { title: '', lessons: [] }])
-                    }}
-                    sx={{
-                      marginTop: 2,
-                      fontWeight: 'bold',
-                      borderRadius: '0px',
+                <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+                  <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    aria-label='basic tabs example'
+                    variant='scrollable'
+                    TabIndicatorProps={{
+                      style: {
+                        backgroundColor: '#000',
+                      },
                     }}
                   >
-                    Add Module
-                  </Button>
-                </Box>
-              </CustomTabPanel>
-              <CustomTabPanel value={value} index={2}>
-                <Box
-                  sx={{
-                    color: '#fff',
-                  }}
-                >
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='lessonTitle'
-                    type='title'
-                    label='Title'
-                    name='title'
-                    autoFocus
-                    autoComplete='off'
-                    onChange={(e) => {
-                      setLessonForm({ ...lessonForm, title: e.target.value })
-                    }}
-                    value={lessonForm.title}
-                    sx={{ ...textFieldColors }}
-                  />
-                  <Box sx={{ color: '#000000' }}>
-                    <MyEditor value={richValueLesson} setValue={setRichValueLesson} />
-                  </Box>
+                    <Tab
+                      value={0}
+                      label='General'
+                      sx={{
+                        minWidth: '50%',
+                        width: '100%',
+                        color: '#000',
 
-                  <Box sx={{ width: '100%', marginTop: 2 }}>
-                    <ExampleYouTube url={lessonForm.link.split('?v=')[1]} />
-                  </Box>
-
-                  <TextField
-                    margin='normal'
-                    required
-                    fullWidth
-                    id='lessonLink'
-                    type='text'
-                    label='Link'
-                    name='link'
-                    InputProps={{
-                      inputProps: { min: 1 },
-                    }}
-                    autoComplete='off'
-                    onChange={(e) => {
-                      setLessonForm({ ...lessonForm, link: e.target.value })
-                    }}
-                    value={lessonForm.link}
-                    sx={{ ...textFieldColors }}
-                  />
-
-                  <Box sx={{ display: 'flex' }}>
-                    <Button
-                      variant='contained'
-                      component='label'
-                      onClick={() => {
-                        setLessonForm({ ...lessonForm, image: '' })
+                        '&.Mui-selected': {
+                          color: '#000',
+                          fontWeight: 'bold',
+                        },
                       }}
-                      sx={{ mt: 1, mr: 1 }}
-                    >
-                      Remove
-                    </Button>
-
-                    <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
-                      <input
-                        type='file'
-                        accept='image/png, image/jpeg'
-                        onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
-                          if (event.target.files) {
-                            try {
-                              setLessonForm({
-                                ...lessonForm,
-                                image:
-                                  ((await uploadFileToS3(event.target.files[0])) as string) ?? '',
-                              })
-                            } catch (error) {
-                              Swal.fire('Some error has occurred', '' + error, 'error')
-                            }
-                          }
+                    />
+                    <Tab
+                      value={1}
+                      label='Structure'
+                      sx={{
+                        minWidth: '50%',
+                        width: '100%',
+                        color: '#000',
+                        '&.Mui-selected': {
+                          color: '#000',
+                          fontWeight: 'bold',
+                        },
+                      }}
+                    />
+                  </Tabs>
+                  <CustomTabPanel value={value} index={0}>
+                    <Box sx={{ color: '#fff' }}>
+                      <TextField
+                        autoComplete='off'
+                        margin='normal'
+                        required
+                        fullWidth
+                        id='title'
+                        type='text'
+                        label='Title'
+                        name='title'
+                        error={(error && error.title) ?? false}
+                        autoFocus
+                        onChange={(e) => {
+                          setForm({ ...form, title: e.target.value })
+                          setEditTrigger(true)
+                          setError({})
                         }}
+                        value={form.title}
+                        sx={{ ...textFieldColors }}
                       />
-                    </Button>
-                  </Box>
+                      <Box sx={{ color: '#000000' }}>
+                        <MyEditor value={richValue} setValue={setRichValue} />
+                      </Box>
+                      <TextField
+                        autoComplete='off'
+                        margin='normal'
+                        required
+                        fullWidth
+                        error={(error && error.duration) ?? false}
+                        id='duration'
+                        type='number'
+                        label='Duration'
+                        name='duration'
+                        InputProps={{
+                          inputProps: { min: 1 },
+                        }}
+                        onChange={(e) => {
+                          setForm({ ...form, duration: Number(e.target.value) })
+                          setEditTrigger(true)
+                          setError({})
+                        }}
+                        value={form.duration || ''}
+                        sx={{ ...textFieldColors, marginTop: 3 }}
+                      />
+                      <TextField
+                        autoComplete='off'
+                        margin='normal'
+                        required
+                        fullWidth
+                        error={(error && error.price) ?? false}
+                        id='price'
+                        type='number'
+                        label='Price'
+                        name='price'
+                        InputProps={{
+                          inputProps: { min: 1 },
+                        }}
+                        onChange={(e) => {
+                          setForm({ ...form, price: Number(e.target.value) })
+                          setEditTrigger(true)
+                          setError({})
+                        }}
+                        value={form.price || ''}
+                        sx={{ ...textFieldColors }}
+                      />
+                      <TextField
+                        autoComplete='off'
+                        margin='normal'
+                        fullWidth
+                        id='priceDiscount'
+                        type='number'
+                        label='Price with discount'
+                        name='priceDiscount'
+                        InputProps={{
+                          inputProps: { min: 1 },
+                        }}
+                        onChange={(e) => {
+                          setForm({ ...form, priceDiscount: Number(e.target.value) })
+                          setEditTrigger(true)
+                        }}
+                        value={form.priceDiscount || ''}
+                        sx={{ ...textFieldColors }}
+                      />
+                      <Box sx={{ marginTop: 2 }}>
+                        <InputLabel>Language</InputLabel>
+                        <Select
+                          error={(error && error.language) ?? false}
+                          fullWidth
+                          id='languageSelect'
+                          value={language}
+                          onChange={handleChangeLanguage}
+                        >
+                          <MenuItem value={'RU'}>RU</MenuItem>
+                          <MenuItem value={'UA'}>UA</MenuItem>
+                          <MenuItem value={'EN'}>EN</MenuItem>
+                        </Select>
+                      </Box>
+                      <Box sx={{ marginTop: 2 }}>
+                        <InputLabel>Level</InputLabel>
+                        <Select
+                          error={(error && error.level) ?? false}
+                          fullWidth
+                          id='levelSelect'
+                          value={level}
+                          onChange={handleChangeLevel}
+                        >
+                          <MenuItem value={'Beginner'}>Beginner</MenuItem>
+                          <MenuItem value={'Junior'}>Junior</MenuItem>
+                          <MenuItem value={'Middle'}>Middle</MenuItem>
+                          <MenuItem value={'Senior'}>Senior</MenuItem>
+                        </Select>
+                      </Box>
+                      <Box sx={{ marginTop: 2 }}>
+                        <InputLabel>Type</InputLabel>
+                        <Select
+                          error={(error && error.type) ?? false}
+                          fullWidth
+                          id='typeSelect'
+                          value={type}
+                          onChange={handleChangeType}
+                        >
+                          <MenuItem value={'self-education'}>Self education</MenuItem>
+                          <MenuItem value={'with-lector'}>With lector</MenuItem>
+                        </Select>
+                      </Box>
+                      {type == 'with-lector' && (
+                        <TextField
+                          autoComplete='off'
+                          margin='normal'
+                          required
+                          fullWidth
+                          error={(error && error.lector) ?? false}
+                          id='lector'
+                          type='text'
+                          label='Lector'
+                          name='lector'
+                          onChange={(e) => {
+                            setForm({ ...form, lector: e.target.value })
+                            setEditTrigger(true)
+                            setError({})
+                          }}
+                          value={form.lector}
+                          sx={{ ...textFieldColors }}
+                        />
+                      )}
+                      {type == 'with-lector' && (
+                        <TextField
+                          autoComplete='off'
+                          margin='normal'
+                          required
+                          fullWidth
+                          id='date'
+                          type='date'
+                          label='Date'
+                          name='date'
+                          onChange={(e) => {
+                            setForm({ ...form, date: e.target.value })
+                            setEditTrigger(true)
+                            setError({})
+                          }}
+                          value={form.date || new Date().toISOString().split('T')[0]}
+                          sx={{
+                            ...textFieldColors,
+                            marginTop: 3,
+                          }}
+                        />
+                      )}
+                      <Box sx={{ marginTop: 2 }}>
+                        <InputLabel>Status</InputLabel>
+                        <Select
+                          error={(error && error.status) ?? false}
+                          fullWidth
+                          id='statusSelect'
+                          value={status}
+                          onChange={handleChangeStatus}
+                        >
+                          <MenuItem value={'active'}>Active</MenuItem>
+                          <MenuItem value={'draft'}>Draft</MenuItem>
+                        </Select>
+                      </Box>
+                      <Box sx={{ display: 'flex', marginTop: 1 }}>
+                        <Box sx={{ marginTop: 1, fontWeight: 'bold', color: '#000' }}>Rating</Box>
+                        <Rating
+                          name='rating'
+                          precision={0.1}
+                          onChange={(event, newValue) => {
+                            setRating(newValue ?? 5.0)
+                            setEditTrigger(true)
+                            setError({})
+                          }}
+                          value={rating || 0}
+                          sx={{
+                            marginLeft: 4,
+                            paddingTop: 1,
+                            paddingBottom: 1,
+                          }}
+                        />
+                      </Box>
+                      <Autocomplete
+                        disablePortal
+                        multiple
+                        id='combo-box-demo'
+                        value={categorySelect}
+                        onChange={(event, value: any) => {
+                          setCategorySelect(value)
+                          setEditTrigger(true)
+                          setError({})
+                        }}
+                        getOptionLabel={(option: any) => option.name_of_tag}
+                        options={allCategorySelect}
+                        fullWidth
+                        renderInput={(params) => <TextField {...params} label='Category' />}
+                        renderOption={(props: object, option: any, state: object) => (
+                          <div
+                            {...props}
+                            style={{ display: 'flex', justifyContent: 'space-between' }}
+                          >
+                            {option.icon_url && (
+                              <img
+                                src={option.icon_url}
+                                alt={'tagIcon_' + option.id}
+                                style={{ width: 20, height: 20 }}
+                              ></img>
+                            )}
+                            <div style={{ textAlign: 'left', width: '100%', paddingLeft: '10px' }}>
+                              {option.name_of_tag}
+                            </div>
+                            <IconButton
+                              key={'deleteButton_' + option.id}
+                              aria-label='delete'
+                              onClick={async (e) => {
+                                const deletingOption = option
+                                const response = await axios.delete(urlTag + '?id=' + option.id)
+                                const resultResponse = response.data
+                                if (resultResponse) {
+                                  setAllCategorySelect(
+                                    allCategorySelect.filter(
+                                      (category) => category.id !== deletingOption.id
+                                    )
+                                  )
+                                  setCategorySelect(
+                                    categorySelect.filter(
+                                      (category) => category.id !== deletingOption.id
+                                    )
+                                  )
+                                  Swal.fire('Deleted!', '', 'success')
+                                }
+                              }}
+                            >
+                              <DeleteIcon key={'deleteIcon_'} color='primary' />
+                            </IconButton>
+                          </div>
+                        )}
+                      />
+                      <Button onClick={showSwalTag}>Create Tag</Button>
 
-                  <Button
-                    variant='contained'
-                    fullWidth
-                    sx={{
-                      marginTop: 2,
-                      fontWeight: 'bold',
-                    }}
-                    onClick={async (e) => {
-                      if (idLessonEdit && compareIsLessonEdited(idLessonEdit, createLessonIndx)) {
-                        setValue(1)
-                        return
-                      }
-                      try {
-                        setEditTrigger(true)
-                        setError({})
-                        if (idLessonEdit) {
-                          let found = false
-                          storedModules.map((less) => {
-                            if (less.title == lessonForm.title.trim()) found = true
-                          })
-                          modules.map((module) => {
-                            module.lessons.map((less) => {
-                              if (less.title == lessonForm.title.trim() && idLessonEdit != less.id)
-                                found = true
-                            })
-                          })
-                          if (!found) {
-                            const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
-                              title: lessonForm.title,
-                              description: richValueLesson,
-                              link: lessonForm.link,
-                              image: lessonForm.image,
-                            })
-                            const resultResponse = response.data
-                            if (resultResponse) {
-                              setModules(
-                                modules.map((elem, index) => {
-                                  if (createLessonIndx === index) {
-                                    return {
-                                      title: elem.title,
-                                      lessons: elem.lessons.map((lessonFilter, lessonIndex) => {
-                                        if (lessonFilter.id !== idLessonEdit) {
-                                          return lessonFilter
-                                        }
-                                        return {
-                                          ...lessonForm,
-                                          description: richValueLesson,
-                                          id: idLessonEdit,
-                                        }
-                                      }),
-                                    }
-                                  }
-                                  return elem
-                                })
-                              )
+                      <Autocomplete
+                        disablePortal
+                        multiple
+                        id='skills'
+                        value={skillsSelect}
+                        onChange={(event, value: any) => {
+                          setSkillsSelect(value)
+                          setEditTrigger(true)
+                          setError({})
+                        }}
+                        getOptionLabel={(option: any) => option.name_skill}
+                        options={allSkillSelect}
+                        fullWidth
+                        renderInput={(params) => <TextField {...params} label='Skill' />}
+                        renderOption={(props: object, option: any, state: object) => (
+                          <div
+                            {...props}
+                            style={{ display: 'flex', justifyContent: 'space-between' }}
+                          >
+                            <div>{option.name_skill}</div>
+                            <IconButton
+                              key={'deleteButtonSkill_' + option.id}
+                              aria-label='delete'
+                              onClick={async (e) => {
+                                const deletingOption = option
+                                const response = await axios.delete(urlSkill + '?id=' + option.id)
+                                const resultResponse = response.data
+                                if (resultResponse) {
+                                  setAllSkillSelect(
+                                    allSkillSelect.filter((skill) => skill.id !== deletingOption.id)
+                                  )
+                                  setSkillsSelect(
+                                    skillsSelect.filter((skill) => skill.id !== deletingOption.id)
+                                  )
+                                  Swal.fire('Deleted!', '', 'success')
+                                }
+                              }}
+                            >
+                              <DeleteIcon key={'deleteIconSkill_'} color='primary' />
+                            </IconButton>
+                          </div>
+                        )}
+                      />
+                      <Button onClick={showSwalSkill}>Create skill</Button>
+
+                      {typeof mediaValue?.content == 'string' && (
+                        <>
+                          {mediaValue.type == 'image' ? (
+                            <>
+                              <img src={mediaValue?.content} />
+                            </>
+                          ) : (
+                            <>
+                              <video controls src={mediaValue?.content} style={{ width: '100%' }} />
+                            </>
+                          )}
+                        </>
+                      )}
+                      <Box sx={{ display: 'flex' }}>
+                        <Button
+                          variant='contained'
+                          component='label'
+                          onClick={() => {
+                            setEditTrigger(true)
+                            setError({})
+                            setMediaValue(undefined)
+                          }}
+                          sx={{ mt: 1, mr: 1 }}
+                        >
+                          Remove
+                        </Button>
+
+                        <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
+                          <input
+                            type='file'
+                            accept='video/mp4, image/png, image/jpeg'
+                            onChange={handlePreviewMediaChange}
+                          />
+                        </Button>
+                      </Box>
+                      <Box sx={{ display: 'flex' }}>
+                        {isEdited() && (
+                          <Button
+                            variant='contained'
+                            sx={{
+                              marginTop: 2,
+                              fontWeight: 'bold',
+                              width: '12rem',
+                              marginRight: 2,
+                            }}
+                            onClick={(e) => {
+                              setForm({
+                                title: '',
+                                date: new Date().toISOString().split('T')[0],
+                                duration: null,
+                                lector: '',
+                                price: null,
+                                priceDiscount: null,
+                              })
                               setLessonForm({
                                 title: '',
                                 link: '',
                                 image: '',
                               })
+                              let selectedModulesArr: Array<Lesson> = []
+                              modules.map((module: Module) => {
+                                module.lessons.map((less: Lesson) => {
+                                  selectedModulesArr.push(less)
+                                })
+                              })
+                              setAllModules([...allModules, ...selectedModulesArr])
+                              setModules([])
+
+                              setRichValue([
+                                {
+                                  type: 'paragaph',
+                                  children: [{ text: '' }],
+                                },
+                              ])
                               setRichValueLesson([
                                 {
                                   type: 'paragaph',
                                   children: [{ text: '' }],
                                 },
                               ])
-                              setIdLessonEdit(null)
+                              setLanguage('')
+                              setLevel('')
+                              setType('')
+                              setStatus('')
+                              setRating(0.0)
+                              setCategorySelect([])
                               setValue(1)
-                            }
-                          } else {
-                            Swal.fire('Course name is already taken', '', 'error')
-                          }
-                        } else {
-                          let found = false
-                          storedModules.map((less) => {
-                            if (less.title == lessonForm.title.trim()) found = true
-                          })
-                          modules.map((module) => {
-                            module.lessons.map((less) => {
-                              if (less.title == lessonForm.title.trim()) found = true
-                            })
-                          })
-                          if (!found) {
-                            const response = await axios.post(urlLesson, {
-                              title: lessonForm.title,
-                              description: richValueLesson,
-                              link: lessonForm.link,
-                              image: lessonForm.image,
-                            })
-                            const resultResponse = response.data
-                            if (resultResponse) {
-                              setModules(
-                                modules.map((modulesElem, index) => {
-                                  if (
-                                    index == createLessonIndx &&
-                                    modulesElem.lessons.filter(
-                                      (reDropElem) => reDropElem.id === resultResponse.lessonId
-                                    ).length === 0
-                                  ) {
-                                    return {
-                                      title: modulesElem.title,
-                                      lessons: [
-                                        ...modulesElem.lessons,
-                                        {
-                                          ...lessonForm,
-                                          id: resultResponse.lessonId,
-                                          description: richValueLesson,
-                                        },
-                                      ],
-                                    }
-                                  }
-                                  return modulesElem
-                                })
-                              )
-                              setLessonForm({
-                                title: '',
-                                link: '',
-                                image: '',
-                              })
-                            }
-                            setCreateLessonIndx(-1)
+                              setTimeout(() => {
+                                setValue(0)
+                              }, 10)
+                            }}
+                          >
+                            Clear draft
+                          </Button>
+                        )}
+                        <Button
+                          variant='contained'
+                          fullWidth
+                          sx={{
+                            marginTop: 2,
+                            fontWeight: 'bold',
+                          }}
+                          onClick={(e) => setValue(1)}
+                        >
+                          Go to structure
+                        </Button>
+                      </Box>
+                    </Box>
+                  </CustomTabPanel>
+                  <CustomTabPanel value={value} index={1}>
+                    <Box sx={{ width: '100%' }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {modules.map((element, i) => {
+                          return (
+                            <Box
+                              key={'mainModuleContainer_' + i}
+                              sx={{ boxShadow: 2, border: '1px solid' }}
+                            >
+                              <Accordion defaultExpanded={true} sx={{}}>
+                                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{}}>
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      width: '100%',
+                                      gap: '10px',
+                                      justifyContent: 'space-between',
+                                    }}
+                                  >
+                                    <TextField
+                                      autoComplete='off'
+                                      margin='normal'
+                                      required
+                                      error={countModuleNameMeet(element.title) > 1}
+                                      id={'module' + i}
+                                      type='text'
+                                      label={'Module ' + (i + 1) + ' name'}
+                                      name={'module' + i}
+                                      autoFocus
+                                      onChange={(e) => {
+                                        setEditTrigger(true)
+                                        setError({})
+                                        setModules(
+                                          modules.map((module, moduleIndex) => {
+                                            if (i == moduleIndex) {
+                                              return { ...module, title: e.target.value }
+                                            } else {
+                                              return module
+                                            }
+                                          })
+                                        )
+                                      }}
+                                      value={element.title}
+                                      sx={{ ...textFieldColors }}
+                                    />
+
+                                    <IconButton
+                                      color='error'
+                                      sx={{
+                                        marginTop: 3,
+                                        width: '40px',
+                                        height: '40px',
+                                        marginRight: 4,
+                                      }}
+                                      onClick={(e) => {
+                                        setEditTrigger(true)
+                                        setError({})
+                                        setModules(
+                                          modules.filter((moduleElem, index) => {
+                                            if (i !== index) {
+                                              return moduleElem
+                                            }
+                                            setAllModules([...allModules, ...moduleElem.lessons])
+                                          })
+                                        )
+                                      }}
+                                    >
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  </div>
+                                </AccordionSummary>
+
+                                <AccordionDetails
+                                  style={{
+                                    paddingLeft: '8px',
+                                    paddingRight: '8px',
+                                    borderTop: '2px solid',
+                                  }}
+                                >
+                                  <Box
+                                    sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}
+                                  >
+                                    <Box sx={{ maxWidth: '40%', width: '100%' }}>
+                                      <Autocomplete
+                                        disablePortal
+                                        id='combo-box-demo'
+                                        getOptionLabel={(option: any) => option.title}
+                                        options={storedModules}
+                                        value={{ title: '' }}
+                                        fullWidth
+                                        renderInput={(params) => (
+                                          <TextField {...params} label='Stored lessons' />
+                                        )}
+                                        onChange={(event, value: any) => {
+                                          setEditTrigger(true)
+                                          setError({})
+                                          setModules(
+                                            modules.map((modulesElem, index) => {
+                                              if (
+                                                index == i &&
+                                                modulesElem.lessons.filter(
+                                                  (reDropElem) => reDropElem.id === value.id
+                                                ).length === 0
+                                              ) {
+                                                setStoredModules(
+                                                  storedModules.filter(
+                                                    (storedModule) => storedModule.id != value.id
+                                                  )
+                                                )
+                                                return {
+                                                  title: modulesElem.title,
+                                                  lessons: [
+                                                    ...modulesElem.lessons,
+                                                    {
+                                                      id: value.id,
+                                                      title: value.title,
+                                                      description: value.description,
+                                                      link: value.link,
+                                                      fields: value.fields,
+                                                    },
+                                                  ],
+                                                }
+                                              }
+                                              return modulesElem
+                                            })
+                                          )
+                                        }}
+                                        renderOption={(
+                                          props: object,
+                                          option: any,
+                                          state: object
+                                        ) => (
+                                          <div
+                                            // {...props}
+                                            style={{
+                                              display: 'flex',
+                                              justifyContent: 'space-between',
+                                            }}
+                                          >
+                                            <div {...props} style={{ width: '100%' }}>
+                                              {option.title}
+                                            </div>
+                                            <IconButton
+                                              key={'deleteButton_' + option.id}
+                                              aria-label='delete'
+                                              onClick={async (e) => {
+                                                const response = await axios.delete(
+                                                  urlLesson + '?id=' + option.id
+                                                )
+                                                const resultResponse = response.data
+                                                if (resultResponse) {
+                                                  setStoredModules(
+                                                    storedModules.filter(
+                                                      (lesson) => lesson.id != option.id
+                                                    )
+                                                  )
+                                                }
+                                              }}
+                                              sx={{}}
+                                            >
+                                              <DeleteIcon key={'deleteIcon_'} color='primary' />
+                                            </IconButton>
+                                          </div>
+                                        )}
+                                      />
+                                    </Box>
+                                  </Box>
+                                  <Box
+                                    sx={{
+                                      width: '100%',
+                                      display: 'flex',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    <Box sx={{ width: '100%' }}>
+                                      {element.lessons.map((lesson, index) => {
+                                        return (
+                                          <div
+                                            key={'mainModuleContainer_' + i}
+                                            style={{
+                                              color: '#0f0e16',
+                                              width: '100%',
+                                              background: '#cccccc',
+                                              marginTop: '16px',
+                                              padding: '16px',
+                                              boxShadow:
+                                                '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
+                                            }}
+                                            draggable
+                                            onDragStart={() => (dragLesson.current = lesson.id)}
+                                            onDragEnter={() => (draggedOverLesson.current = index)}
+                                            onDragEnd={(e) => handleSort(element.lessons, i)}
+                                            onDragOver={(e) => e.preventDefault()}
+                                          >
+                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                              <DragIndicatorIcon />
+                                              <Box sx={{ fontWeight: 'bold' }}>
+                                                {lesson.title ?? ''}
+                                              </Box>
+                                            </Box>
+
+                                            <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                                              <IconButton
+                                                onClick={(e) => {
+                                                  setPreview(
+                                                    lesson.id == preview ? '-1' : lesson.id ?? '-1'
+                                                  )
+                                                }}
+                                              >
+                                                <PreviewIcon />
+                                              </IconButton>
+                                              <IconButton
+                                                onClick={(e) => {
+                                                  setIdLessonEdit(
+                                                    idLessonEdit == lesson.id
+                                                      ? null
+                                                      : lesson.id
+                                                      ? lesson.id
+                                                      : null
+                                                  )
+                                                  setLessonForm({
+                                                    title: lesson.title,
+                                                    link: lesson.link,
+                                                    image: lesson.image ?? '',
+                                                  })
+                                                  setRichValueLesson(lesson.description)
+                                                  setCreateLessonIndx(i)
+                                                  setValue(2)
+                                                }}
+                                              >
+                                                <EditIcon />
+                                              </IconButton>
+                                              <IconButton
+                                                onClick={async (e) => {
+                                                  setEditTrigger(true)
+                                                  setError({})
+                                                  setStoredModules([...storedModules, lesson])
+                                                  setModules(
+                                                    modules.map((elem, index) => {
+                                                      if (i === index) {
+                                                        return {
+                                                          title: elem.title,
+                                                          lessons: elem.lessons.filter(
+                                                            (lessonFilter, lessonIndex) => {
+                                                              if (lessonFilter.id !== lesson.id) {
+                                                                return lessonFilter
+                                                              }
+                                                              setStoredModules([
+                                                                ...storedModules,
+                                                                lessonFilter,
+                                                              ])
+                                                            }
+                                                          ),
+                                                        }
+                                                      }
+                                                      return elem
+                                                    })
+                                                  )
+                                                }}
+                                              >
+                                                <DeleteIcon color='error' />
+                                              </IconButton>
+                                            </Box>
+                                            {preview == lesson.id && idLessonEdit != lesson.id && (
+                                              <>
+                                                <Box
+                                                  sx={{
+                                                    paddingLeft: '16px',
+                                                    maxHeight: '10rem',
+                                                    overflow: 'auto',
+                                                    scrollbarWidth: 'none',
+                                                  }}
+                                                >
+                                                  <SlateView value={lesson.description} />
+                                                </Box>
+                                                <Box
+                                                  sx={{
+                                                    overflow: 'auto',
+                                                    scrollbarWidth: 'none',
+                                                    marginTop: 2,
+                                                  }}
+                                                >
+                                                  <ExampleYouTube
+                                                    url={lesson.link.split('?v=')[1]}
+                                                  />
+                                                </Box>
+                                              </>
+                                            )}
+                                          </div>
+                                        )
+                                      })}
+                                    </Box>
+                                  </Box>
+
+                                  <Box
+                                    sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}
+                                  >
+                                    <Button
+                                      variant='contained'
+                                      onClick={() => {
+                                        setCreateLessonIndx(createLessonIndx === i ? -1 : i)
+
+                                        setRichValueLesson([
+                                          {
+                                            type: 'paragaph',
+                                            children: [{ text: '' }],
+                                          },
+                                        ])
+                                        setValue(2)
+                                      }}
+                                    >
+                                      Create lesson
+                                    </Button>
+                                  </Box>
+                                </AccordionDetails>
+                              </Accordion>
+                            </Box>
+                          )
+                        })}
+                      </Box>
+                      <Button
+                        variant='contained'
+                        onClick={(e) => {
+                          setModules([...modules, { title: '', lessons: [] }])
+                        }}
+                        sx={{
+                          marginTop: 2,
+                          fontWeight: 'bold',
+                          borderRadius: '0px',
+                        }}
+                      >
+                        Add Module
+                      </Button>
+                    </Box>
+                  </CustomTabPanel>
+                  <CustomTabPanel value={value} index={2}>
+                    <Box
+                      sx={{
+                        color: '#fff',
+                      }}
+                    >
+                      <TextField
+                        margin='normal'
+                        required
+                        fullWidth
+                        id='lessonTitle'
+                        type='title'
+                        label='Title'
+                        name='title'
+                        autoFocus
+                        autoComplete='off'
+                        onChange={(e) => {
+                          setLessonForm({ ...lessonForm, title: e.target.value })
+                        }}
+                        value={lessonForm.title}
+                        sx={{ ...textFieldColors }}
+                      />
+                      <Box sx={{ color: '#000000' }}>
+                        <MyEditor value={richValueLesson} setValue={setRichValueLesson} />
+                      </Box>
+
+                      <Box sx={{ width: '100%', marginTop: 2 }}>
+                        <ExampleYouTube url={lessonForm.link.split('?v=')[1]} />
+                      </Box>
+
+                      <TextField
+                        margin='normal'
+                        required
+                        fullWidth
+                        id='lessonLink'
+                        type='text'
+                        label='Link'
+                        name='link'
+                        InputProps={{
+                          inputProps: { min: 1 },
+                        }}
+                        autoComplete='off'
+                        onChange={(e) => {
+                          setLessonForm({ ...lessonForm, link: e.target.value })
+                        }}
+                        value={lessonForm.link}
+                        sx={{ ...textFieldColors }}
+                      />
+
+                      <Box sx={{ display: 'flex' }}>
+                        <Button
+                          variant='contained'
+                          component='label'
+                          onClick={() => {
+                            setLessonForm({ ...lessonForm, image: '' })
+                          }}
+                          sx={{ mt: 1, mr: 1 }}
+                        >
+                          Remove
+                        </Button>
+
+                        <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
+                          <input
+                            type='file'
+                            accept='image/png, image/jpeg'
+                            onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+                              if (event.target.files) {
+                                try {
+                                  setLessonForm({
+                                    ...lessonForm,
+                                    image:
+                                      ((await uploadFileToS3(event.target.files[0])) as string) ??
+                                      '',
+                                  })
+                                } catch (error) {
+                                  Swal.fire('Some error has occurred', '' + error, 'error')
+                                }
+                              }
+                            }}
+                          />
+                        </Button>
+                      </Box>
+
+                      <Button
+                        variant='contained'
+                        fullWidth
+                        sx={{
+                          marginTop: 2,
+                          fontWeight: 'bold',
+                        }}
+                        onClick={async (e) => {
+                          if (
+                            idLessonEdit &&
+                            compareIsLessonEdited(idLessonEdit, createLessonIndx)
+                          ) {
                             setValue(1)
-                          } else {
-                            Swal.fire('Course name is already taken', '', 'error')
+                            return
                           }
-                        }
-                      } catch (error) {
-                        Swal.fire('Something went wrong!', error + '', 'error')
-                        return
-                      }
-                    }}
-                  >
-                    {idLessonEdit
-                      ? compareIsLessonEdited(idLessonEdit, createLessonIndx)
-                        ? 'Cancel'
-                        : 'Save'
-                      : 'Create'}
-                  </Button>
+                          try {
+                            setEditTrigger(true)
+                            setError({})
+                            if (idLessonEdit) {
+                              let found = false
+                              storedModules.map((less) => {
+                                if (less.title == lessonForm.title.trim()) found = true
+                              })
+                              modules.map((module) => {
+                                module.lessons.map((less) => {
+                                  if (
+                                    less.title == lessonForm.title.trim() &&
+                                    idLessonEdit != less.id
+                                  )
+                                    found = true
+                                })
+                              })
+                              if (!found) {
+                                const response = await axios.put(
+                                  urlLesson + '?id=' + idLessonEdit,
+                                  {
+                                    title: lessonForm.title,
+                                    description: richValueLesson,
+                                    link: lessonForm.link,
+                                    image: lessonForm.image,
+                                  }
+                                )
+                                const resultResponse = response.data
+                                if (resultResponse) {
+                                  setModules(
+                                    modules.map((elem, index) => {
+                                      if (createLessonIndx === index) {
+                                        return {
+                                          title: elem.title,
+                                          lessons: elem.lessons.map((lessonFilter, lessonIndex) => {
+                                            if (lessonFilter.id !== idLessonEdit) {
+                                              return lessonFilter
+                                            }
+                                            return {
+                                              ...lessonForm,
+                                              description: richValueLesson,
+                                              id: idLessonEdit,
+                                            }
+                                          }),
+                                        }
+                                      }
+                                      return elem
+                                    })
+                                  )
+                                  setLessonForm({
+                                    title: '',
+                                    link: '',
+                                    image: '',
+                                  })
+                                  setRichValueLesson([
+                                    {
+                                      type: 'paragaph',
+                                      children: [{ text: '' }],
+                                    },
+                                  ])
+                                  setIdLessonEdit(null)
+                                  setValue(1)
+                                }
+                              } else {
+                                Swal.fire('Course name is already taken', '', 'error')
+                              }
+                            } else {
+                              let found = false
+                              storedModules.map((less) => {
+                                if (less.title == lessonForm.title.trim()) found = true
+                              })
+                              modules.map((module) => {
+                                module.lessons.map((less) => {
+                                  if (less.title == lessonForm.title.trim()) found = true
+                                })
+                              })
+                              if (!found) {
+                                const response = await axios.post(urlLesson, {
+                                  title: lessonForm.title,
+                                  description: richValueLesson,
+                                  link: lessonForm.link,
+                                  image: lessonForm.image,
+                                })
+                                const resultResponse = response.data
+                                if (resultResponse) {
+                                  setModules(
+                                    modules.map((modulesElem, index) => {
+                                      if (
+                                        index == createLessonIndx &&
+                                        modulesElem.lessons.filter(
+                                          (reDropElem) => reDropElem.id === resultResponse.lessonId
+                                        ).length === 0
+                                      ) {
+                                        return {
+                                          title: modulesElem.title,
+                                          lessons: [
+                                            ...modulesElem.lessons,
+                                            {
+                                              ...lessonForm,
+                                              id: resultResponse.lessonId,
+                                              description: richValueLesson,
+                                            },
+                                          ],
+                                        }
+                                      }
+                                      return modulesElem
+                                    })
+                                  )
+                                  setLessonForm({
+                                    title: '',
+                                    link: '',
+                                    image: '',
+                                  })
+                                }
+                                setCreateLessonIndx(-1)
+                                setValue(1)
+                              } else {
+                                Swal.fire('Course name is already taken', '', 'error')
+                              }
+                            }
+                          } catch (error) {
+                            Swal.fire('Something went wrong!', error + '', 'error')
+                            return
+                          }
+                        }}
+                      >
+                        {idLessonEdit
+                          ? compareIsLessonEdited(idLessonEdit, createLessonIndx)
+                            ? 'Cancel'
+                            : 'Save'
+                          : 'Create'}
+                      </Button>
+                    </Box>
+                  </CustomTabPanel>
                 </Box>
-              </CustomTabPanel>
-            </Box>
-          </Box>
-          <Button
-            variant='contained'
-            fullWidth
-            sx={{
-              marginTop: 2,
-              fontWeight: 'bold',
-            }}
-            onClick={handleSubmit}
-          >
-            {id ? (editTrigger ? 'Save' : 'Cancel') : 'Add Course'}
-          </Button>
+              </Box>
+              <Button
+                variant='contained'
+                fullWidth
+                sx={{
+                  marginTop: 2,
+                  fontWeight: 'bold',
+                }}
+                onClick={handleSubmit}
+              >
+                {id ? (editTrigger ? 'Save' : 'Cancel') : 'Add Course'}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Box
+                sx={{ display: 'flex', justifyContent: 'center', marginTop: 20, marginBottom: 70 }}
+              >
+                <CircularProgress sx={{ color: '#000' }} />
+              </Box>
+            </>
+          )}
         </Box>
       </Box>
     </Box>
