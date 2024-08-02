@@ -192,7 +192,6 @@ const LessonDetails = () => {
   const [completedLessonTrigger, setCompletedLessonTrigger] = useState(false)
 
   const t = getLocale()
-  console.log(data && data.data.link)
   return (
     <Layout>
       <Box
@@ -389,6 +388,8 @@ const LessonDetails = () => {
                         urlFeedback +
                           '?userId=' +
                           userData.id +
+                          '&rating=' +
+                          newValue +
                           '&lessonId=' +
                           id +
                           '&feedbackName=' +
@@ -418,12 +419,14 @@ const LessonDetails = () => {
                 selectedLesson={id ?? -1}
                 completedLessonTrigger={completedLessonTrigger}
               />
-            ) : (
+            ) : typeof window !== 'undefined' && localStorage.getItem('SelectedCourse') ? (
               <Box
                 sx={{ display: 'flex', justifyContent: 'center', marginTop: 10, marginBottom: 70 }}
               >
                 <CircularProgress sx={{ color: '#fff' }} />
               </Box>
+            ) : (
+              <></>
             )}
           </Box>
         </Box>

@@ -297,7 +297,7 @@ const CourseCreate = () => {
     try {
       if (id) {
         const response = await axios.put(
-          url + '?id=' + id + '&isActive=' + (status == 'active' ? true : false),
+          url + '?id=' + id + '&views=100' + '&isActive=' + (status == 'active' ? true : false),
           json
         )
         const resultResponse = response.data

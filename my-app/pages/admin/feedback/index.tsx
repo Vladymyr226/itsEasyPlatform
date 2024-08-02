@@ -17,10 +17,18 @@ const tableColumn = {
 }
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedbacks`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/users`
 
 const TableColumns = () => {
   return (
     <>
+      <Box
+        sx={{
+          ...tableColumn,
+        }}
+      >
+        Raiting
+      </Box>
       <Box
         sx={{
           ...tableColumn,
@@ -41,6 +49,13 @@ const TableColumns = () => {
         }}
       >
         Created at
+      </Box>
+      <Box
+        sx={{
+          ...tableColumn,
+        }}
+      >
+        User
       </Box>
     </>
   )
@@ -75,6 +90,13 @@ const AdminFeedbackTable = () => {
         },
       })
       const resultLesson = await responseLesson.json()
+
+      const responseUser = await fetch(urlUser, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultUser = await responseUser.json()
       setData(
         result.getFeedbacks.map((feedback: any) => {
           return {
@@ -82,6 +104,7 @@ const AdminFeedbackTable = () => {
             lesson_id: resultLesson.getLessons.filter(
               (less: any) => less.id == feedback.lesson_id
             )[0],
+            user_id: resultUser.getUsers.filter((user: any) => user.id == feedback.user_id)[0],
           }
         })
       )
@@ -93,7 +116,7 @@ const AdminFeedbackTable = () => {
       getPageData()
     }
   }, [])
-
+  console.log(data)
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
       <Box sx={{ display: 'flex', justifyContent: 'between', padding: 4, background: '#000' }}>
@@ -199,7 +222,7 @@ const AdminFeedbackTable = () => {
                 paddingTop: 1,
                 paddingBottom: 1,
                 width: '100%',
-                minWidth: '30rem',
+                minWidth: '50rem',
               }}
             >
               <TableColumns />
@@ -213,7 +236,7 @@ const AdminFeedbackTable = () => {
                       sx={{
                         width: '100%',
                         background: '#000',
-                        minWidth: '30rem',
+                        minWidth: '50rem',
                         height: '2px',
                       }}
                     ></Box>
@@ -236,7 +259,21 @@ const AdminFeedbackTable = () => {
                           paddingBottom: 1,
                         }}
                       >
-                        {element.lesson_id.data.title}
+                        {element.rating}
+                      </Box>
+                      <Box
+                        sx={{
+                          borderRight: '2px solid #000',
+                          minWidth: '10rem',
+                          width: '100%',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        <Link href={'/lesson?id=' + element.lesson_id.id}>
+                          {element.lesson_id.data.title}
+                        </Link>
                       </Box>
                       <Box
                         sx={{
@@ -260,11 +297,23 @@ const AdminFeedbackTable = () => {
                           textAlign: 'center',
                           paddingTop: 1,
                           paddingBottom: 1,
+                          borderRight: '2px solid #000',
                         }}
                       >
                         {new Date(element.created_at).toLocaleDateString() +
                           ' , ' +
                           new Date(element.created_at).toLocaleTimeString()}
+                      </Box>
+                      <Box
+                        sx={{
+                          minWidth: '10rem',
+                          width: '100%',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.user_id.user_name}
                       </Box>
                     </Box>
                   </div>
@@ -274,7 +323,7 @@ const AdminFeedbackTable = () => {
               <div>
                 <LinearProgress
                   sx={{
-                    minWidth: '30rem',
+                    minWidth: '50rem',
                   }}
                 />
                 <Box
