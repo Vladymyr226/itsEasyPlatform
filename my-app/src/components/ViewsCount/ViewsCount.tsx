@@ -4,12 +4,12 @@ import eye from '../../assets/eye.svg'
 import Image from 'next/image'
 import { getLocale } from '@/utils/getLocale'
 
-const ViewsCount = () => {
+const ViewsCount = ({ views }: { views: number }) => {
   const t = getLocale()
   return (
     <div className={s.viewsWrapper}>
       <Image className={s.icon} src={eye} alt='eye' />
-      413 {t.views}
+      {views} {t.views}
     </div>
   )
 }

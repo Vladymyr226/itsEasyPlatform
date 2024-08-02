@@ -9,7 +9,15 @@ import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { Box } from '@mui/material'
 
-const CourseImage = ({ rating, mediaValue }: { rating: number; mediaValue: any }) => {
+const CourseImage = ({
+  rating,
+  mediaValue,
+  views,
+}: {
+  rating: number
+  mediaValue: any
+  views: number
+}) => {
   const [play, setPlay] = useState(false)
   const videoRef = useRef(null)
   const blockRef = useRef(null)
@@ -47,7 +55,7 @@ const CourseImage = ({ rating, mediaValue }: { rating: number; mediaValue: any }
                 </div>
                 <div style={{ padding: '10px', zIndex: 99 }}>
                   <Rating rating={rating} />
-                  <ViewsCount />
+                  <ViewsCount views={views} />
                 </div>
               </div>
               <Image className={s.shadow} src={courseShadow} alt='shadow' />
@@ -80,7 +88,7 @@ const CourseImage = ({ rating, mediaValue }: { rating: number; mediaValue: any }
                   </div>
                   <div style={{ padding: '10px', zIndex: 99 }}>
                     <Rating isSmall={true} rating={rating} />
-                    <ViewsCount />
+                    <ViewsCount views={views} />
                   </div>
                 </div>
                 <Image className={s.shadow} src={courseShadow} alt='shadow' />

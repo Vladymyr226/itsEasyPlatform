@@ -48,6 +48,7 @@ interface Course {
   data: CourseData
   is_active: boolean
   created_at: string
+  views: number
 }
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 export default function HomePage() {
@@ -331,6 +332,7 @@ export default function HomePage() {
                     id={course.id}
                     mediaValue={course.data.mediaValue}
                     createdAt={course.created_at}
+                    views={course.views}
                   />
                 </>
               )

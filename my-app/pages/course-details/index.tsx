@@ -21,6 +21,7 @@ import { Box, CircularProgress } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { getLocale } from '@/utils/getLocale'
 import CourseLessonMaterials from '@/components/CourseMaterials/CourseLessonMaterials'
+import axios from 'axios'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
@@ -43,6 +44,7 @@ interface CourseData {
 }
 interface Course {
   id: string
+  views: number
   data: CourseData
   is_active: boolean
 }
@@ -103,6 +105,13 @@ const CourseDetails = () => {
         if (!result.is_active) {
           router.push('./')
         }
+        const responseViewed = await axios.put(
+          url + '?id=' + fullUrl.split('id=')[1] + '&views=' + Number(Number(result.views) + 1),
+          {
+            ...result.data,
+          }
+        )
+
         const modulesTmp = await Promise.all(
           result.data.modules.map(async (module: any) => {
             const lessons = await Promise.all(
@@ -221,7 +230,7 @@ const CourseDetails = () => {
                           </div>
                           <div style={{ padding: '10px', zIndex: 99 }}>
                             {data && <Rating rating={data?.data.rating} />}
-                            <ViewsCount />
+                            <ViewsCount views={data?.views} />
                           </div>
                         </div>
                       </Box>
@@ -250,7 +259,7 @@ const CourseDetails = () => {
                         </div>
                         <div style={{ padding: '10px', zIndex: 99 }}>
                           {data && <Rating rating={data?.data.rating} />}
-                          <ViewsCount />
+                          <ViewsCount views={data?.views} />
                         </div>
                       </div>
                     </>

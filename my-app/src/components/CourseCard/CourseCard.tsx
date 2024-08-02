@@ -15,6 +15,7 @@ interface CourseCardProps {
   id: string
   mediaValue: any
   createdAt: string
+  views: number
 }
 const CourseCard = (props: CourseCardProps) => {
   const [width, setWidth] = useState(0)
@@ -40,9 +41,12 @@ const CourseCard = (props: CourseCardProps) => {
         id={props.id}
         mediaValue={props.mediaValue}
         createdAt={props.createdAt}
+        views={props.views}
       />
 
-      {width >= 1200 && <CourseImage mediaValue={props.mediaValue} rating={props.rating} />}
+      {width >= 1200 && (
+        <CourseImage mediaValue={props.mediaValue} rating={props.rating} views={props.views} />
+      )}
     </div>
   )
 }

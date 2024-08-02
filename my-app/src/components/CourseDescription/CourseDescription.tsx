@@ -22,6 +22,7 @@ interface CourseDescriptionProps {
   id: string
   mediaValue: any
   createdAt: string
+  views: number
 }
 const CourseDescription = (props: CourseDescriptionProps) => {
   const [width, setWidth] = useState(0)
@@ -148,7 +149,9 @@ const CourseDescription = (props: CourseDescriptionProps) => {
         </li>
       </ul>
 
-      {width < 1200 && <CourseImage mediaValue={props.mediaValue} rating={props.rating} />}
+      {width < 1200 && (
+        <CourseImage mediaValue={props.mediaValue} rating={props.rating} views={props.views} />
+      )}
 
       {width > 1200 ? (
         <p

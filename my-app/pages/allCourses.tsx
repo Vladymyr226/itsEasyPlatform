@@ -87,6 +87,7 @@ interface Course {
   data: CourseData
   is_active: boolean
   created_at: string
+  views: number
 }
 const AllCoursesDetails = () => {
   const [width, setWidth] = useState(0)
@@ -744,6 +745,7 @@ const AllCoursesDetails = () => {
                           id={course.id}
                           mediaValue={course.data.mediaValue}
                           createdAt={course.created_at}
+                          views={course.views}
                         />
                       </>
                     )
