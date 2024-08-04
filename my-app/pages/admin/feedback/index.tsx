@@ -271,7 +271,13 @@ const AdminFeedbackTable = () => {
                           paddingBottom: 1,
                         }}
                       >
-                        <Link href={'/lesson?id=' + element.lesson_id.id}>
+                        <Link
+                          href={'/lesson?id=' + element.lesson_id.id}
+                          onClick={() => {
+                            localStorage.removeItem('SelectedCourse')
+                            localStorage.removeItem('SelectedModuleIndex')
+                          }}
+                        >
                           {element.lesson_id.data.title}
                         </Link>
                       </Box>
