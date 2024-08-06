@@ -41,8 +41,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  max-width: 330px;
+  min-width: 330px;
+  max-width: none;
 }
 
 .courseItemHeader {

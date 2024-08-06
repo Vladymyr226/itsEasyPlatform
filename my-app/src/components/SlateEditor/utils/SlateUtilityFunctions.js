@@ -164,8 +164,33 @@ export const getBlock = (props) => {
       )
     case 'codeElem':
       return (
-        <pre {...attributes} style={{ wordWrap: 'break-word', whiteSpace: 'pre-wrap' }}>
-          <code style={{ background: '#ccc' }}>{children}</code>
+        <pre
+          {...attributes}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            listStylePosition: 'inside',
+            flexDirection: 'column',
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            minWidth: '100%',
+            color: '#abb2bf', // Light text color for better contrast
+          }}
+        >
+          <code
+            style={{
+              background: '#1e222a', // Slightly lighter background for the code block
+              color: '#61dafb', // Bright cyan text color
+              width: '100%',
+              padding: '10px',
+              paddingLeft: '20px',
+              marginTop: '-5px',
+              marginBottom: '-5px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Subtle shadow for depth
+            }}
+          >
+            {children}
+          </code>
         </pre>
         // <blockquote {...attributes} {...element.attr}>
         //   {children}

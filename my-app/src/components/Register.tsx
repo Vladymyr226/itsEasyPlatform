@@ -50,20 +50,45 @@ const Registration = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try {
+      if (form.userName.indexOf(' ') != -1) {
+        Swal.fire({
+          title: 'Username cannot contain spaces inside!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
+        return
+      }
       if (form.userName.trim().length < 3 || form.userName.trim().length >= 32) {
-        Swal.fire('Username must be longer than 3 and shorter than 32 characters!', '', 'error')
+        Swal.fire({
+          title: 'Username must be longer than 3 and shorter than 32 characters!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
         return
       }
       if (form.email.trim().length > 40) {
-        Swal.fire('Email must be shorter than 40 characters!', '', 'error')
+        Swal.fire({
+          title: 'Email must be shorter than 40 characters!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
         return
       }
       if (!validateString(form.password)) {
-        Swal.fire(
-          'Password must be at least 10 characters long and contain only digits and letters!',
-          '',
-          'error'
-        )
+        Swal.fire({
+          title:
+            'Password must be at least 10 characters long and contain only digits and letters!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
         return
       }
 
@@ -75,12 +100,24 @@ const Registration = () => {
       if (resultResponse) {
         setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
         localStorage.setItem('UserID', resultResponse.user.id)
-        Swal.fire('You signed up successfully!', '', 'success')
-        router.push('/admin')
+        Swal.fire({
+          title: 'You signed up successfully!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'success',
+        })
+        router.push('/')
       }
     } catch (error) {
       alert(error)
-      Swal.fire('Sign up failure!', '', 'error')
+      Swal.fire({
+        title: 'Sign up failure!',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
       return
     }
   }

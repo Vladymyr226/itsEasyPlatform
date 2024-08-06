@@ -13,14 +13,14 @@ import Link from 'next/link'
 import { getLocale } from '@/utils/getLocale'
 
 const CourseMaterials = ({ modules }: { modules: any }) => {
-  const [selected, setSelected] = useState<number | null>(0)
+  const [closed, setClosed] = useState<Array<number> | null>([])
 
   const toggle = (i: number) => {
-    if (selected === i) {
-      return setSelected(null)
+    if (closed?.indexOf(i) !== -1) {
+      return setClosed(closed ? closed.filter((ind: number) => ind != i) : [])
     }
 
-    setSelected(i)
+    setClosed([...closed, i])
   }
   const t = getLocale()
   return (
@@ -30,10 +30,10 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
           <div className={s.accordoinItem}>
             <div
               onClick={() => toggle(index)}
-              className={`${s.accordionTitle} ${selected === index ? s.active : ''}`}
+              className={`${s.accordionTitle} ${closed?.indexOf(index) === -1 ? s.active : ''}`}
             >
               <div className={s.titleLeft}>
-                <Image src={selected === index ? arrowTop : arrowBottom} alt='arrow' />
+                <Image src={closed?.indexOf(index) === -1 ? arrowTop : arrowBottom} alt='arrow' />
 
                 {module.title}
               </div>
@@ -50,7 +50,7 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
               </div>
             </div>
 
-            <ul className={`${s.accordionContent} ${selected === index ? s.show : ''}`}>
+            <ul className={`${s.accordionContent} ${closed?.indexOf(index) === -1 ? s.show : ''}`}>
               {module.lessons.map((lesson: any, idx: number) => (
                 <li className={s.materialItem} key={idx}>
                   <div className={s.materialItemTitle}>

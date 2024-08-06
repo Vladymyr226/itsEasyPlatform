@@ -101,6 +101,8 @@ const AdminTable = () => {
   function showDeleteAlert(id: number) {
     Swal.fire({
       title: 'Do you want to delete the course?',
+      background: '#171622',
+      color: '#ffec3e',
 
       showCancelButton: true,
       confirmButtonText: 'Delete',
@@ -111,7 +113,13 @@ const AdminTable = () => {
         const resultResponse = response.data
         if (resultResponse) {
           setData(data?.filter((course) => course.id != id))
-          Swal.fire('Deleted!', '', 'success')
+          Swal.fire({
+            title: 'Deleted!',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#c58efe',
+            icon: 'success',
+          })
         }
       }
     })

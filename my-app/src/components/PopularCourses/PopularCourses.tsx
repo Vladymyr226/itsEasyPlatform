@@ -22,7 +22,7 @@ import 'swiper/css/pagination'
 import { A11y, Navigation, Pagination } from 'swiper/modules'
 import { Box } from '@mui/material'
 import { getLocale } from '@/utils/getLocale'
-const PopularCourses = ({ data }: { data: any }) => {
+const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolean }) => {
   const router = useRouter()
 
   return (
@@ -32,26 +32,20 @@ const PopularCourses = ({ data }: { data: any }) => {
           dynamicBullets: true,
         }}
         className='mySwiper'
-        style={{ padding: 50, width: '90%' }}
+        style={{ width: '100%' }}
         modules={[Navigation, Pagination]}
         navigation={true}
-        spaceBetween={50}
+        spaceBetween={10}
         breakpoints={{
           480: {
             slidesPerView: 1,
-            spaceBetween: 30,
+            spaceBetween: 100,
           },
-          768: {
+          880: {
             slidesPerView: 2,
-            spaceBetween: 30,
           },
-          1024: {
-            slidesPerView: 2,
-            spaceBetween: 30,
-          },
-          1200: {
-            slidesPerView: 2,
-            spaceBetween: 30,
+          1280: {
+            slidesPerView: smallScreen ? 2 : 3,
           },
         }}
       >
@@ -65,8 +59,12 @@ const PopularCourses = ({ data }: { data: any }) => {
           const t = getLocale()
           return (
             <>
-              <SwiperSlide className={s.courseItem} key={'popularCourse_' + course.id}>
-                <div style={{ maxWidth: '330px' }}>
+              <SwiperSlide
+                className={s.courseItem}
+                key={'popularCourse_' + course.id}
+                style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+              >
+                <div style={{ width: '100%', maxWidth: '330px' }}>
                   <div className={s.courseItemHeader} style={{ width: '100%' }}>
                     {course.data.mediaValue.type == 'image' ? (
                       <img

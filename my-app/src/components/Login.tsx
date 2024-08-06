@@ -42,12 +42,18 @@ const Login = () => {
       const response = await axios.post(url + 'email=' + email + '&password=' + password)
       const resultResponse = response.data
       if (resultResponse) {
-        router.push('/admin')
+        router.push('/')
         localStorage.setItem('UserID', resultResponse.user.id)
         setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
       }
     } catch (error) {
-      Swal.fire('Login failure!', '', 'error')
+      Swal.fire({
+        title: 'Login failure!',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
     }
   }
   const [showPass, setShowPass] = useState(false)

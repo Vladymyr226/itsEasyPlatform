@@ -406,6 +406,7 @@ const CourseDetails = () => {
                 </p>
                 <div
                   style={{
+                    marginTop: '20px',
                     maxWidth: '100%',
                     width: '100%',
                     height: '700px',
@@ -418,7 +419,7 @@ const CourseDetails = () => {
                       right: { xs: 0, md: null },
                     }}
                   >
-                    <PopularCourses data={popularCoursesData} />
+                    <PopularCourses data={popularCoursesData} smallScreen />
                   </Box>
                 </div>
               </>

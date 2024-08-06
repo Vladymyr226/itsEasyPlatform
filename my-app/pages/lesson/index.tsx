@@ -125,13 +125,14 @@ const LessonDetails = () => {
                   return { id: resultLesson.id, data: resultLesson.data }
                 })
               )
+
               return {
                 title: module.title,
                 lessons: lessons,
               }
             })
           )
-
+          console.log(modules)
           setModules(modules)
         }
       } else {
@@ -244,14 +245,33 @@ const LessonDetails = () => {
                   marginTop: 2,
                 }}
               >
-                {getLessonIndx() > 0 && (
+                {(getLessonIndx() > 0 ||
+                  Number(
+                    typeof window !== 'undefined' ? localStorage.getItem('SelectedModuleIndex') : 0
+                  ) > 0) && (
                   <Button
                     variant='text'
                     onClick={(e) => {
-                      if (getLessonIndx() > 0) {
+                      const getLessIndx = getLessonIndx()
+                      if (getLessIndx > 0) {
                         if (moduleLessons) {
                           router.replace('/lesson?id=' + moduleLessons[getLessonIndx() - 1])
                           setId(Number(moduleLessons[getLessonIndx() - 1]))
+                        }
+                      } else {
+                        if (Number(localStorage.getItem('SelectedModuleIndex')) > 0) {
+                          const currentIndex = Number(localStorage.getItem('SelectedModuleIndex'))
+                          localStorage.setItem('SelectedModuleIndex', '' + (currentIndex - 1))
+                          setCompletedLessonTrigger(!completedLessonTrigger)
+                          const lessIndex = Number(
+                            modules
+                              ? modules[currentIndex - 1].lessons[
+                                  modules[currentIndex - 1].lessons.length - 1
+                                ].id
+                              : 0
+                          )
+                          router.replace('/lesson?id=' + lessIndex)
+                          setId(lessIndex)
                         }
                       }
                     }}
@@ -277,7 +297,15 @@ const LessonDetails = () => {
                             comletedLessonsId: [...userData.comleted_lessons_id, id],
                           })
                           const resultResponse = response.data
+                          const userId = localStorage.getItem('UserID')
+                          const responseUser = await fetch(urlUser + '/' + userId, {
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                          })
+                          const resultUser = await responseUser.json()
                           setCompletedLessonTrigger(!completedLessonTrigger)
+                          setUserData(resultUser)
                           if (
                             resultResponse &&
                             moduleLessons &&
@@ -292,6 +320,23 @@ const LessonDetails = () => {
                               router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
                               setId(Number(moduleLessons[getLessonIndx() + 1]))
                             }
+                          } else {
+                            if (
+                              resultResponse &&
+                              Number(localStorage.getItem('SelectedModuleIndex')) <
+                                (modules?.length ?? 0) - 1
+                            ) {
+                              const currentIndex = Number(
+                                localStorage.getItem('SelectedModuleIndex')
+                              )
+                              localStorage.setItem('SelectedModuleIndex', '' + (currentIndex + 1))
+                              setCompletedLessonTrigger(!completedLessonTrigger)
+                              const lessIndex = Number(
+                                modules ? modules[currentIndex + 1].lessons[0].id : 0
+                              )
+                              router.replace('/lesson?id=' + lessIndex)
+                              setId(lessIndex)
+                            }
                           }
                         }}
                       >
@@ -300,30 +345,48 @@ const LessonDetails = () => {
                     )}
                 </Box>
 
-                {moduleLessons &&
+                {((moduleLessons &&
                   getLessonIndx() >= 0 &&
-                  getLessonIndx() < moduleLessons?.length - 1 && (
-                    <Button
-                      variant='text'
-                      onClick={(e) => {
-                        if (
-                          moduleLessons &&
-                          getLessonIndx() >= 0 &&
-                          getLessonIndx() < moduleLessons?.length - 1
-                        ) {
-                          if (moduleLessons) {
-                            router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
+                  getLessonIndx() < moduleLessons?.length - 1) ||
+                  Number(
+                    typeof window !== 'undefined' ? localStorage.getItem('SelectedModuleIndex') : 0
+                  ) <
+                    (modules?.length ?? 0) - 1) && (
+                  <Button
+                    variant='text'
+                    onClick={(e) => {
+                      if (
+                        moduleLessons &&
+                        getLessonIndx() >= 0 &&
+                        getLessonIndx() < moduleLessons?.length - 1
+                      ) {
+                        if (moduleLessons) {
+                          router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
 
-                            setId(Number(moduleLessons[getLessonIndx() + 1]))
-                          }
+                          setId(Number(moduleLessons[getLessonIndx() + 1]))
                         }
-                      }}
-                      endIcon={<ArrowForwardIosIcon />}
-                      sx={{ color: '#fff' }}
-                    >
-                      {t.next}
-                    </Button>
-                  )}
+                      } else {
+                        if (
+                          Number(localStorage.getItem('SelectedModuleIndex')) <
+                          (modules?.length ?? 0) - 1
+                        ) {
+                          const currentIndex = Number(localStorage.getItem('SelectedModuleIndex'))
+                          localStorage.setItem('SelectedModuleIndex', '' + (currentIndex + 1))
+                          setCompletedLessonTrigger(!completedLessonTrigger)
+                          const lessIndex = Number(
+                            modules ? modules[currentIndex + 1].lessons[0].id : 0
+                          )
+                          router.replace('/lesson?id=' + lessIndex)
+                          setId(lessIndex)
+                        }
+                      }
+                    }}
+                    endIcon={<ArrowForwardIosIcon />}
+                    sx={{ color: '#fff' }}
+                  >
+                    {t.next}
+                  </Button>
+                )}
               </Box>
             </Box>
           ) : (
@@ -341,7 +404,7 @@ const LessonDetails = () => {
             paddingLeft: 1,
             overflowY: 'scroll',
             scrollbarWidth: 'none',
-            width: { xs: '100%', md: '380px' },
+            width: { xs: '100%', md: '500px' },
           }}
         >
           <Box
@@ -374,6 +437,10 @@ const LessonDetails = () => {
                       userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
                     ) {
                       const { value: text } = await Swal.fire({
+                        background: '#171622',
+                        color: '#ffec3e',
+                        confirmButtonColor: '#c58efe',
+
                         input: 'textarea',
                         title: t.feedbackTitle,
                         inputPlaceholder: t.typeMessage,
@@ -395,10 +462,20 @@ const LessonDetails = () => {
                           '&feedbackName=' +
                           text
                       )
-                      Swal.fire(t.thanks)
+                      Swal.fire({
+                        title: t.thanks,
+                        background: '#171622',
+                        color: '#ffec3e',
+                        confirmButtonColor: '#c58efe',
+                      })
                     }
                   } else {
-                    Swal.fire(t.thanks)
+                    Swal.fire({
+                      title: t.thanks,
+                      background: '#171622',
+                      color: '#ffec3e',
+                      confirmButtonColor: '#c58efe',
+                    })
                   }
                 }
               }}
@@ -419,7 +496,7 @@ const LessonDetails = () => {
                 selectedLesson={id ?? -1}
                 completedLessonTrigger={completedLessonTrigger}
               />
-            ) : typeof window !== 'undefined' && localStorage.getItem('SelectedCourse') ? (
+            ) : selectedCourse ? (
               <Box
                 sx={{ display: 'flex', justifyContent: 'center', marginTop: 10, marginBottom: 70 }}
               >

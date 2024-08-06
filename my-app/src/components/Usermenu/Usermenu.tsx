@@ -62,7 +62,13 @@ const Usermenu = () => {
               if (localStorage.getItem('UserID')) {
                 deleteCookie('jwt')
                 localStorage.removeItem('UserID')
-                Swal.fire('You logged out successfully', '', 'success')
+                Swal.fire({
+                  title: 'You logged out successfully!',
+                  background: '#171622',
+                  color: '#ffec3e',
+                  confirmButtonColor: '#c58efe',
+                  icon: 'success',
+                })
               } else {
                 router.push('/admin/login')
               }

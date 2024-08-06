@@ -127,6 +127,17 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+@media screen and (min-width: 800px) {
+  .titleRight {
+    margin-right: -40px;
+    min-width: 120px;
+    align-items: center;
+
+    flex-direction: row;
+    gap: 20px;
+  }
+}
+
 @media screen and (min-width: 1200px) {
   .materialsAccordion {
     margin-top: 50px;
@@ -137,6 +148,8 @@
   }
 
   .titleRight {
+    margin-right: -40px;
+    min-width: 120px;
     align-items: center;
 
     flex-direction: row;
