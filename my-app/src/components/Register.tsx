@@ -42,8 +42,8 @@ const Registration = () => {
 
   function validateString(input: string) {
     const trimmedInput = input.trim()
-    const pattern = /^[a-zA-Z0-9]{10,100}$/
-    const isValidLength = trimmedInput.length >= 10 && trimmedInput.length <= 100
+    const pattern = /^[a-zA-Z0-9]{4,100}$/
+    const isValidLength = trimmedInput.length >= 4 && trimmedInput.length <= 100
     const matchesPattern = pattern.test(trimmedInput)
     return isValidLength && matchesPattern
   }
@@ -82,8 +82,7 @@ const Registration = () => {
       }
       if (!validateString(form.password)) {
         Swal.fire({
-          title:
-            'Password must be at least 10 characters long and contain only digits and letters!',
+          title: 'Password must be at least 4 characters long and contain only digits and letters!',
           background: '#171622',
           color: '#ffec3e',
           confirmButtonColor: '#c58efe',

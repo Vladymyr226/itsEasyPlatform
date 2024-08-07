@@ -58,6 +58,7 @@ import { isEqual } from 'lodash-es'
 import { deleteCookie } from 'cookies-next'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import Logo from '@/components/Logo/Logo'
+import { removeLessonIds } from '@/utils/removeAllLessonId'
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
@@ -320,6 +321,7 @@ const CourseCreate = () => {
         )
         const resultResponse = response.data
         if (resultResponse) {
+          setEditTrigger(false)
           Swal.fire({
             title: 'Changed!',
             background: '#171622',
@@ -334,6 +336,7 @@ const CourseCreate = () => {
           json
         )
         const resultResponse = response.data
+
         if (resultResponse) {
           Swal.fire({
             title: 'Created!',
@@ -342,7 +345,8 @@ const CourseCreate = () => {
             confirmButtonColor: '#c58efe',
             icon: 'success',
           })
-          router.push('/admin')
+          setEditTrigger(false)
+          setId(resultResponse.courseId)
         }
       }
     } catch (error) {
@@ -360,6 +364,7 @@ const CourseCreate = () => {
 
   // sweet alert functions
   function showPushAction(url: string) {
+    console.log(editTrigger)
     if (id ? editTrigger : isEdited()) {
       Swal.fire({
         title: 'Do you want to save changes?',
@@ -605,6 +610,9 @@ const CourseCreate = () => {
       setIsLoaded(true)
     }
   }
+  useEffect(() => {
+    getPageData()
+  }, [id])
   useEffect(() => {
     getPageData()
     function handleOnBeforeUnload(e: BeforeUnloadEvent) {
@@ -1294,7 +1302,10 @@ const CourseCreate = () => {
                             marginTop: 2,
                             fontWeight: 'bold',
                           }}
-                          onClick={(e) => setValue(1)}
+                          onClick={(e) => {
+                            handleSubmit('')
+                            setValue(1)
+                          }}
                         >
                           Go to structure
                         </Button>
@@ -1456,6 +1467,7 @@ const CourseCreate = () => {
                                                   confirmButtonText: 'Delete',
                                                 }).then(async (result) => {
                                                   if (result.isConfirmed) {
+                                                    removeLessonIds(option.id)
                                                     const response = await axios.delete(
                                                       urlLesson + '?id=' + option.id
                                                     )
