@@ -82,6 +82,7 @@ export const en = {
   sign_in: 'Sign in',
   sign_up: 'Sign up',
   password: 'Password',
+  password_repeat: 'Repeat password',
   register_now: 'Register now',
   login_now: 'Login now',
   username: 'Username',
@@ -94,4 +95,7 @@ export const en = {
   typeMessage: 'Type your message here',
   next: 'Next',
   previous: 'Previous',
+  forgot_my_password: 'Forgot password?',
+  reset_password: 'Reset password',
+  confirm: 'Confirm',
 }

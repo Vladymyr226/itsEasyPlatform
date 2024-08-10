@@ -82,6 +82,7 @@ export const ua = {
   sign_in: 'Увійти',
   sign_up: 'Зареєструватися',
   password: 'Пароль',
+  password_repeat: 'Повторіть пароль',
   register_now: 'Зареєструватися зараз',
   login_now: 'Увійдіть зараз',
   username: 'Логін',
@@ -94,4 +95,7 @@ export const ua = {
   typeMessage: 'Введіть своє повідомлення тут',
   next: 'Далі',
   previous: 'Попередній',
+  forgot_my_password: 'Забув пароль?',
+  reset_password: 'Скидання пароля',
+  confirm: 'Підтвердити',
 }

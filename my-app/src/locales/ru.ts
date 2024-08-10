@@ -82,6 +82,7 @@ export const ru = {
   sign_in: 'Войти',
   sign_up: 'Зарегистрироваться',
   password: 'Пароль',
+  password_repeat: 'Повторите пароль',
   register_now: 'Зарегистрироваться',
   login_now: 'Войти сейчас',
   username: 'Имя пользователя',
@@ -94,4 +95,7 @@ export const ru = {
   typeMessage: 'Пишите ваше сообщение здесь',
   next: 'Далее',
   previous: 'Предыдущий',
+  forgot_my_password: 'Забыл пароль?',
+  reset_password: 'Сброс пароля',
+  confirm: 'Подтвердить',
 }

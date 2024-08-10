@@ -30,6 +30,8 @@ const textFieldColors = {
   },
 }
 const url = `${process.env.NEXT_BACK_HOST_API}/auth/login?`
+const urlReset = `${process.env.NEXT_BACK_HOST_API}/auth/request-reset-password?`
+const urlReset2 = `${process.env.NEXT_BACK_HOST_API}/auth/reset-password?`
 
 const Login = () => {
   const router = useRouter()
@@ -38,30 +40,60 @@ const Login = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    try {
-      const response = await axios.post(url + 'email=' + email + '&password=' + password)
-      const resultResponse = response.data
-      if (resultResponse) {
-        router.push('/')
-        localStorage.setItem('UserID', resultResponse.user.id)
-        setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
+    if (passwordForgot) {
+      try {
+        const response = await axios.post(urlReset + 'email=' + email)
+        const resultResponse = response.data
+        if (resultResponse) {
+          Swal.fire({
+            title: 'Open your email and follow the instructions!',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#c58efe',
+            icon: 'success',
+          }).then(async (result) => {
+            console.log(result)
+            router.push('/')
+          })
+        }
+      } catch (error) {
+        Swal.fire({
+          title: 'Some error!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
       }
-    } catch (error) {
-      Swal.fire({
-        title: 'Login failure!',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
-        icon: 'error',
-      })
+    }
+
+    if (!passwordForgot) {
+      try {
+        const response = await axios.post(url + 'email=' + email + '&password=' + password)
+        const resultResponse = response.data
+        if (resultResponse) {
+          router.push('/')
+          localStorage.setItem('UserID', resultResponse.user.id)
+          setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
+        }
+      } catch (error) {
+        Swal.fire({
+          title: 'Login failure!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
+      }
     }
   }
   const [showPass, setShowPass] = useState(false)
+  const [passwordForgot, setPasswordForgot] = useState(false)
   const t = getLocale()
   return (
     <Box sx={{ background: 'none', width: '100%' }}>
       <Typography component='h1' variant='h5' sx={{ color: '#ffec3e' }}>
-        {t.sign_in}
+        {passwordForgot ? t.reset_password : t.sign_in}
       </Typography>
       <Box component='form' id='formSignIn' onSubmit={handleSubmit} sx={{ mt: 1 }}>
         <TextField
@@ -87,38 +119,54 @@ const Login = () => {
             },
           }}
         />
-        <TextField
-          margin='normal'
-          required
-          fullWidth
-          name='password'
-          label={t.password}
-          type={showPass ? 'text' : 'password'}
-          id='password'
-          autoComplete='current-password'
-          onChange={(e) => setPassword(e.target.value)}
-          InputLabelProps={{
-            sx: {
-              color: '#ffec3e',
+        {!passwordForgot && (
+          <TextField
+            margin='normal'
+            required
+            fullWidth
+            name='password'
+            label={t.password}
+            type={showPass ? 'text' : 'password'}
+            id='password'
+            autoComplete='current-password'
+            onChange={(e) => setPassword(e.target.value)}
+            InputLabelProps={{
+              sx: {
+                color: '#ffec3e',
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <IconButton
+                  onClick={(e) => {
+                    setShowPass(!showPass)
+                  }}
+                >
+                  {showPass ? (
+                    <VisibilityOffIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
+                  ) : (
+                    <VisibilityIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
+                  )}
+                </IconButton>
+              ),
+            }}
+            sx={{ ...textFieldColors }}
+          />
+        )}
+        <Box
+          onClick={(e) => setPasswordForgot(!passwordForgot)}
+          sx={{
+            color: '#ffec3e',
+            textAlign: 'right',
+            fontSize: '14px',
+            '&:hover': {
+              color: '#fff',
+              cursor: 'pointer',
             },
           }}
-          InputProps={{
-            endAdornment: (
-              <IconButton
-                onClick={(e) => {
-                  setShowPass(!showPass)
-                }}
-              >
-                {showPass ? (
-                  <VisibilityOffIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
-                ) : (
-                  <VisibilityIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
-                )}
-              </IconButton>
-            ),
-          }}
-          sx={{ ...textFieldColors }}
-        />
+        >
+          {passwordForgot ? t.sign_in : t.forgot_my_password}
+        </Box>
         <Button
           type='submit'
           fullWidth
@@ -138,23 +186,25 @@ const Login = () => {
             },
           }}
         >
-          {t.sign_in}
+          {passwordForgot ? t.confirm : t.sign_in}
         </Button>
-        <Link href={'./register'}>
-          <Box
-            sx={{
-              color: '#ffec3e',
-              textAlign: 'right',
-              fontSize: '14px',
-              '&:hover': {
-                color: '#fff',
-                cursor: 'pointer',
-              },
-            }}
-          >
-            {t.register_now}
-          </Box>
-        </Link>
+        {!passwordForgot && (
+          <Link href={'./register'}>
+            <Box
+              sx={{
+                color: '#ffec3e',
+                textAlign: 'right',
+                fontSize: '14px',
+                '&:hover': {
+                  color: '#fff',
+                  cursor: 'pointer',
+                },
+              }}
+            >
+              {t.register_now}
+            </Box>
+          </Link>
+        )}
       </Box>
     </Box>
   )
