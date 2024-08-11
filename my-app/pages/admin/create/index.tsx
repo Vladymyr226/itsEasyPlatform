@@ -59,6 +59,7 @@ import { deleteCookie } from 'cookies-next'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import Logo from '@/components/Logo/Logo'
 import { removeLessonIds } from '@/utils/removeAllLessonId'
+import LessonCreateQuiz from '@/components/LessonCreate/LessonCreateQuiz'
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
@@ -145,6 +146,7 @@ const CourseCreate = () => {
     price: null,
     priceDiscount: null,
   })
+  const [lessonType, setLessonType] = useState('')
   const [fetchedData, setFetchedData] = useState<any>()
   const [fetchedMediaData, setFetchedMediaData] = useState<any>()
   const [rating, setRating] = useState(0.0)
@@ -160,7 +162,7 @@ const CourseCreate = () => {
       children: [{ text: '' }],
     },
   ])
-  const [lessonForm, setLessonForm] = useState({
+  const [lessonForm, setLessonForm] = useState<any>({
     title: '',
     link: '',
     image: '',
@@ -206,7 +208,9 @@ const CourseCreate = () => {
     setError({})
     setStatus(event.target.value as string)
   }
-
+  const handleChangeLessonType = (event: SelectChangeEvent) => {
+    setLessonType(event.target.value as string)
+  }
   const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setEditTrigger(true)
@@ -520,9 +524,8 @@ const CourseCreate = () => {
         let allLessons = resultLesson.getLessons.map((lesson: any) => {
           return {
             id: lesson.id,
-            title: lesson.data.title,
-            description: lesson.data.description,
-            link: lesson.data.link,
+            type: lesson.type,
+            ...lesson.data,
           }
         })
         if (resultData[0].data.mediaValue) {
@@ -600,9 +603,8 @@ const CourseCreate = () => {
           result.getLessons.map((lesson: any) => {
             return {
               id: lesson.id,
-              title: lesson.data.title,
-              description: lesson.data.description,
-              link: lesson.data.link,
+              type: lesson.type,
+              ...lesson.data,
             }
           })
         )
@@ -1426,11 +1428,7 @@ const CourseCreate = () => {
                                                   lessons: [
                                                     ...modulesElem.lessons,
                                                     {
-                                                      id: value.id,
-                                                      title: value.title,
-                                                      description: value.description,
-                                                      link: value.link,
-                                                      fields: value.fields,
+                                                      ...value,
                                                     },
                                                   ],
                                                 }
@@ -1544,13 +1542,10 @@ const CourseCreate = () => {
                                                       ? lesson.id
                                                       : null
                                                   )
-                                                  setLessonForm({
-                                                    title: lesson.title,
-                                                    link: lesson.link,
-                                                    image: lesson.image ?? '',
-                                                  })
+                                                  setLessonForm(lesson)
                                                   setRichValueLesson(lesson.description)
                                                   setCreateLessonIndx(i)
+                                                  setLessonType(lesson.type)
                                                   setValue(2)
                                                 }}
                                               >
@@ -1665,283 +1660,323 @@ const CourseCreate = () => {
                         color: '#fff',
                       }}
                     >
-                      <TextField
-                        margin='normal'
-                        required
-                        fullWidth
-                        id='lessonTitle'
-                        type='title'
-                        label='Title'
-                        name='title'
-                        autoFocus
-                        autoComplete='off'
-                        onChange={(e) => {
-                          setLessonForm({ ...lessonForm, title: e.target.value })
-                        }}
-                        value={lessonForm.title}
-                        sx={{ ...textFieldColors }}
-                      />
-                      <Box sx={{ color: '#000000' }}>
-                        <MyEditor value={richValueLesson} setValue={setRichValueLesson} />
-                      </Box>
+                      {!idLessonEdit && (
+                        <Box sx={{ marginTop: 2 }}>
+                          <InputLabel>Lesson type</InputLabel>
+                          <Select
+                            fullWidth
+                            id='lessonTypeSelect'
+                            value={lessonType}
+                            onChange={handleChangeLessonType}
+                          >
+                            <MenuItem value={'default'}>Default</MenuItem>
+                            <MenuItem value={'quiz'}>Quiz</MenuItem>
+                          </Select>
+                        </Box>
+                      )}
+                      {lessonType == 'quiz' && (
+                        <LessonCreateQuiz
+                          startData={lessonForm}
+                          setValue={setValue}
+                          idLessonEdit={idLessonEdit}
+                          setIdLessonEdit={setIdLessonEdit}
+                          createLessonIndx={createLessonIndx}
+                          setCreateLessonIndx={setCreateLessonIndx}
+                          modules={modules}
+                          setModules={setModules}
+                          setEditTrigger={setEditTrigger}
+                          setError={setError}
+                          storedModules={storedModules}
+                        />
+                      )}
+                      {lessonType == 'default' && (
+                        <Box>
+                          <TextField
+                            margin='normal'
+                            required
+                            fullWidth
+                            id='lessonTitle'
+                            type='title'
+                            label='Title'
+                            name='title'
+                            autoFocus
+                            autoComplete='off'
+                            onChange={(e) => {
+                              setLessonForm({ ...lessonForm, title: e.target.value })
+                            }}
+                            value={lessonForm.title}
+                            sx={{ ...textFieldColors }}
+                          />
+                          <Box sx={{ color: '#000000' }}>
+                            <MyEditor value={richValueLesson} setValue={setRichValueLesson} />
+                          </Box>
 
-                      <Box sx={{ width: '100%', marginTop: 2 }}>
-                        <ExampleYouTube url={lessonForm.link.split('?v=')[1]} />
-                      </Box>
+                          <Box sx={{ width: '100%', marginTop: 2 }}>
+                            <ExampleYouTube url={lessonForm.link.split('?v=')[1]} />
+                          </Box>
 
-                      <TextField
-                        margin='normal'
-                        required
-                        fullWidth
-                        id='lessonLink'
-                        type='text'
-                        label='Link'
-                        name='link'
-                        InputProps={{
-                          inputProps: { min: 1 },
-                        }}
-                        autoComplete='off'
-                        onChange={(e) => {
-                          setLessonForm({ ...lessonForm, link: e.target.value })
-                        }}
-                        value={lessonForm.link}
-                        sx={{ ...textFieldColors }}
-                      />
+                          <TextField
+                            margin='normal'
+                            required
+                            fullWidth
+                            id='lessonLink'
+                            type='text'
+                            label='Link'
+                            name='link'
+                            InputProps={{
+                              inputProps: { min: 1 },
+                            }}
+                            autoComplete='off'
+                            onChange={(e) => {
+                              setLessonForm({ ...lessonForm, link: e.target.value })
+                            }}
+                            value={lessonForm.link}
+                            sx={{ ...textFieldColors }}
+                          />
 
-                      <Box sx={{ display: 'flex' }}>
-                        <Button
-                          variant='contained'
-                          component='label'
-                          onClick={() => {
-                            setLessonForm({ ...lessonForm, image: '' })
-                          }}
-                          sx={{ mt: 1, mr: 1 }}
-                        >
-                          Remove
-                        </Button>
+                          <Box sx={{ display: 'flex' }}>
+                            <Button
+                              variant='contained'
+                              component='label'
+                              onClick={() => {
+                                setLessonForm({ ...lessonForm, image: '' })
+                              }}
+                              sx={{ mt: 1, mr: 1 }}
+                            >
+                              Remove
+                            </Button>
 
-                        <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
-                          <input
-                            type='file'
-                            accept='image/png, image/jpeg'
-                            onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
-                              if (event.target.files) {
-                                try {
-                                  setLessonForm({
-                                    ...lessonForm,
-                                    image:
-                                      ((await uploadFileToS3(event.target.files[0])) as string) ??
-                                      '',
+                            <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
+                              <input
+                                type='file'
+                                accept='image/png, image/jpeg'
+                                onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+                                  if (event.target.files) {
+                                    try {
+                                      setLessonForm({
+                                        ...lessonForm,
+                                        image:
+                                          ((await uploadFileToS3(
+                                            event.target.files[0]
+                                          )) as string) ?? '',
+                                      })
+                                    } catch (error) {
+                                      Swal.fire({
+                                        title: 'Some error has occurred!',
+                                        text: '' + error,
+                                        background: '#171622',
+                                        color: '#ffec3e',
+                                        confirmButtonColor: '#c58efe',
+                                        icon: 'error',
+                                      })
+                                    }
+                                  }
+                                }}
+                              />
+                            </Button>
+                          </Box>
+                          <Box sx={{ display: 'flex' }}>
+                            <Button
+                              variant='contained'
+                              sx={{
+                                marginTop: 2,
+                                marginRight: 2,
+                                fontWeight: 'bold',
+                              }}
+                              onClick={async (e) => {
+                                setValue(1)
+                              }}
+                            >
+                              Ruturn
+                            </Button>
+                            <Button
+                              variant='contained'
+                              fullWidth
+                              sx={{
+                                marginTop: 2,
+                                fontWeight: 'bold',
+                              }}
+                              onClick={async (e) => {
+                                if (
+                                  idLessonEdit &&
+                                  compareIsLessonEdited(idLessonEdit, createLessonIndx)
+                                ) {
+                                  setValue(1)
+                                  return
+                                }
+                                if (lessonForm.title == '') {
+                                  Swal.fire({
+                                    title: 'Lesson title can not be empty!',
+                                    background: '#171622',
+                                    color: '#ffec3e',
+                                    confirmButtonColor: '#c58efe',
+                                    icon: 'error',
                                   })
+                                  return
+                                }
+                                try {
+                                  setEditTrigger(true)
+                                  setError({})
+                                  if (idLessonEdit) {
+                                    let found = false
+                                    storedModules.map((less) => {
+                                      if (less.title == lessonForm.title.trim()) found = true
+                                    })
+                                    modules.map((module) => {
+                                      module.lessons.map((less) => {
+                                        if (
+                                          less.title == lessonForm.title.trim() &&
+                                          idLessonEdit != less.id
+                                        )
+                                          found = true
+                                      })
+                                    })
+                                    if (!found) {
+                                      const response = await axios.put(
+                                        urlLesson + '?id=' + idLessonEdit,
+                                        {
+                                          title: lessonForm.title,
+                                          description: richValueLesson,
+                                          link: lessonForm.link,
+                                          image: lessonForm.image,
+                                          type: 'default',
+                                        }
+                                      )
+                                      const resultResponse = response.data
+                                      if (resultResponse) {
+                                        setModules(
+                                          modules.map((elem, index) => {
+                                            if (createLessonIndx === index) {
+                                              return {
+                                                title: elem.title,
+                                                lessons: elem.lessons.map(
+                                                  (lessonFilter, lessonIndex) => {
+                                                    if (lessonFilter.id !== idLessonEdit) {
+                                                      return lessonFilter
+                                                    }
+                                                    return {
+                                                      ...lessonForm,
+                                                      description: richValueLesson,
+                                                      id: idLessonEdit,
+                                                      type: 'default',
+                                                    }
+                                                  }
+                                                ),
+                                              }
+                                            }
+                                            return elem
+                                          })
+                                        )
+                                        setLessonForm({
+                                          title: '',
+                                          link: '',
+                                          image: '',
+                                        })
+                                        setRichValueLesson([
+                                          {
+                                            type: 'paragaph',
+                                            children: [{ text: '' }],
+                                          },
+                                        ])
+                                        setIdLessonEdit(null)
+                                        setValue(1)
+                                      }
+                                    } else {
+                                      Swal.fire({
+                                        title: 'Course name is already taken!',
+                                        background: '#171622',
+                                        color: '#ffec3e',
+                                        confirmButtonColor: '#c58efe',
+                                        icon: 'error',
+                                      })
+                                    }
+                                  } else {
+                                    let found = false
+                                    storedModules.map((less) => {
+                                      if (less.title == lessonForm.title.trim()) found = true
+                                    })
+                                    modules.map((module) => {
+                                      module.lessons.map((less) => {
+                                        if (less.title == lessonForm.title.trim()) found = true
+                                      })
+                                    })
+                                    if (!found) {
+                                      const response = await axios.post(
+                                        urlLesson + '?type=default',
+                                        {
+                                          title: lessonForm.title,
+                                          description: richValueLesson,
+                                          link: lessonForm.link,
+                                          image: lessonForm.image,
+                                        }
+                                      )
+                                      const resultResponse = response.data
+                                      if (resultResponse) {
+                                        setModules(
+                                          modules.map((modulesElem, index) => {
+                                            if (
+                                              index == createLessonIndx &&
+                                              modulesElem.lessons.filter(
+                                                (reDropElem) =>
+                                                  reDropElem.id === resultResponse.lessonId
+                                              ).length === 0
+                                            ) {
+                                              return {
+                                                title: modulesElem.title,
+                                                lessons: [
+                                                  ...modulesElem.lessons,
+                                                  {
+                                                    ...lessonForm,
+                                                    id: resultResponse.lessonId,
+                                                    description: richValueLesson,
+                                                    type: 'default',
+                                                  },
+                                                ],
+                                              }
+                                            }
+                                            return modulesElem
+                                          })
+                                        )
+                                        setLessonForm({
+                                          title: '',
+                                          link: '',
+                                          image: '',
+                                        })
+                                      }
+                                      setCreateLessonIndx(-1)
+                                      setValue(1)
+                                    } else {
+                                      Swal.fire({
+                                        title: 'Course name is already taken!',
+                                        background: '#171622',
+                                        color: '#ffec3e',
+                                        confirmButtonColor: '#c58efe',
+                                        icon: 'error',
+                                      })
+                                    }
+                                  }
                                 } catch (error) {
                                   Swal.fire({
-                                    title: 'Some error has occurred!',
-                                    text: '' + error,
+                                    title: 'Something went wrong!',
+                                    text: error + '',
                                     background: '#171622',
                                     color: '#ffec3e',
                                     confirmButtonColor: '#c58efe',
                                     icon: 'error',
                                   })
+                                  return
                                 }
-                              }
-                            }}
-                          />
-                        </Button>
-                      </Box>
-                      <Box sx={{ display: 'flex' }}>
-                        <Button
-                          variant='contained'
-                          sx={{
-                            marginTop: 2,
-                            marginRight: 2,
-                            fontWeight: 'bold',
-                          }}
-                          onClick={async (e) => {
-                            setValue(1)
-                          }}
-                        >
-                          Ruturn
-                        </Button>
-                        <Button
-                          variant='contained'
-                          fullWidth
-                          sx={{
-                            marginTop: 2,
-                            fontWeight: 'bold',
-                          }}
-                          onClick={async (e) => {
-                            if (
-                              idLessonEdit &&
-                              compareIsLessonEdited(idLessonEdit, createLessonIndx)
-                            ) {
-                              setValue(1)
-                              return
-                            }
-                            if (lessonForm.title == '') {
-                              Swal.fire({
-                                title: 'Lesson title can not be empty!',
-                                background: '#171622',
-                                color: '#ffec3e',
-                                confirmButtonColor: '#c58efe',
-                                icon: 'error',
-                              })
-                              return
-                            }
-                            try {
-                              setEditTrigger(true)
-                              setError({})
-                              if (idLessonEdit) {
-                                let found = false
-                                storedModules.map((less) => {
-                                  if (less.title == lessonForm.title.trim()) found = true
-                                })
-                                modules.map((module) => {
-                                  module.lessons.map((less) => {
-                                    if (
-                                      less.title == lessonForm.title.trim() &&
-                                      idLessonEdit != less.id
-                                    )
-                                      found = true
-                                  })
-                                })
-                                if (!found) {
-                                  const response = await axios.put(
-                                    urlLesson + '?id=' + idLessonEdit,
-                                    {
-                                      title: lessonForm.title,
-                                      description: richValueLesson,
-                                      link: lessonForm.link,
-                                      image: lessonForm.image,
-                                    }
-                                  )
-                                  const resultResponse = response.data
-                                  if (resultResponse) {
-                                    setModules(
-                                      modules.map((elem, index) => {
-                                        if (createLessonIndx === index) {
-                                          return {
-                                            title: elem.title,
-                                            lessons: elem.lessons.map(
-                                              (lessonFilter, lessonIndex) => {
-                                                if (lessonFilter.id !== idLessonEdit) {
-                                                  return lessonFilter
-                                                }
-                                                return {
-                                                  ...lessonForm,
-                                                  description: richValueLesson,
-                                                  id: idLessonEdit,
-                                                }
-                                              }
-                                            ),
-                                          }
-                                        }
-                                        return elem
-                                      })
-                                    )
-                                    setLessonForm({
-                                      title: '',
-                                      link: '',
-                                      image: '',
-                                    })
-                                    setRichValueLesson([
-                                      {
-                                        type: 'paragaph',
-                                        children: [{ text: '' }],
-                                      },
-                                    ])
-                                    setIdLessonEdit(null)
-                                    setValue(1)
-                                  }
-                                } else {
-                                  Swal.fire({
-                                    title: 'Course name is already taken!',
-                                    background: '#171622',
-                                    color: '#ffec3e',
-                                    confirmButtonColor: '#c58efe',
-                                    icon: 'error',
-                                  })
-                                }
-                              } else {
-                                let found = false
-                                storedModules.map((less) => {
-                                  if (less.title == lessonForm.title.trim()) found = true
-                                })
-                                modules.map((module) => {
-                                  module.lessons.map((less) => {
-                                    if (less.title == lessonForm.title.trim()) found = true
-                                  })
-                                })
-                                if (!found) {
-                                  const response = await axios.post(urlLesson, {
-                                    title: lessonForm.title,
-                                    description: richValueLesson,
-                                    link: lessonForm.link,
-                                    image: lessonForm.image,
-                                  })
-                                  const resultResponse = response.data
-                                  if (resultResponse) {
-                                    setModules(
-                                      modules.map((modulesElem, index) => {
-                                        if (
-                                          index == createLessonIndx &&
-                                          modulesElem.lessons.filter(
-                                            (reDropElem) =>
-                                              reDropElem.id === resultResponse.lessonId
-                                          ).length === 0
-                                        ) {
-                                          return {
-                                            title: modulesElem.title,
-                                            lessons: [
-                                              ...modulesElem.lessons,
-                                              {
-                                                ...lessonForm,
-                                                id: resultResponse.lessonId,
-                                                description: richValueLesson,
-                                              },
-                                            ],
-                                          }
-                                        }
-                                        return modulesElem
-                                      })
-                                    )
-                                    setLessonForm({
-                                      title: '',
-                                      link: '',
-                                      image: '',
-                                    })
-                                  }
-                                  setCreateLessonIndx(-1)
-                                  setValue(1)
-                                } else {
-                                  Swal.fire({
-                                    title: 'Course name is already taken!',
-                                    background: '#171622',
-                                    color: '#ffec3e',
-                                    confirmButtonColor: '#c58efe',
-                                    icon: 'error',
-                                  })
-                                }
-                              }
-                            } catch (error) {
-                              Swal.fire({
-                                title: 'Something went wrong!',
-                                text: error + '',
-                                background: '#171622',
-                                color: '#ffec3e',
-                                confirmButtonColor: '#c58efe',
-                                icon: 'error',
-                              })
-                              return
-                            }
-                          }}
-                        >
-                          {idLessonEdit
-                            ? compareIsLessonEdited(idLessonEdit, createLessonIndx)
-                              ? 'Cancel'
-                              : 'Save'
-                            : 'Create'}
-                        </Button>
-                      </Box>
+                              }}
+                            >
+                              {idLessonEdit
+                                ? compareIsLessonEdited(idLessonEdit, createLessonIndx)
+                                  ? 'Cancel'
+                                  : 'Save'
+                                : 'Create'}
+                            </Button>
+                          </Box>
+                        </Box>
+                      )}
                     </Box>
                   </CustomTabPanel>
                 </Box>

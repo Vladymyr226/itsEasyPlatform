@@ -22,7 +22,13 @@ import YouTube, { YouTubeProps } from 'react-youtube'
 
 import { YouTubeProp } from '@/utils/interfaces'
 import { useRouter } from 'next/navigation'
-import { Accordion, AccordionDetails, AccordionSummary, CircularProgress } from '@mui/material'
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  CircularProgress,
+  Checkbox,
+} from '@mui/material'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
@@ -59,13 +65,15 @@ const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 const urlFeedback = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback`
 interface LessonData {
   title: string
-  link: string
-  description: any
-  image: any
+  link?: string
+  description?: any
+  image?: any
+  questions?: any
 }
 interface Lesson {
   id: string
   data: LessonData
+  type: string
 }
 const LessonDetails = () => {
   const [width, setWidth] = useState(0)
@@ -100,6 +108,15 @@ const LessonDetails = () => {
           },
         })
         const result = await response.json()
+        if (result.type === 'quiz') {
+          setAnswerForm(
+            result.data.questions.map((question: any) => {
+              return question.options.map((option: any) => {
+                return false
+              })
+            })
+          )
+        }
         setData(result)
         if (localStorage.getItem('SelectedCourse') && localStorage.getItem('SelectedModuleIndex')) {
           const responseCourse = await fetch(url + '/' + localStorage.getItem('SelectedCourse'), {
@@ -191,8 +208,13 @@ const LessonDetails = () => {
   }
   const router = useRouter()
   const [completedLessonTrigger, setCompletedLessonTrigger] = useState(false)
+  const [answerForm, setAnswerForm] = useState<any>()
+  const [checkAnswers, setCheckAnswers] = useState(false)
+  const [resetAnswersBtn, setResetAnswersBtn] = useState(false)
+  const [clearCheckBoxes, setClearCheckBoxes] = useState(false)
 
   const t = getLocale()
+  console.log(answerForm)
   return (
     <Layout>
       <Box
@@ -217,25 +239,82 @@ const LessonDetails = () => {
             <Box
               sx={{ height: { xs: null, md: '140vb' }, display: 'flex', flexDirection: 'column' }}
             >
-              <Box sx={{ width: '100%' }}>
-                {data.data.link ? (
-                  <>
-                    <ExampleYouTube url={data.data.link.split('?v=')[1]} />
-                  </>
-                ) : data.data.image ? (
-                  <img src={data.data.image}></img>
-                ) : (
-                  <></>
-                )}
-              </Box>
+              {data.type == 'default' && (
+                <Box sx={{ width: '100%' }}>
+                  {data.data.link ? (
+                    <>
+                      <ExampleYouTube url={data.data.link.split('?v=')[1]} />
+                    </>
+                  ) : data.data.image ? (
+                    <img src={data.data.image}></img>
+                  ) : (
+                    <></>
+                  )}
+                </Box>
+              )}
               <h1 style={{ textAlign: 'left', color: '#ffec3e', marginBottom: '20px' }}>
                 <b>{data && data.data.title}</b>
               </h1>
-              <Box sx={{ overflowY: 'auto', scrollbarWidth: 'none' }}>
-                <Box sx={{ width: '100%', height: 'max-content', color: '#fff', padding: '15px' }}>
-                  <SlateView value={data && data.data.description} />
+              {data.type == 'default' && (
+                <Box sx={{ overflowY: 'auto', scrollbarWidth: 'none' }}>
+                  <Box
+                    sx={{ width: '100%', height: 'max-content', color: '#fff', padding: '15px' }}
+                  >
+                    <SlateView value={data && data.data.description} />
+                  </Box>
                 </Box>
-              </Box>
+              )}
+              {data.type == 'quiz' && (
+                <Box>
+                  {data.data.questions.map((question: any, indx: number) => {
+                    return (
+                      <Box key={'Question_' + indx}>
+                        <h1 style={{ textAlign: 'left', color: '#fff', marginBottom: '20px' }}>
+                          <b>{indx + 1 + '. ' + question.title}</b>
+                        </h1>
+                        {question.options.map((option: any, optionIndx: number) => {
+                          return (
+                            <Box
+                              key={'QuestionOption_' + indx}
+                              sx={{ display: 'flex', color: '#fff', marginTop: 1 }}
+                            >
+                              {!clearCheckBoxes && (
+                                <Checkbox
+                                  defaultChecked={answerForm[indx][optionIndx]}
+                                  disabled={checkAnswers}
+                                  onChange={(e) => {
+                                    let tmpArr: any = answerForm
+                                    tmpArr[indx][optionIndx] = e.target.checked
+                                    setAnswerForm(tmpArr)
+                                  }}
+                                  inputProps={{ 'aria-label': 'controlled' }}
+                                  sx={{
+                                    background:
+                                      checkAnswers &&
+                                      answerForm &&
+                                      (answerForm[indx][optionIndx] || option.correct)
+                                        ? answerForm[indx][optionIndx] == option.correct
+                                          ? '#008000'
+                                          : '#FF0000'
+                                        : null,
+                                    color: '#fff',
+                                    '&.Mui-checked': {
+                                      color: '#fff',
+                                    },
+                                  }}
+                                />
+                              )}
+                              <b style={{ marginTop: '10px', marginLeft: '10px' }}>
+                                {option.title}
+                              </b>
+                            </Box>
+                          )
+                        })}
+                      </Box>
+                    )
+                  })}
+                </Box>
+              )}
               <Box
                 sx={{
                   width: '100%',
@@ -287,61 +366,129 @@ const LessonDetails = () => {
                     userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 &&
                     userData?.comleted_lessons_id &&
                     userData?.comleted_lessons_id.indexOf(id) == -1 && (
-                      <Button
-                        variant='contained'
-                        sx={{ maxWidth: '500px', width: '50%' }}
-                        onClick={async (e) => {
-                          const response = await axios.put(urlUser + '?id=' + userData.id, {
-                            purchasedCoursesId: [...userData.purchased_courses_id],
-                            favouriteCoursesId: [...userData.favourite_courses_id],
-                            comletedLessonsId: [...userData.comleted_lessons_id, id],
-                          })
-                          const resultResponse = response.data
-                          const userId = localStorage.getItem('UserID')
-                          const responseUser = await fetch(urlUser + '/' + userId, {
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                          })
-                          const resultUser = await responseUser.json()
-                          setCompletedLessonTrigger(!completedLessonTrigger)
-                          setUserData(resultUser)
-                          if (
-                            resultResponse &&
-                            moduleLessons &&
-                            getLessonIndx() >= 0 &&
-                            getLessonIndx() < moduleLessons?.length - 1
-                          ) {
-                            setUserData({
-                              ...userData,
-                              comleted_lessons_id: [...userData.comleted_lessons_id, id],
-                            })
-                            if (moduleLessons) {
-                              router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
-                              setId(Number(moduleLessons[getLessonIndx() + 1]))
-                            }
-                          } else {
-                            if (
-                              resultResponse &&
-                              Number(localStorage.getItem('SelectedModuleIndex')) <
-                                (modules?.length ?? 0) - 1
-                            ) {
-                              const currentIndex = Number(
-                                localStorage.getItem('SelectedModuleIndex')
+                      <>
+                        {!resetAnswersBtn && (
+                          <Button
+                            variant='contained'
+                            sx={{ maxWidth: '500px', width: '50%' }}
+                            onClick={async (e) => {
+                              if (data.type == 'default') {
+                                const response = await axios.put(urlUser + '?id=' + userData.id, {
+                                  purchasedCoursesId: [...userData.purchased_courses_id],
+                                  favouriteCoursesId: [...userData.favourite_courses_id],
+                                  comletedLessonsId: [...userData.comleted_lessons_id, id],
+                                })
+                                const resultResponse = response.data
+                                const userId = localStorage.getItem('UserID')
+                                const responseUser = await fetch(urlUser + '/' + userId, {
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                })
+                                const resultUser = await responseUser.json()
+                                setCompletedLessonTrigger(!completedLessonTrigger)
+                                setUserData(resultUser)
+                                if (
+                                  resultResponse &&
+                                  moduleLessons &&
+                                  getLessonIndx() >= 0 &&
+                                  getLessonIndx() < moduleLessons?.length - 1
+                                ) {
+                                  setUserData({
+                                    ...userData,
+                                    comleted_lessons_id: [...userData.comleted_lessons_id, id],
+                                  })
+                                  if (moduleLessons) {
+                                    router.replace(
+                                      '/lesson?id=' + moduleLessons[getLessonIndx() + 1]
+                                    )
+                                    setId(Number(moduleLessons[getLessonIndx() + 1]))
+                                  }
+                                } else {
+                                  if (
+                                    resultResponse &&
+                                    Number(localStorage.getItem('SelectedModuleIndex')) <
+                                      (modules?.length ?? 0) - 1
+                                  ) {
+                                    const currentIndex = Number(
+                                      localStorage.getItem('SelectedModuleIndex')
+                                    )
+                                    localStorage.setItem(
+                                      'SelectedModuleIndex',
+                                      '' + (currentIndex + 1)
+                                    )
+                                    setCompletedLessonTrigger(!completedLessonTrigger)
+                                    const lessIndex = Number(
+                                      modules ? modules[currentIndex + 1].lessons[0].id : 0
+                                    )
+                                    router.replace('/lesson?id=' + lessIndex)
+                                    setId(lessIndex)
+                                  }
+                                }
+                              }
+                              if (data.type == 'quiz') {
+                                setCheckAnswers(true)
+                                let result = true
+                                data.data.questions.map((question: any, indx: number) => {
+                                  question.options.map((option: any, optionIndx: number) => {
+                                    if (option.correct != answerForm[indx][optionIndx]) {
+                                      result = false
+                                    }
+                                  })
+                                })
+                                if (result) {
+                                  const response = await axios.put(urlUser + '?id=' + userData.id, {
+                                    purchasedCoursesId: [...userData.purchased_courses_id],
+                                    favouriteCoursesId: [...userData.favourite_courses_id],
+                                    comletedLessonsId: [...userData.comleted_lessons_id, id],
+                                  })
+                                  const resultResponse = response.data
+                                  const userId = localStorage.getItem('UserID')
+                                  const responseUser = await fetch(urlUser + '/' + userId, {
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                    },
+                                  })
+                                  const resultUser = await responseUser.json()
+                                  setCompletedLessonTrigger(!completedLessonTrigger)
+                                  setUserData(resultUser)
+                                  Swal.fire({
+                                    title: 'Great job!',
+                                    background: '#171622',
+                                    color: '#ffec3e',
+                                    confirmButtonColor: '#c58efe',
+                                  })
+                                } else {
+                                  setResetAnswersBtn(true)
+                                }
+                              }
+                            }}
+                          >
+                            {t.complete}
+                          </Button>
+                        )}
+                        {resetAnswersBtn && (
+                          <Button
+                            variant='contained'
+                            sx={{ maxWidth: '200px', width: '50%', marginLeft: 2 }}
+                            onClick={(e) => {
+                              setAnswerForm(
+                                answerForm.map((ansForm: any) => {
+                                  return ansForm.map((opt: any) => {
+                                    return false
+                                  })
+                                })
                               )
-                              localStorage.setItem('SelectedModuleIndex', '' + (currentIndex + 1))
-                              setCompletedLessonTrigger(!completedLessonTrigger)
-                              const lessIndex = Number(
-                                modules ? modules[currentIndex + 1].lessons[0].id : 0
-                              )
-                              router.replace('/lesson?id=' + lessIndex)
-                              setId(lessIndex)
-                            }
-                          }
-                        }}
-                      >
-                        {t.complete}
-                      </Button>
+                              setClearCheckBoxes(true)
+                              setTimeout(() => setClearCheckBoxes(false), 1)
+                              setCheckAnswers(false)
+                              setResetAnswersBtn(false)
+                            }}
+                          >
+                            Reset quiz
+                          </Button>
+                        )}
+                      </>
                     )}
                 </Box>
 
