@@ -29,7 +29,6 @@ export async function removeLessonIds(lessonId: number) {
       }
     })
     editedCourses.map(async (course: any) => {
-      console.log(course)
       const response = await axios.put(
         url + '?id=' + course.id + '&isActive=' + course.is_active,
         course.data

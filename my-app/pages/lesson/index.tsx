@@ -69,6 +69,7 @@ interface LessonData {
   description?: any
   image?: any
   questions?: any
+  fields?: any
 }
 interface Lesson {
   id: string
@@ -78,7 +79,6 @@ interface Lesson {
 const LessonDetails = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Lesson>()
-
   const [moduleLessons, setModuleLessons] = useState<Array<string>>()
   const [modules, setModules] = useState<Array<Module>>()
 
@@ -149,7 +149,6 @@ const LessonDetails = () => {
               }
             })
           )
-          console.log(modules)
           setModules(modules)
         }
       } else {
@@ -214,7 +213,6 @@ const LessonDetails = () => {
   const [clearCheckBoxes, setClearCheckBoxes] = useState(false)
 
   const t = getLocale()
-  console.log(answerForm)
   return (
     <Layout>
       <Box
@@ -315,6 +313,53 @@ const LessonDetails = () => {
                   })}
                 </Box>
               )}
+              {data.type == 'practice' && (
+                <Box>
+                  {data.data.fields.map((field: any, indx: number) => {
+                    return (
+                      <Box key={'Field' + indx}>
+                        {field.type == 'slate' && (
+                          <Box
+                            sx={{
+                              width: '100%',
+                              height: 'max-content',
+                              color: '#fff',
+                              padding: '15px',
+                            }}
+                          >
+                            <SlateView value={field && field.value} />
+                          </Box>
+                        )}
+                        {field.type == 'code' && (
+                          <Box
+                            sx={{
+                              width: '100%',
+                              height: 'max-content',
+                              color: '#fff',
+                              padding: '15px',
+                            }}
+                          >
+                            <iframe
+                              src={field ? field.value : 'https://codesandbox.io/'}
+                              style={{
+                                width: '100%',
+                                height: '90vh',
+                                border: '0',
+                                borderRadius: '4px',
+                                overflow: 'hidden',
+                              }}
+                              title='React'
+                              allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
+                              sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
+                            ></iframe>
+                          </Box>
+                        )}
+                      </Box>
+                    )
+                  })}
+                </Box>
+              )}
+              {/* Botom buttons */}
               <Box
                 sx={{
                   width: '100%',
@@ -372,7 +417,7 @@ const LessonDetails = () => {
                             variant='contained'
                             sx={{ maxWidth: '500px', width: '50%' }}
                             onClick={async (e) => {
-                              if (data.type == 'default') {
+                              if (data.type == 'default' || data.type == 'practice') {
                                 const response = await axios.put(urlUser + '?id=' + userData.id, {
                                   purchasedCoursesId: [...userData.purchased_courses_id],
                                   favouriteCoursesId: [...userData.favourite_courses_id],

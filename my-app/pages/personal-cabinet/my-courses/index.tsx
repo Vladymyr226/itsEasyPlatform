@@ -133,7 +133,6 @@ const MyCourses = () => {
         (course: any) => resultUser?.purchased_courses_id.indexOf(course.id) != -1
       )
       setData(resultData)
-      console.log(resultData)
       setDataDisplay(resultData)
     }
   }

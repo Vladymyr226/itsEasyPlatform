@@ -11,7 +11,6 @@ const AdminLogin = () => {
 
   const router = useRouter()
   const { id } = router.query
-  console.log(id)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)

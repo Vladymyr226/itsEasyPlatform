@@ -67,7 +67,6 @@ const CourseGridCard = ({ course, showProgress }: { course: any; showProgress?: 
   }
   const refImg = useRef<any>(null)
   const refContainer = useRef<any>(null)
-  console.log(refImg.current)
   return (
     <li className={s.courseItem}>
       <div ref={refContainer} style={{ maxWidth: '330px' }}>

@@ -60,6 +60,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import Logo from '@/components/Logo/Logo'
 import { removeLessonIds } from '@/utils/removeAllLessonId'
 import LessonCreateQuiz from '@/components/LessonCreate/LessonCreateQuiz'
+import LessonCreatePractice from '@/components/LessonCreate/LessonCreatePractice'
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
@@ -368,7 +369,6 @@ const CourseCreate = () => {
 
   // sweet alert functions
   function showPushAction(url: string) {
-    console.log(editTrigger)
     if (id ? editTrigger : isEdited()) {
       Swal.fire({
         title: 'Do you want to save changes?',
@@ -1524,15 +1524,19 @@ const CourseCreate = () => {
                                             </Box>
 
                                             <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-                                              <IconButton
-                                                onClick={(e) => {
-                                                  setPreview(
-                                                    lesson.id == preview ? '-1' : lesson.id ?? '-1'
-                                                  )
-                                                }}
-                                              >
-                                                <PreviewIcon />
-                                              </IconButton>
+                                              {lesson.type == 'default' && (
+                                                <IconButton
+                                                  onClick={(e) => {
+                                                    setPreview(
+                                                      lesson.id == preview
+                                                        ? '-1'
+                                                        : lesson.id ?? '-1'
+                                                    )
+                                                  }}
+                                                >
+                                                  <PreviewIcon />
+                                                </IconButton>
+                                              )}
                                               <IconButton
                                                 onClick={(e) => {
                                                   setIdLessonEdit(
@@ -1671,11 +1675,27 @@ const CourseCreate = () => {
                           >
                             <MenuItem value={'default'}>Default</MenuItem>
                             <MenuItem value={'quiz'}>Quiz</MenuItem>
+                            <MenuItem value={'practice'}>Practice</MenuItem>
                           </Select>
                         </Box>
                       )}
                       {lessonType == 'quiz' && (
                         <LessonCreateQuiz
+                          startData={lessonForm}
+                          setValue={setValue}
+                          idLessonEdit={idLessonEdit}
+                          setIdLessonEdit={setIdLessonEdit}
+                          createLessonIndx={createLessonIndx}
+                          setCreateLessonIndx={setCreateLessonIndx}
+                          modules={modules}
+                          setModules={setModules}
+                          setEditTrigger={setEditTrigger}
+                          setError={setError}
+                          storedModules={storedModules}
+                        />
+                      )}
+                      {lessonType == 'practice' && (
+                        <LessonCreatePractice
                           startData={lessonForm}
                           setValue={setValue}
                           idLessonEdit={idLessonEdit}

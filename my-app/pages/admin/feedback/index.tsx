@@ -116,7 +116,6 @@ const AdminFeedbackTable = () => {
       getPageData()
     }
   }, [])
-  console.log(data)
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
       <Box sx={{ display: 'flex', justifyContent: 'between', padding: 4, background: '#000' }}>

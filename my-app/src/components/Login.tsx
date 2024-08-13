@@ -52,7 +52,6 @@ const Login = () => {
             confirmButtonColor: '#c58efe',
             icon: 'success',
           }).then(async (result) => {
-            console.log(result)
             router.push('/')
           })
         }

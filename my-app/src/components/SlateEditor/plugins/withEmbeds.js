@@ -9,7 +9,6 @@ const withEmbeds = (editor) => {
   editor.insertBreak = (...args) => {
     const parentPath = Path.parent(editor.selection.focus.path)
     const parentNode = Node.get(editor, parentPath)
-    // console.log(parentNode);
     if (editor.isVoid(parentNode)) {
       const nextPath = Path.next(parentPath)
       Transforms.insertNodes(

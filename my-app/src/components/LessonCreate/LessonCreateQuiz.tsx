@@ -70,7 +70,6 @@ const LessonCreateQuiz = ({
   storedModules,
   startData,
 }: quizCreation) => {
-  console.log('startData', startData ? startData : '')
   const [lessonForm, setLessonForm] = useState({
     title: startData ? startData.title : '',
   })
@@ -126,7 +125,6 @@ const LessonCreateQuiz = ({
       })
     )
   }
-  console.log(questionModules)
   return (
     <Box>
       <TextField
