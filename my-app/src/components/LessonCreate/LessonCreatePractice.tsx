@@ -223,7 +223,7 @@ const LessonCreatePractice = ({
                               fullWidth
                               id='lessonTitle'
                               type='title'
-                              label='Codesandbox url'
+                              label='Url'
                               name='title'
                               autoFocus
                               autoComplete='off'
@@ -297,7 +297,7 @@ const LessonCreatePractice = ({
             borderRadius: '0px',
           }}
         >
-          Add Codesandbox
+          Add Code
         </Button>
       </Box>
       <Box sx={{ display: 'flex' }}>
