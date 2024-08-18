@@ -36,6 +36,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { getLocale } from '@/utils/getLocale'
+import parse from 'html-react-parser'
+
 interface CourseData {
   title: string
   language: string
@@ -353,6 +355,18 @@ const LessonDetails = () => {
                               allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
                               sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
                             ></iframe>
+                          </Box>
+                        )}
+                        {field.type == 'codeHtml' && (
+                          <Box
+                            sx={{
+                              width: '100%',
+                              height: 'max-content',
+                              color: '#fff',
+                              padding: '15px',
+                            }}
+                          >
+                            {parse(field ? field.value : '<div></div>')}
                           </Box>
                         )}
                       </Box>

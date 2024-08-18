@@ -243,6 +243,35 @@ const LessonCreatePractice = ({
                             />
                           </Box>
                         )}
+
+                        {element.type == 'codeHtml' && displayDrag && (
+                          <Box>
+                            <TextField
+                              margin='normal'
+                              required
+                              fullWidth
+                              id='htmlTitle'
+                              label='HTML'
+                              multiline
+                              name='title'
+                              autoFocus
+                              autoComplete='off'
+                              onChange={(e) => {
+                                setTaskModules(
+                                  taskModules.map((module: any, index: number) => {
+                                    if (index == i) {
+                                      return { ...module, value: e.target.value }
+                                    } else {
+                                      return module
+                                    }
+                                  })
+                                )
+                              }}
+                              value={element.value}
+                              sx={{ ...textFieldColors }}
+                            />
+                          </Box>
+                        )}
                       </Box>
                     </Box>
 
@@ -297,7 +326,28 @@ const LessonCreatePractice = ({
             borderRadius: '0px',
           }}
         >
-          Add Code
+          Add Code (Link)
+        </Button>
+        <Button
+          variant='contained'
+          onClick={(e) => {
+            setTaskModules([
+              ...taskModules,
+              {
+                tmpId: new Date().getTime(),
+                type: 'codeHtml',
+                value: [],
+              },
+            ])
+          }}
+          sx={{
+            marginLeft: 2,
+            marginTop: 2,
+            fontWeight: 'bold',
+            borderRadius: '0px',
+          }}
+        >
+          Add Code (HTML)
         </Button>
       </Box>
       <Box sx={{ display: 'flex' }}>
