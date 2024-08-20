@@ -852,9 +852,10 @@ const LessonDetails = () => {
                     ref={containerRef}
                     sx={{ overflow: 'scroll', maxHeight: '20rem', paddingRight: 2 }}
                   >
-                    {chatData.data.messages.map((message: any) => {
+                    {chatData.data.messages.map((message: any, i: number) => {
                       return (
                         <Box
+                          key={'message_' + i}
                           sx={{
                             display: 'flex',
                             justifyContent: message.from == 'user' ? 'end' : 'start',
