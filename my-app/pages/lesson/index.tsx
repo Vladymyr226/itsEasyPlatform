@@ -276,7 +276,9 @@ const LessonDetails = () => {
           messages: [
             {
               role: 'system',
-              content: message,
+              content:
+                'You are an assistant for a web application that offers IT courses and should provide brief and accurate answers only to questions on IT topics. The answer should be given in the language in which the question is written. Here is the message: ' +
+                message,
             },
           ],
         },
