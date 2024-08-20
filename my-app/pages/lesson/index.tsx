@@ -1,5 +1,4 @@
 'use client'
-import s from '../CourseDetails.module.css'
 import skillsImage from '../../../src/assets/skillsImage.png'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
@@ -17,7 +16,7 @@ import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
-import { Box, Button } from '@mui/material'
+import { Box, Button, TextField, IconButton } from '@mui/material'
 import YouTube, { YouTubeProps } from 'react-youtube'
 
 import { YouTubeProp } from '@/utils/interfaces'
@@ -37,6 +36,8 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import { getLocale } from '@/utils/getLocale'
 import parse from 'html-react-parser'
+import SendIcon from '@mui/icons-material/Send'
+import s from './lesson.module.css'
 
 interface CourseData {
   title: string
@@ -65,6 +66,8 @@ const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 const urlFeedback = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback`
+const urlChat = `${process.env.NEXT_BACK_HOST_API}/cabinet/chat`
+
 interface LessonData {
   title: string
   link?: string
@@ -89,11 +92,17 @@ const LessonDetails = () => {
   const [userData, setUserData] = useState<any>()
   const [selectedCourse, setSelectedCourse] = useState<any>()
 
+  const [chatDataId, setChatDataId] = useState<any>()
+  const [chatData, setChatData] = useState<any>()
+  const [userId, setUserId] = useState<any>()
+  console.log(userId)
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
       setSelectedCourse(localStorage.getItem('SelectedCourse'))
       const fullUrl = window.location.href
       const userId = localStorage.getItem('UserID')
+      setUserId(userId)
       const responseUser = await fetch(urlUser + '/' + userId, {
         headers: {
           'Content-Type': 'application/json',
@@ -104,6 +113,7 @@ const LessonDetails = () => {
       setUserData(resultUser)
       if (fullUrl.split('id=')[1]) {
         setId(Number(fullUrl.split('id=')[1]))
+        getPageData2(Number(fullUrl.split('id=')[1]), resultUser.id)
         const response = await fetch(urlLesson + '/' + fullUrl.split('id=')[1], {
           headers: {
             'Content-Type': 'application/json',
@@ -141,7 +151,7 @@ const LessonDetails = () => {
                     },
                   })
                   const resultLesson = await responseLesson.json()
-                  return { id: resultLesson.id, data: resultLesson.data }
+                  return { id: resultLesson.id, data: resultLesson.data, type: resultLesson.type }
                 })
               )
 
@@ -154,6 +164,38 @@ const LessonDetails = () => {
           setModules(modules)
         }
       } else {
+      }
+    }
+  }
+  const containerRef = useRef<any>()
+  async function getPageData2(id2: any, userID2: any) {
+    console.log(userID2)
+    if (userID2) {
+      const response = await fetch(urlChat + 's/', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const result = await response.json()
+      const chats = result.getChats.filter(
+        (chat: any) => chat.lesson_id == id2 && chat.user_id == userID2
+      )
+
+      if (chats.length > 0) {
+        setChatData(chats[0])
+        setChatDataId(chats[0].id)
+        setTimeout(() => {
+          const lastItem = containerRef.current.lastElementChild
+          if (lastItem) {
+            lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+          }
+        }, 1000)
+      } else {
+        const responsePost = await axios.post(urlChat + '?lessonId=' + id2 + '&userId=' + userID2)
+        const resultResponse2 = responsePost.data
+        if (resultResponse2) {
+          setChatDataId(resultResponse2)
+        }
       }
     }
   }
@@ -173,6 +215,7 @@ const LessonDetails = () => {
           }
         })
       })
+      getPageData2(id, userData.id)
     }
   }, [id])
 
@@ -214,7 +257,79 @@ const LessonDetails = () => {
   const [resetAnswersBtn, setResetAnswersBtn] = useState(false)
   const [clearCheckBoxes, setClearCheckBoxes] = useState(false)
 
+  const [message, setMessage] = useState('')
+
   const t = getLocale()
+
+  const [dataGpt, setDataGpt] = useState(false)
+
+  const handleGPT = async () => {
+    const url = 'https://api.openai.com/v1/chat/completions'
+    const apiKey =
+      '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' // Replace with your actual API key
+
+    try {
+      const response = await axios.post(
+        url,
+        {
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: message,
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      // Обновляем состояние dataGpt с полученными данными из ответа
+
+      const responseChat = await axios.put(
+        urlChat + '?lessonId=' + id + '&userId=' + userData.id + '&chatId=' + chatDataId,
+        {
+          messages: chatData.data.messages
+            ? [
+                ...chatData.data.messages,
+                { value: message, from: 'user', time: new Date() },
+                { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
+              ]
+            : [
+                { value: message, from: 'user', time: new Date() },
+                { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
+              ],
+        }
+      )
+      if (response.status == 200) {
+        setChatData({
+          ...chatData,
+          data: {
+            messages: [
+              ...chatData.data.messages,
+              { value: message, from: 'user', time: new Date() },
+              { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
+            ],
+          },
+        })
+        setTimeout(() => {
+          const lastItem = containerRef.current.lastElementChild
+          if (lastItem) {
+            lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+          }
+        }, 1)
+      }
+      setMessage('')
+      setDataGpt(false)
+    } catch (error) {
+      console.error('Ошибка при отправке запроса:', error)
+    }
+  }
+
   return (
     <Layout>
       <Box
@@ -317,61 +432,63 @@ const LessonDetails = () => {
               )}
               {data.type == 'practice' && (
                 <Box>
-                  {data.data.fields.map((field: any, indx: number) => {
-                    return (
-                      <Box key={'Field' + indx}>
-                        {field.type == 'slate' && (
-                          <Box
-                            sx={{
-                              width: '100%',
-                              height: 'max-content',
-                              color: '#fff',
-                              padding: '15px',
-                            }}
-                          >
-                            <SlateView value={field && field.value} />
-                          </Box>
-                        )}
-                        {field.type == 'code' && (
-                          <Box
-                            sx={{
-                              width: '100%',
-                              height: 'max-content',
-                              color: '#fff',
-                              padding: '15px',
-                            }}
-                          >
-                            <iframe
-                              src={field ? field.value : 'https://codesandbox.io/'}
-                              style={{
+                  {data.data.fields &&
+                    data.data.fields.map((field: any, indx: number) => {
+                      return (
+                        <Box key={'Field' + indx}>
+                          {field.type == 'slate' && (
+                            <Box
+                              sx={{
                                 width: '100%',
-                                height: '90vh',
-                                border: '0',
-                                borderRadius: '4px',
-                                overflow: 'hidden',
+                                height: 'max-content',
+                                color: '#fff',
+                                padding: '15px',
                               }}
-                              title='React'
-                              allowFullScreen
-                              allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
-                              sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
-                            ></iframe>
-                          </Box>
-                        )}
-                        {field.type == 'codeHtml' && (
-                          <Box
-                            sx={{
-                              width: '100%',
-                              height: 'max-content',
-                              color: '#fff',
-                              padding: '15px',
-                            }}
-                          >
-                            {parse(field ? field.value : '<div></div>')}
-                          </Box>
-                        )}
-                      </Box>
-                    )
-                  })}
+                            >
+                              <SlateView value={field && field.value} />
+                            </Box>
+                          )}
+                          {field.type}
+                          {field.type == 'code' && (
+                            <Box
+                              sx={{
+                                width: '100%',
+                                height: 'max-content',
+                                color: '#fff',
+                                padding: '15px',
+                              }}
+                            >
+                              <iframe
+                                src={field ? field.value : 'https://codesandbox.io/'}
+                                style={{
+                                  width: '100%',
+                                  height: '90vh',
+                                  border: '0',
+                                  borderRadius: '4px',
+                                  overflow: 'hidden',
+                                }}
+                                title='React'
+                                allowFullScreen
+                                allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
+                                sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
+                              ></iframe>
+                            </Box>
+                          )}
+                          {field.type == 'codeHtml' && (
+                            <Box
+                              sx={{
+                                width: '100%',
+                                height: 'max-content',
+                                color: '#fff',
+                                padding: '15px',
+                              }}
+                            >
+                              {parse(field ? field.value : '<div></div>')}
+                            </Box>
+                          )}
+                        </Box>
+                      )
+                    })}
                 </Box>
               )}
               {/* Botom buttons */}
@@ -614,8 +731,27 @@ const LessonDetails = () => {
             width: { xs: '100%', md: '500px' },
           }}
         >
+          <Box>
+            {modules ? (
+              <CourseLessonMaterials
+                setId={setId}
+                modules={modules}
+                selectedLesson={id ?? -1}
+                completedLessonTrigger={completedLessonTrigger}
+              />
+            ) : selectedCourse ? (
+              <Box
+                sx={{ display: 'flex', justifyContent: 'center', marginTop: 10, marginBottom: 10 }}
+              >
+                <CircularProgress sx={{ color: '#fff' }} />
+              </Box>
+            ) : (
+              <></>
+            )}
+          </Box>
           <Box
             sx={{
+              marginTop: 2,
               borderRadius: 2,
               background: 'rgba(197, 142, 254, 0.1)',
               color: '#fff',
@@ -695,24 +831,151 @@ const LessonDetails = () => {
               }}
             />
           </Box>
-          <Box sx={{ marginTop: 2 }}>
-            {modules ? (
-              <CourseLessonMaterials
-                setId={setId}
-                modules={modules}
-                selectedLesson={id ?? -1}
-                completedLessonTrigger={completedLessonTrigger}
-              />
-            ) : selectedCourse ? (
-              <Box
-                sx={{ display: 'flex', justifyContent: 'center', marginTop: 10, marginBottom: 70 }}
-              >
-                <CircularProgress sx={{ color: '#fff' }} />
-              </Box>
-            ) : (
-              <></>
-            )}
-          </Box>
+          {userId && (
+            <Box
+              sx={{
+                marginTop: 2,
+                borderRadius: 2,
+                background: '#201c2d',
+                color: '#fff',
+                padding: 2,
+                paddingRight: 0,
+                display: 'flex',
+                justifyContent: 'space-around',
+              }}
+            >
+              {chatData ? (
+                <Box sx={{ width: '100%' }}>
+                  <Box
+                    ref={containerRef}
+                    sx={{ overflow: 'scroll', maxHeight: '20rem', paddingRight: 2 }}
+                  >
+                    {chatData.data.messages.map((message: any) => {
+                      return (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: message.from == 'user' ? 'end' : 'start',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              maxWidth: '70%',
+                              background: '#2a2439',
+                              marginTop: 0.5,
+                              marginBottom: 0.5,
+                              whiteSpace: 'pre-wrap',
+                              padding: 1.5,
+                              borderRadius: 2,
+                            }}
+                          >
+                            {message.value}
+                          </Box>
+                        </Box>
+                      )
+                    })}
+                    {dataGpt && (
+                      <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                      </div>
+                    )}
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
+                    <TextField
+                      autoComplete={'off'}
+                      id='standard-name'
+                      fullWidth
+                      placeholder={t.find_course}
+                      value={dataGpt ? '' : message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      multiline
+                      inputProps={{ style: { fontSize: 18 } }}
+                      sx={{
+                        width: '100%',
+                        background: '#171622',
+                        '& .MuiInputBase-root': {
+                          color: '#8b8b92',
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#8b8b92',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#28263a',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#28263a',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#28263a',
+                          },
+                        },
+                      }}
+                    />
+                    <Box
+                      sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+                    >
+                      <IconButton
+                        sx={{ background: '#2a2439' }}
+                        onClick={async (e: any) => {
+                          if (message.trim() != '') {
+                            // const response = await axios.put(
+                            //   urlChat +
+                            //     '?lessonId=' +
+                            //     id +
+                            //     '&userId=' +
+                            //     userData.id +
+                            //     '&chatId=' +
+                            //     chatDataId,
+                            //   {
+                            //     messages: chatData.data.messages
+                            //       ? [
+                            //           ...chatData.data.messages,
+                            //           { value: message, from: 'user', time: new Date() },
+                            //         ]
+                            //       : [{ value: message, from: 'user', time: new Date() }],
+                            //   }
+                            // )
+                            // if (response.status == 200) {
+                            setChatData({
+                              ...chatData,
+                              data: {
+                                messages: [
+                                  ...chatData.data.messages,
+                                  { value: message, from: 'user', time: new Date() },
+                                ],
+                              },
+                            })
+                            setDataGpt(true)
+                            setTimeout(() => {
+                              const lastItem = containerRef.current.lastElementChild
+                              if (lastItem) {
+                                lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                              }
+                            }, 1)
+                            setTimeout(() => {
+                              handleGPT()
+                            }, 1000)
+                            // }
+                          }
+                        }}
+                      >
+                        <SendIcon sx={{ color: '#fff' }} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Box>
+              ) : selectedCourse ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <CircularProgress sx={{ color: '#fff' }} />
+                </Box>
+              ) : (
+                <></>
+              )}
+            </Box>
+          )}
         </Box>
       </Box>
     </Layout>
