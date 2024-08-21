@@ -38,6 +38,11 @@ import { getLocale } from '@/utils/getLocale'
 import parse from 'html-react-parser'
 import SendIcon from '@mui/icons-material/Send'
 import s from './lesson.module.css'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormControl from '@mui/material/FormControl'
+import FormLabel from '@mui/material/FormLabel'
 
 interface CourseData {
   title: string
@@ -169,7 +174,6 @@ const LessonDetails = () => {
   }
   const containerRef = useRef<any>()
   async function getPageData2(id2: any, userID2: any) {
-    console.log(userID2)
     if (userID2) {
       const response = await fetch(urlChat + 's/', {
         headers: {
@@ -180,7 +184,6 @@ const LessonDetails = () => {
       const chats = result.getChats.filter(
         (chat: any) => chat.lesson_id == id2 && chat.user_id == userID2
       )
-
       if (chats.length > 0) {
         setChatData(chats[0])
         setChatDataId(chats[0].id)
@@ -191,15 +194,24 @@ const LessonDetails = () => {
           }
         }, 1000)
       } else {
-        const responsePost = await axios.post(urlChat + '?lessonId=' + id2 + '&userId=' + userID2)
+        const responsePost = await axios.post(urlChat + '?lessonId=' + id2 + '&userId=' + userID2, {
+          messages: [],
+        })
         const resultResponse2 = responsePost.data
+        console.log(resultResponse2)
         if (resultResponse2) {
-          setChatDataId(resultResponse2)
+          setChatData({
+            id: resultResponse2.chatId,
+            lesson_id: id2,
+            user_id: userID2,
+            data: { messages: [] },
+          })
+          setChatDataId(resultResponse2.chatId)
         }
       }
     }
   }
-
+  console.log(data)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
@@ -331,7 +343,6 @@ const LessonDetails = () => {
       console.error('Ошибка при отправке запроса:', error)
     }
   }
-
   return (
     <Layout>
       <Box
@@ -389,44 +400,102 @@ const LessonDetails = () => {
                         <h1 style={{ textAlign: 'left', color: '#fff', marginBottom: '20px' }}>
                           <b>{indx + 1 + '. ' + question.title}</b>
                         </h1>
-                        {question.options.map((option: any, optionIndx: number) => {
-                          return (
-                            <Box
-                              key={'QuestionOption_' + indx}
-                              sx={{ display: 'flex', color: '#fff', marginTop: 1 }}
-                            >
-                              {!clearCheckBoxes && (
-                                <Checkbox
-                                  defaultChecked={answerForm[indx][optionIndx]}
-                                  disabled={checkAnswers}
-                                  onChange={(e) => {
-                                    let tmpArr: any = answerForm
-                                    tmpArr[indx][optionIndx] = e.target.checked
-                                    setAnswerForm(tmpArr)
-                                  }}
-                                  inputProps={{ 'aria-label': 'controlled' }}
-                                  sx={{
-                                    background:
-                                      checkAnswers &&
-                                      answerForm &&
-                                      (answerForm[indx][optionIndx] || option.correct)
-                                        ? answerForm[indx][optionIndx] == option.correct
-                                          ? '#008000'
-                                          : '#FF0000'
-                                        : null,
-                                    color: '#fff',
-                                    '&.Mui-checked': {
+                        {question.options.filter((option: any) => option.correct).length > 1 ? (
+                          question.options.map((option: any, optionIndx: number) => {
+                            return (
+                              <Box
+                                key={'QuestionOption_' + indx}
+                                sx={{ display: 'flex', color: '#fff', marginTop: 1 }}
+                              >
+                                {!clearCheckBoxes && (
+                                  <Checkbox
+                                    defaultChecked={answerForm[indx][optionIndx]}
+                                    disabled={checkAnswers}
+                                    onChange={(e) => {
+                                      let tmpArr: any = answerForm
+                                      tmpArr[indx][optionIndx] = e.target.checked
+                                      setAnswerForm(tmpArr)
+                                    }}
+                                    inputProps={{ 'aria-label': 'controlled' }}
+                                    sx={{
+                                      background:
+                                        checkAnswers &&
+                                        answerForm &&
+                                        (answerForm[indx][optionIndx] || option.correct)
+                                          ? answerForm[indx][optionIndx] == option.correct
+                                            ? '#008000'
+                                            : '#FF0000'
+                                          : null,
                                       color: '#fff',
-                                    },
-                                  }}
-                                />
-                              )}
-                              <b style={{ marginTop: '10px', marginLeft: '10px' }}>
-                                {option.title}
-                              </b>
-                            </Box>
-                          )
-                        })}
+                                      '&.Mui-checked': {
+                                        color: '#fff',
+                                      },
+                                    }}
+                                  />
+                                )}
+                                <b style={{ marginTop: '10px', marginLeft: '10px' }}>
+                                  {option.title}
+                                </b>
+                              </Box>
+                            )
+                          })
+                        ) : (
+                          <Box
+                            key={'QuestionOption_' + indx}
+                            sx={{ display: 'flex', color: '#fff', marginTop: 1, paddingLeft: 1.5 }}
+                          >
+                            {!clearCheckBoxes && (
+                              <RadioGroup
+                                aria-labelledby='demo-radio-buttons-group-label'
+                                name='radio-buttons-group'
+                              >
+                                {question.options.map((option: any, optionIndx: number) => {
+                                  return (
+                                    <>
+                                      <FormControlLabel
+                                        key={'QuestionOption_' + indx + '_' + option.title}
+                                        value={option.title}
+                                        sx={{
+                                          color: '#fff',
+                                          '& .MuiFormControlLabel-label.Mui-disabled': {
+                                            color: '#fff !important',
+                                          },
+                                        }}
+                                        control={
+                                          <Radio
+                                            onClick={(e) => {
+                                              let tmpArr: any = answerForm
+                                              tmpArr[indx] = tmpArr[indx].map(() => {
+                                                return false
+                                              })
+
+                                              tmpArr[indx][optionIndx] = true
+                                              setAnswerForm(tmpArr)
+                                            }}
+                                            sx={{
+                                              background:
+                                                checkAnswers &&
+                                                answerForm &&
+                                                (answerForm[indx][optionIndx] || option.correct)
+                                                  ? answerForm[indx][optionIndx] == option.correct
+                                                    ? '#008000'
+                                                    : '#FF0000'
+                                                  : null,
+                                              color: '#fff',
+                                              '&.Mui-disabled': { color: '#fff' },
+                                              '&.Mui-checked': { color: '#fff' },
+                                            }}
+                                          />
+                                        }
+                                        label={option.title}
+                                      />
+                                    </>
+                                  )
+                                })}
+                              </RadioGroup>
+                            )}
+                          </Box>
+                        )}
                       </Box>
                     )
                   })}
@@ -852,31 +921,32 @@ const LessonDetails = () => {
                     ref={containerRef}
                     sx={{ overflow: 'scroll', maxHeight: '20rem', paddingRight: 2 }}
                   >
-                    {chatData.data.messages.map((message: any, i: number) => {
-                      return (
-                        <Box
-                          key={'message_' + i}
-                          sx={{
-                            display: 'flex',
-                            justifyContent: message.from == 'user' ? 'end' : 'start',
-                          }}
-                        >
+                    {chatData.data.messages &&
+                      chatData.data.messages.map((message: any, i: number) => {
+                        return (
                           <Box
+                            key={'message_' + i}
                             sx={{
-                              maxWidth: '70%',
-                              background: '#2a2439',
-                              marginTop: 0.5,
-                              marginBottom: 0.5,
-                              whiteSpace: 'pre-wrap',
-                              padding: 1.5,
-                              borderRadius: 2,
+                              display: 'flex',
+                              justifyContent: message.from == 'user' ? 'end' : 'start',
                             }}
                           >
-                            {message.value}
+                            <Box
+                              sx={{
+                                maxWidth: '70%',
+                                background: '#2a2439',
+                                marginTop: 0.5,
+                                marginBottom: 0.5,
+                                whiteSpace: 'pre-wrap',
+                                padding: 1.5,
+                                borderRadius: 2,
+                              }}
+                            >
+                              {message.value}
+                            </Box>
                           </Box>
-                        </Box>
-                      )
-                    })}
+                        )
+                      })}
                     {dataGpt && (
                       <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
                         <div></div>

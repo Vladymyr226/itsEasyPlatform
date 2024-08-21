@@ -1336,6 +1336,7 @@ const CourseCreate = () => {
                                     <TextField
                                       autoComplete='off'
                                       margin='normal'
+                                      fullWidth
                                       required
                                       error={countModuleNameMeet(element.title) > 1}
                                       id={'module' + i}
@@ -1396,7 +1397,7 @@ const CourseCreate = () => {
                                   <Box
                                     sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}
                                   >
-                                    <Box sx={{ maxWidth: '40%', width: '100%' }}>
+                                    <Box sx={{ maxWidth: '100%', width: '100%' }}>
                                       <Autocomplete
                                         disablePortal
                                         id='combo-box-demo'
