@@ -72,6 +72,7 @@ const LessonCreateQuiz = ({
 }: quizCreation) => {
   const [lessonForm, setLessonForm] = useState({
     title: startData ? startData.title : '',
+    questionLimit: startData ? startData.questionLimit : null,
   })
   const [questionModules, setQuestionModules] = useState<any>(
     startData && startData.questions ? startData.questions : []
@@ -83,6 +84,7 @@ const LessonCreateQuiz = ({
     )
     return (
       lessonToCompare[0].title === lessonForm.title &&
+      lessonToCompare[0].questionLimit === lessonForm.questionLimit &&
       lessonToCompare[0].questions.length === questionModules.length
     )
   }
@@ -127,22 +129,43 @@ const LessonCreateQuiz = ({
   }
   return (
     <Box>
-      <TextField
-        margin='normal'
-        required
-        fullWidth
-        id='lessonTitle'
-        type='title'
-        label='Title'
-        name='title'
-        autoFocus
-        autoComplete='off'
-        onChange={(e) => {
-          setLessonForm({ ...lessonForm, title: e.target.value })
-        }}
-        value={lessonForm.title}
-        sx={{ ...textFieldColors }}
-      />
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          id='lessonTitle'
+          type='title'
+          label='Title'
+          name='title'
+          autoFocus
+          autoComplete='off'
+          onChange={(e) => {
+            setLessonForm({ ...lessonForm, title: e.target.value })
+          }}
+          value={lessonForm.title}
+          sx={{ ...textFieldColors }}
+        />
+        <TextField
+          autoComplete='off'
+          margin='normal'
+          id='QuestionLimit'
+          type='number'
+          label='Question Limit'
+          name='questionLimit'
+          InputProps={{
+            inputProps: { min: -1 },
+          }}
+          onChange={(e) => {
+            setLessonForm({
+              ...lessonForm,
+              questionLimit: Number(e.target.value),
+            })
+          }}
+          value={lessonForm.questionLimit || -1}
+          sx={{ ...textFieldColors }}
+        />
+      </Box>
       <Box sx={{ width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {questionModules.map((element: any, i: any) => {
@@ -454,6 +477,7 @@ const LessonCreateQuiz = ({
                 if (!found) {
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
                     title: lessonForm.title,
+                    questionLimit: lessonForm.questionLimit,
                     questions: questionModules,
                   })
                   const resultResponse = response.data
@@ -470,6 +494,7 @@ const LessonCreateQuiz = ({
                               return {
                                 ...lessonForm,
                                 id: idLessonEdit,
+                                questionLimit: lessonForm.questionLimit,
                                 title: lessonForm.title,
                                 questions: questionModules,
                                 type: 'quiz',
@@ -482,6 +507,7 @@ const LessonCreateQuiz = ({
                     )
                     setLessonForm({
                       title: '',
+                      questionLimit: null,
                     })
                     setIdLessonEdit(null)
                     setValue(1)
@@ -508,6 +534,7 @@ const LessonCreateQuiz = ({
                 if (!found) {
                   const response = await axios.post(urlLesson + '?type=quiz', {
                     title: lessonForm.title,
+                    questionLimit: lessonForm.questionLimit,
                     questions: questionModules,
                   })
                   const resultResponse = response.data
@@ -528,6 +555,7 @@ const LessonCreateQuiz = ({
                                 ...lessonForm,
                                 id: resultResponse.lessonId,
                                 title: lessonForm.title,
+                                questionLimit: lessonForm.questionLimit,
                                 questions: questionModules,
                                 type: 'quiz',
                               },
@@ -539,6 +567,7 @@ const LessonCreateQuiz = ({
                     )
                     setLessonForm({
                       title: '',
+                      questionLimit: null,
                     })
                   }
                   setCreateLessonIndx(-1)

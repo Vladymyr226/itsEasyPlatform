@@ -73,6 +73,7 @@ const LessonCreatePractice = ({
 }: practiceCreation) => {
   const [lessonForm, setLessonForm] = useState({
     title: startData ? startData.title : '',
+    questionLimit: startData ? startData.questionLimit : null,
   })
   const [taskModules, setTaskModules] = useState<any>(
     startData && startData.fields ? startData.fields : []
@@ -120,22 +121,43 @@ const LessonCreatePractice = ({
   }, [startData])
   return (
     <Box>
-      <TextField
-        margin='normal'
-        required
-        fullWidth
-        id='lessonTitle'
-        type='title'
-        label='Title'
-        name='title'
-        autoFocus
-        autoComplete='off'
-        onChange={(e) => {
-          setLessonForm({ ...lessonForm, title: e.target.value })
-        }}
-        value={lessonForm.title}
-        sx={{ ...textFieldColors }}
-      />
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          id='lessonTitle'
+          type='title'
+          label='Title'
+          name='title'
+          autoFocus
+          autoComplete='off'
+          onChange={(e) => {
+            setLessonForm({ ...lessonForm, title: e.target.value })
+          }}
+          value={lessonForm.title}
+          sx={{ ...textFieldColors }}
+        />
+        <TextField
+          autoComplete='off'
+          margin='normal'
+          id='QuestionLimit'
+          type='number'
+          label='Question Limit'
+          name='questionLimit'
+          InputProps={{
+            inputProps: { min: -1 },
+          }}
+          onChange={(e) => {
+            setLessonForm({
+              ...lessonForm,
+              questionLimit: Number(e.target.value),
+            })
+          }}
+          value={lessonForm.questionLimit || -1}
+          sx={{ ...textFieldColors }}
+        />
+      </Box>
       <Box sx={{ width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {taskModules.map((element: any, i: any) => {
@@ -399,6 +421,7 @@ const LessonCreatePractice = ({
                 if (!found) {
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
                     title: lessonForm.title,
+                    questionLimit: lessonForm.questionLimit,
                     fields: taskModules,
                   })
                   const resultResponse = response.data
@@ -416,6 +439,7 @@ const LessonCreatePractice = ({
                                 ...lessonForm,
                                 id: idLessonEdit,
                                 title: lessonForm.title,
+                                questionLimit: lessonForm.questionLimit,
                                 fields: taskModules.map((module: any) => {
                                   return { type: module.type, value: module.value }
                                 }),
@@ -429,6 +453,7 @@ const LessonCreatePractice = ({
                     )
                     setLessonForm({
                       title: '',
+                      questionLimit: null,
                     })
                     setIdLessonEdit(null)
                     setValue(1)
@@ -455,6 +480,7 @@ const LessonCreatePractice = ({
                 if (!found) {
                   const response = await axios.post(urlLesson + '?type=practice', {
                     title: lessonForm.title,
+                    questionLimit: lessonForm.questionLimit,
                     fields: taskModules.map((module: any) => {
                       return { type: module.type, value: module.value }
                     }),
@@ -477,6 +503,7 @@ const LessonCreatePractice = ({
                                 ...lessonForm,
                                 id: resultResponse.lessonId,
                                 title: lessonForm.title,
+                                questionLimit: lessonForm.questionLimit,
                                 fields: taskModules.map((module: any) => {
                                   return { type: module.type, value: module.value }
                                 }),
@@ -490,6 +517,7 @@ const LessonCreatePractice = ({
                     )
                     setLessonForm({
                       title: '',
+                      questionLimit: null,
                     })
                   }
                   setCreateLessonIndx(-1)

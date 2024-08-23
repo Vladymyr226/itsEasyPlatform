@@ -167,6 +167,7 @@ const CourseCreate = () => {
     title: '',
     link: '',
     image: '',
+    questionLimit: null,
   })
   const [preview, setPreview] = useState('-1')
   const [editTrigger, setEditTrigger] = useState(false)
@@ -180,6 +181,7 @@ const CourseCreate = () => {
       title: '',
       link: '',
       image: '',
+      questionLimit: null,
     })
     setRichValueLesson([
       {
@@ -520,7 +522,7 @@ const CourseCreate = () => {
         const resultData = result.getCourses.filter(
           (course: any) => course.id == fullUrl.split('_id=')[1]
         )
-
+        console.log(resultLesson.getLessons)
         let allLessons = resultLesson.getLessons.map((lesson: any) => {
           return {
             id: lesson.id,
@@ -673,6 +675,7 @@ const CourseCreate = () => {
     return (
       lessonToCompare[0].title === lessonForm.title &&
       lessonToCompare[0].link === lessonForm.link &&
+      lessonToCompare[0].questionLimit === lessonForm.questionLimit &&
       compareRichTexts(richValueLesson, lessonToCompare[0].description)
     )
   }
@@ -1260,6 +1263,7 @@ const CourseCreate = () => {
                                 title: '',
                                 link: '',
                                 image: '',
+                                questionLimit: null,
                               })
                               let selectedModulesArr: Array<Lesson> = []
                               modules.map((module: Module) => {
@@ -1712,22 +1716,44 @@ const CourseCreate = () => {
                       )}
                       {lessonType == 'default' && (
                         <Box>
-                          <TextField
-                            margin='normal'
-                            required
-                            fullWidth
-                            id='lessonTitle'
-                            type='title'
-                            label='Title'
-                            name='title'
-                            autoFocus
-                            autoComplete='off'
-                            onChange={(e) => {
-                              setLessonForm({ ...lessonForm, title: e.target.value })
-                            }}
-                            value={lessonForm.title}
-                            sx={{ ...textFieldColors }}
-                          />
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <TextField
+                              margin='normal'
+                              required
+                              fullWidth
+                              id='lessonTitle'
+                              type='title'
+                              label='Title'
+                              name='title'
+                              autoFocus
+                              autoComplete='off'
+                              onChange={(e) => {
+                                setLessonForm({ ...lessonForm, title: e.target.value })
+                              }}
+                              value={lessonForm.title}
+                              sx={{ ...textFieldColors }}
+                            />
+                            <TextField
+                              autoComplete='off'
+                              margin='normal'
+                              id='QuestionLimit'
+                              type='number'
+                              label='Question Limit'
+                              name='questionLimit'
+                              InputProps={{
+                                inputProps: { min: -1 },
+                              }}
+                              onChange={(e) => {
+                                setLessonForm({
+                                  ...lessonForm,
+                                  questionLimit: Number(e.target.value),
+                                })
+                              }}
+                              value={lessonForm.questionLimit || -1}
+                              sx={{ ...textFieldColors }}
+                            />
+                          </Box>
+
                           <Box sx={{ color: '#000000' }}>
                             <MyEditor value={richValueLesson} setValue={setRichValueLesson} />
                           </Box>
@@ -1857,6 +1883,7 @@ const CourseCreate = () => {
                                         urlLesson + '?id=' + idLessonEdit,
                                         {
                                           title: lessonForm.title,
+                                          questionLimit: lessonForm.questionLimit,
                                           description: richValueLesson,
                                           link: lessonForm.link,
                                           image: lessonForm.image,
@@ -1892,6 +1919,7 @@ const CourseCreate = () => {
                                           title: '',
                                           link: '',
                                           image: '',
+                                          questionLimit: null,
                                         })
                                         setRichValueLesson([
                                           {
@@ -1925,6 +1953,7 @@ const CourseCreate = () => {
                                       const response = await axios.post(
                                         urlLesson + '?type=default',
                                         {
+                                          questionLimit: lessonForm.questionLimit,
                                           title: lessonForm.title,
                                           description: richValueLesson,
                                           link: lessonForm.link,
@@ -1962,6 +1991,7 @@ const CourseCreate = () => {
                                           title: '',
                                           link: '',
                                           image: '',
+                                          questionLimit: null,
                                         })
                                       }
                                       setCreateLessonIndx(-1)

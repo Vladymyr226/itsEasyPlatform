@@ -77,6 +77,7 @@ interface LessonData {
   title: string
   link?: string
   description?: any
+  questionLimit?: number
   image?: any
   questions?: any
   fields?: any
@@ -100,8 +101,8 @@ const LessonDetails = () => {
   const [chatDataId, setChatDataId] = useState<any>()
   const [chatData, setChatData] = useState<any>()
   const [userId, setUserId] = useState<any>()
-  console.log(userId)
-
+  const [lessonContext, setLessonContext] = useState<any>()
+  console.log(lessonContext ? lessonContext : 'lohi')
   async function getPageData() {
     if (typeof window !== 'undefined') {
       setSelectedCourse(localStorage.getItem('SelectedCourse'))
@@ -134,6 +135,25 @@ const LessonDetails = () => {
             })
           )
         }
+        if (result.type == 'practice') {
+          const slateFields = result.data.fields.filter((field: any) => field.type == 'slate')
+          const value = slateFields
+            .map((field: any) => {
+              return field.value
+                .map((line: any) => {
+                  return line.children
+                    .map((finalLine: any) => {
+                      console.log(finalLine)
+                      return finalLine.text
+                    })
+                    .toString()
+                })
+                .toString()
+            })
+            .toString()
+          setLessonContext(value)
+        }
+
         setData(result)
         if (localStorage.getItem('SelectedCourse') && localStorage.getItem('SelectedModuleIndex')) {
           const responseCourse = await fetch(url + '/' + localStorage.getItem('SelectedCourse'), {
@@ -211,7 +231,6 @@ const LessonDetails = () => {
       }
     }
   }
-  console.log(data)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
@@ -223,7 +242,28 @@ const LessonDetails = () => {
       modules.map((module: any) => {
         module.lessons.map((less: any) => {
           if (less.id == id) {
-            setData(less)
+            setData(undefined)
+            setTimeout(() => {
+              if (less.type == 'practice') {
+                const slateFields = less.data.fields.filter((field: any) => field.type == 'slate')
+                const value = slateFields
+                  .map((field: any) => {
+                    return field.value
+                      .map((line: any) => {
+                        return line.children
+                          .map((finalLine: any) => {
+                            console.log(finalLine)
+                            return finalLine.text
+                          })
+                          .toString()
+                      })
+                      .toString()
+                  })
+                  .toString()
+                setLessonContext(value)
+              }
+              setData(less)
+            }, 1)
           }
         })
       })
@@ -289,7 +329,11 @@ const LessonDetails = () => {
             {
               role: 'system',
               content:
-                'You are an assistant for a web application that offers IT courses and should provide brief and accurate answers only to questions on IT topics. The answer should be given in the language in which the question is written. Here is the message: ' +
+                'You are an assistant for a web application that offers IT courses and should provide brief and accurate answers only to questions on IT topics' +
+                (lessonContext
+                  ? '. Here is the context of the lesson (' + lessonContext + ')'
+                  : '') +
+                '. The answer should be given in the language in which the question is written. Here is the message: ' +
                 message,
             },
           ],
@@ -343,6 +387,8 @@ const LessonDetails = () => {
       console.error('Ошибка при отправке запроса:', error)
     }
   }
+
+  console.log(chatData)
   return (
     <Layout>
       <Box
@@ -516,10 +562,20 @@ const LessonDetails = () => {
                                 padding: '15px',
                               }}
                             >
-                              <SlateView value={field && field.value} />
+                              <SlateView
+                                value={
+                                  field
+                                    ? field.value
+                                    : [
+                                        {
+                                          type: 'paragaph',
+                                          children: [{ text: '' }],
+                                        },
+                                      ]
+                                }
+                              />
                             </Box>
                           )}
-                          {field.type}
                           {field.type == 'code' && (
                             <Box
                               sx={{
@@ -917,6 +973,7 @@ const LessonDetails = () => {
             >
               {chatData ? (
                 <Box sx={{ width: '100%' }}>
+                  <h2>{t.askGpt}</h2>
                   <Box
                     ref={containerRef}
                     sx={{ overflow: 'scroll', maxHeight: '20rem', paddingRight: 2 }}
@@ -991,6 +1048,13 @@ const LessonDetails = () => {
                       sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                     >
                       <IconButton
+                        disabled={
+                          data && data.data.questionLimit != null
+                            ? chatData.data.messages.filter(
+                                (message: any) => message.from == 'chat'
+                              ).length >= data.data.questionLimit
+                            : false
+                        }
                         sx={{ background: '#2a2439' }}
                         onClick={async (e: any) => {
                           if (message.trim() != '') {
@@ -1039,6 +1103,18 @@ const LessonDetails = () => {
                       </IconButton>
                     </Box>
                   </Box>
+                  {data && data.data.questionLimit != null ? (
+                    <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
+                      {data &&
+                        data.data.questionLimit -
+                          chatData.data.messages.filter((message: any) => message.from == 'chat')
+                            .length +
+                          ' ' +
+                          t.requestsLeft}
+                    </Box>
+                  ) : (
+                    <></>
+                  )}
                 </Box>
               ) : selectedCourse ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>

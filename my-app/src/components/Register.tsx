@@ -92,13 +92,21 @@ const Registration = () => {
       }
 
       const response = await axios.post(
-        url + '?userName=' + form.userName + '&email=' + form.email + '&password=' + form.password,
+        url +
+          '?userName=' +
+          form.userName +
+          '&email=' +
+          form.email +
+          '&password=' +
+          form.password +
+          '&isVerified=' +
+          false,
         {}
       )
       const resultResponse = response.data
       if (resultResponse) {
         setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
-        localStorage.setItem('UserID', resultResponse.user.id)
+
         Swal.fire({
           title: 'You signed up successfully!',
           background: '#171622',
