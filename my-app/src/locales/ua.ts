@@ -99,5 +99,6 @@ export const ua = {
   reset_password: 'Скидання пароля',
   confirm: 'Підтвердити',
   requestsLeft: 'запитів залишилось',
-  askGpt: 'Запитайте Chat GPT',
+  askGpt: 'Задати питання',
+  gptPlaceholder: 'Напишіть своє запитання тут',
 }

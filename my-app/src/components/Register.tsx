@@ -38,6 +38,7 @@ const Registration = () => {
     userName: '',
     email: '',
     password: '',
+    passwordConfirm: '',
   })
 
   function validateString(input: string) {
@@ -50,6 +51,16 @@ const Registration = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try {
+      if (form.password != form.passwordConfirm) {
+        Swal.fire({
+          title: 'Passwords do not match!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
+        return
+      }
       if (form.userName.indexOf(' ') != -1) {
         Swal.fire({
           title: 'Username cannot contain spaces inside!',
@@ -108,7 +119,8 @@ const Registration = () => {
         setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
 
         Swal.fire({
-          title: 'You signed up successfully!',
+          title:
+            'The verification email has been send! Follow the given instructions to verify your account.',
           background: '#171622',
           color: '#ffec3e',
           confirmButtonColor: '#c58efe',
@@ -129,6 +141,7 @@ const Registration = () => {
     }
   }
   const [showPass, setShowPass] = useState(false)
+  const [showPassConfirm, setShowPassConfirm] = useState(false)
   const t = getLocale()
   return (
     <Box sx={{ background: 'none', width: '100%' }}>
@@ -202,6 +215,38 @@ const Registration = () => {
             ),
           }}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
+          sx={{ ...textFieldColors }}
+        />
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          name='passwordConfirm'
+          label={t.password_repeat}
+          type={showPass ? 'text' : 'password'}
+          id='passwordConfirm'
+          autoComplete='current-password'
+          InputLabelProps={{
+            sx: {
+              color: '#ffec3e',
+            },
+          }}
+          InputProps={{
+            endAdornment: (
+              <IconButton
+                onClick={(e) => {
+                  setShowPassConfirm(!showPassConfirm)
+                }}
+              >
+                {showPassConfirm ? (
+                  <VisibilityOffIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
+                ) : (
+                  <VisibilityIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
+                )}
+              </IconButton>
+            ),
+          }}
+          onChange={(e) => setForm({ ...form, passwordConfirm: e.target.value })}
           sx={{ ...textFieldColors }}
         />
         <Button

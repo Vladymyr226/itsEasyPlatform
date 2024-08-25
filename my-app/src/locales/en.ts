@@ -99,5 +99,6 @@ export const en = {
   reset_password: 'Reset password',
   confirm: 'Confirm',
   requestsLeft: 'requests left',
-  askGpt: 'Ask Chat GPT',
+  askGpt: 'Ask a question',
+  gptPlaceholder: 'Text your question here',
 }

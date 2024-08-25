@@ -102,7 +102,7 @@ const LessonDetails = () => {
   const [chatData, setChatData] = useState<any>()
   const [userId, setUserId] = useState<any>()
   const [lessonContext, setLessonContext] = useState<any>()
-  console.log(lessonContext ? lessonContext : 'lohi')
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
       setSelectedCourse(localStorage.getItem('SelectedCourse'))
@@ -134,6 +134,24 @@ const LessonDetails = () => {
               })
             })
           )
+        }
+        if (result.type == 'default') {
+          const slateFields = result.data.fields.filter((field: any) => field.type == 'slate')
+          const value = slateFields
+            .map((field: any) => {
+              return field.value
+                .map((line: any) => {
+                  return line.children
+                    .map((finalLine: any) => {
+                      console.log(finalLine)
+                      return finalLine.text
+                    })
+                    .toString()
+                })
+                .toString()
+            })
+            .toString()
+          setLessonContext(value)
         }
         if (result.type == 'practice') {
           const slateFields = result.data.fields.filter((field: any) => field.type == 'slate')
@@ -403,7 +421,7 @@ const LessonDetails = () => {
         <Box
           sx={{
             width: '100%',
-
+            minHeight: { xs: null, md: '140vb' },
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 2,
@@ -411,16 +429,19 @@ const LessonDetails = () => {
         >
           {data ? (
             <Box
-              sx={{ height: { xs: null, md: '140vb' }, display: 'flex', flexDirection: 'column' }}
+              sx={{
+                minHeight: { xs: null, md: '140vb' },
+                display: 'flex',
+                flexDirection: 'column',
+              }}
             >
               {data.type == 'default' && (
                 <Box sx={{ width: '100%' }}>
-                  {data.data.link ? (
+                  {data.data.image ? (
                     <>
-                      <ExampleYouTube url={data.data.link.split('?v=')[1]} />
+                      <img src={data.data.image}></img>
+                      <br />
                     </>
-                  ) : data.data.image ? (
-                    <img src={data.data.image}></img>
                   ) : (
                     <></>
                   )}
@@ -429,7 +450,8 @@ const LessonDetails = () => {
               <h1 style={{ textAlign: 'left', color: '#ffec3e', marginBottom: '20px' }}>
                 <b>{data && data.data.title}</b>
               </h1>
-              {data.type == 'default' && (
+              <Box>
+                {/* {data.type == 'default' && (
                 <Box sx={{ overflowY: 'auto', scrollbarWidth: 'none' }}>
                   <Box
                     sx={{ width: '100%', height: 'max-content', color: '#fff', padding: '15px' }}
@@ -437,187 +459,286 @@ const LessonDetails = () => {
                     <SlateView value={data && data.data.description} />
                   </Box>
                 </Box>
-              )}
-              {data.type == 'quiz' && (
-                <Box>
-                  {data.data.questions.map((question: any, indx: number) => {
-                    return (
-                      <Box key={'Question_' + indx}>
-                        <h1 style={{ textAlign: 'left', color: '#fff', marginBottom: '20px' }}>
-                          <b>{indx + 1 + '. ' + question.title}</b>
-                        </h1>
-                        {question.options.filter((option: any) => option.correct).length > 1 ? (
-                          question.options.map((option: any, optionIndx: number) => {
-                            return (
+              )} */}
+                {data.type == 'default' && (
+                  <Box>
+                    {data.data.fields &&
+                      data.data.fields.map((field: any, indx: number) => {
+                        return (
+                          <Box key={'Field' + indx}>
+                            {field.type == 'slate' && (
                               <Box
-                                key={'QuestionOption_' + indx}
-                                sx={{ display: 'flex', color: '#fff', marginTop: 1 }}
+                                sx={{
+                                  width: '100%',
+                                  height: 'max-content',
+                                  color: '#fff',
+                                  padding: '15px',
+                                }}
                               >
-                                {!clearCheckBoxes && (
-                                  <Checkbox
-                                    defaultChecked={answerForm[indx][optionIndx]}
-                                    disabled={checkAnswers}
-                                    onChange={(e) => {
-                                      let tmpArr: any = answerForm
-                                      tmpArr[indx][optionIndx] = e.target.checked
-                                      setAnswerForm(tmpArr)
-                                    }}
-                                    inputProps={{ 'aria-label': 'controlled' }}
-                                    sx={{
-                                      background:
-                                        checkAnswers &&
-                                        answerForm &&
-                                        (answerForm[indx][optionIndx] || option.correct)
-                                          ? answerForm[indx][optionIndx] == option.correct
-                                            ? '#008000'
-                                            : '#FF0000'
-                                          : null,
-                                      color: '#fff',
-                                      '&.Mui-checked': {
-                                        color: '#fff',
-                                      },
-                                    }}
-                                  />
-                                )}
-                                <b style={{ marginTop: '10px', marginLeft: '10px' }}>
-                                  {option.title}
-                                </b>
-                              </Box>
-                            )
-                          })
-                        ) : (
-                          <Box
-                            key={'QuestionOption_' + indx}
-                            sx={{ display: 'flex', color: '#fff', marginTop: 1, paddingLeft: 1.5 }}
-                          >
-                            {!clearCheckBoxes && (
-                              <RadioGroup
-                                aria-labelledby='demo-radio-buttons-group-label'
-                                name='radio-buttons-group'
-                              >
-                                {question.options.map((option: any, optionIndx: number) => {
-                                  return (
-                                    <>
-                                      <FormControlLabel
-                                        key={'QuestionOption_' + indx + '_' + option.title}
-                                        value={option.title}
-                                        sx={{
-                                          color: '#fff',
-                                          '& .MuiFormControlLabel-label.Mui-disabled': {
-                                            color: '#fff !important',
+                                <SlateView
+                                  value={
+                                    field
+                                      ? field.value
+                                      : [
+                                          {
+                                            type: 'paragaph',
+                                            children: [{ text: '' }],
                                           },
-                                        }}
-                                        control={
-                                          <Radio
-                                            onClick={(e) => {
-                                              let tmpArr: any = answerForm
-                                              tmpArr[indx] = tmpArr[indx].map(() => {
-                                                return false
-                                              })
+                                        ]
+                                  }
+                                />
+                              </Box>
+                            )}
+                            {field.type == 'code' && (
+                              // <Box
+                              //   sx={{
+                              //     width: '100%',
+                              //     height: '900px',
+                              //     color: '#fff',
+                              //     padding: '15px',
+                              //   }}
+                              // >
 
-                                              tmpArr[indx][optionIndx] = true
-                                              setAnswerForm(tmpArr)
-                                            }}
-                                            sx={{
-                                              background:
-                                                checkAnswers &&
-                                                answerForm &&
-                                                (answerForm[indx][optionIndx] || option.correct)
-                                                  ? answerForm[indx][optionIndx] == option.correct
-                                                    ? '#008000'
-                                                    : '#FF0000'
-                                                  : null,
-                                              color: '#fff',
-                                              '&.Mui-disabled': { color: '#fff' },
-                                              '&.Mui-checked': { color: '#fff' },
-                                            }}
-                                          />
-                                        }
-                                        label={option.title}
-                                      />
-                                    </>
-                                  )
-                                })}
-                              </RadioGroup>
+                              // </Box>
+                              <Box
+                                sx={{
+                                  width: '100%',
+                                  color: '#fff',
+                                  padding: '15px',
+                                }}
+                              >
+                                <iframe
+                                  src={field ? field.value : 'https://codesandbox.io/'}
+                                  style={{
+                                    width: '100%',
+                                    height: '900px',
+                                    border: '0',
+                                    borderRadius: '4px',
+                                    overflow: 'hidden',
+                                  }}
+                                  title='React'
+                                  allowFullScreen
+                                  allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
+                                  sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
+                                ></iframe>
+                              </Box>
+                            )}
+                            {field.type == 'codeHtml' && (
+                              <Box
+                                sx={{
+                                  width: '100%',
+                                  height: 'max-content',
+                                  color: '#fff',
+                                  padding: '15px',
+                                }}
+                              >
+                                {parse(field ? field.value : '<div></div>')}
+                              </Box>
+                            )}
+                            {field.type == 'youTube' && (
+                              <Box
+                                sx={{
+                                  width: '100%',
+                                  height: 'max-content',
+                                  color: '#fff',
+                                  padding: '15px',
+                                }}
+                              >
+                                <ExampleYouTube url={field.value.split('?v=')[1]} />
+                              </Box>
                             )}
                           </Box>
-                        )}
-                      </Box>
-                    )
-                  })}
-                </Box>
-              )}
-              {data.type == 'practice' && (
-                <Box>
-                  {data.data.fields &&
-                    data.data.fields.map((field: any, indx: number) => {
+                        )
+                      })}
+                  </Box>
+                )}
+                {data.type == 'quiz' && (
+                  <Box>
+                    {data.data.questions.map((question: any, indx: number) => {
                       return (
-                        <Box key={'Field' + indx}>
-                          {field.type == 'slate' && (
-                            <Box
-                              sx={{
-                                width: '100%',
-                                height: 'max-content',
-                                color: '#fff',
-                                padding: '15px',
-                              }}
-                            >
-                              <SlateView
-                                value={
-                                  field
-                                    ? field.value
-                                    : [
-                                        {
-                                          type: 'paragaph',
-                                          children: [{ text: '' }],
+                        <Box key={'Question_' + indx}>
+                          <h1 style={{ textAlign: 'left', color: '#fff', marginBottom: '20px' }}>
+                            <b>{indx + 1 + '. ' + question.title}</b>
+                          </h1>
+                          {question.options.filter((option: any) => option.correct).length > 1 ? (
+                            question.options.map((option: any, optionIndx: number) => {
+                              return (
+                                <Box
+                                  key={'QuestionOption_' + indx}
+                                  sx={{ display: 'flex', color: '#fff', marginTop: 1 }}
+                                >
+                                  {!clearCheckBoxes && (
+                                    <Checkbox
+                                      defaultChecked={answerForm[indx][optionIndx]}
+                                      disabled={checkAnswers}
+                                      onChange={(e) => {
+                                        let tmpArr: any = answerForm
+                                        tmpArr[indx][optionIndx] = e.target.checked
+                                        setAnswerForm(tmpArr)
+                                      }}
+                                      inputProps={{ 'aria-label': 'controlled' }}
+                                      sx={{
+                                        background:
+                                          checkAnswers &&
+                                          answerForm &&
+                                          (answerForm[indx][optionIndx] || option.correct)
+                                            ? answerForm[indx][optionIndx] == option.correct
+                                              ? '#008000'
+                                              : '#FF0000'
+                                            : null,
+                                        color: '#fff',
+                                        '&.Mui-checked': {
+                                          color: '#fff',
                                         },
-                                      ]
-                                }
-                              />
-                            </Box>
-                          )}
-                          {field.type == 'code' && (
+                                      }}
+                                    />
+                                  )}
+                                  <b style={{ marginTop: '10px', marginLeft: '10px' }}>
+                                    {option.title}
+                                  </b>
+                                </Box>
+                              )
+                            })
+                          ) : (
                             <Box
+                              key={'QuestionOption_' + indx}
                               sx={{
-                                width: '100%',
-                                height: 'max-content',
+                                display: 'flex',
                                 color: '#fff',
-                                padding: '15px',
+                                marginTop: 1,
+                                paddingLeft: 1.5,
                               }}
                             >
-                              <iframe
-                                src={field ? field.value : 'https://codesandbox.io/'}
-                                style={{
-                                  width: '100%',
-                                  height: '90vh',
-                                  border: '0',
-                                  borderRadius: '4px',
-                                  overflow: 'hidden',
-                                }}
-                                title='React'
-                                allowFullScreen
-                                allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
-                                sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
-                              ></iframe>
-                            </Box>
-                          )}
-                          {field.type == 'codeHtml' && (
-                            <Box
-                              sx={{
-                                width: '100%',
-                                height: 'max-content',
-                                color: '#fff',
-                                padding: '15px',
-                              }}
-                            >
-                              {parse(field ? field.value : '<div></div>')}
+                              {!clearCheckBoxes && (
+                                <RadioGroup
+                                  aria-labelledby='demo-radio-buttons-group-label'
+                                  name='radio-buttons-group'
+                                >
+                                  {question.options.map((option: any, optionIndx: number) => {
+                                    return (
+                                      <>
+                                        <FormControlLabel
+                                          key={'QuestionOption_' + indx + '_' + option.title}
+                                          value={option.title}
+                                          sx={{
+                                            color: '#fff',
+                                            '& .MuiFormControlLabel-label.Mui-disabled': {
+                                              color: '#fff !important',
+                                            },
+                                          }}
+                                          control={
+                                            <Radio
+                                              onClick={(e) => {
+                                                let tmpArr: any = answerForm
+                                                console.log(tmpArr)
+                                                tmpArr[indx] = tmpArr[indx].map(() => {
+                                                  return false
+                                                })
+
+                                                tmpArr[indx][optionIndx] = true
+                                                setAnswerForm(tmpArr)
+                                              }}
+                                              sx={{
+                                                background:
+                                                  checkAnswers &&
+                                                  answerForm &&
+                                                  (answerForm[indx][optionIndx] || option.correct)
+                                                    ? answerForm[indx][optionIndx] == option.correct
+                                                      ? '#008000'
+                                                      : '#FF0000'
+                                                    : null,
+                                                color: '#fff',
+                                                '&.Mui-disabled': { color: '#fff' },
+                                                '&.Mui-checked': { color: '#fff' },
+                                              }}
+                                            />
+                                          }
+                                          label={option.title}
+                                        />
+                                      </>
+                                    )
+                                  })}
+                                </RadioGroup>
+                              )}
                             </Box>
                           )}
                         </Box>
                       )
                     })}
-                </Box>
-              )}
+                  </Box>
+                )}
+                {data.type == 'practice' && (
+                  <Box>
+                    {data.data.fields &&
+                      data.data.fields.map((field: any, indx: number) => {
+                        return (
+                          <Box key={'Field' + indx}>
+                            {field.type == 'slate' && (
+                              <Box
+                                sx={{
+                                  width: '100%',
+                                  height: 'max-content',
+                                  color: '#fff',
+                                  padding: '15px',
+                                }}
+                              >
+                                <SlateView
+                                  value={
+                                    field
+                                      ? field.value
+                                      : [
+                                          {
+                                            type: 'paragaph',
+                                            children: [{ text: '' }],
+                                          },
+                                        ]
+                                  }
+                                />
+                              </Box>
+                            )}
+                            {field.type == 'code' && (
+                              <Box
+                                sx={{
+                                  width: '100%',
+                                  height: 'max-content',
+                                  color: '#fff',
+                                  padding: '15px',
+                                }}
+                              >
+                                <iframe
+                                  src={field ? field.value : 'https://codesandbox.io/'}
+                                  style={{
+                                    width: '100%',
+                                    height: '90vh',
+                                    border: '0',
+                                    borderRadius: '4px',
+                                    overflow: 'hidden',
+                                  }}
+                                  title='React'
+                                  allowFullScreen
+                                  allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
+                                  sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
+                                ></iframe>
+                              </Box>
+                            )}
+                            {field.type == 'codeHtml' && (
+                              <Box
+                                sx={{
+                                  width: '100%',
+                                  height: 'max-content',
+                                  color: '#fff',
+                                  padding: '15px',
+                                }}
+                              >
+                                {parse(field ? field.value : '<div></div>')}
+                              </Box>
+                            )}
+                          </Box>
+                        )
+                      })}
+                  </Box>
+                )}
+              </Box>
               {/* Botom buttons */}
               <Box
                 sx={{
@@ -876,88 +997,94 @@ const LessonDetails = () => {
               <></>
             )}
           </Box>
-          <Box
-            sx={{
-              marginTop: 2,
-              borderRadius: 2,
-              background: 'rgba(197, 142, 254, 0.1)',
-              color: '#fff',
-              padding: 2,
-              display: 'flex',
-              justifyContent: 'space-around',
-            }}
-          >
-            <h3>{t.your_rating}</h3>
-            <Rating
-              disabled={
-                !(
-                  selectedCourse &&
-                  userData &&
-                  userData?.purchased_courses_id &&
-                  userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
-                )
-              }
-              onChange={async (event, newValue) => {
-                if (newValue) {
-                  if (newValue < 5) {
-                    if (
+          {selectedCourse &&
+            userData &&
+            userData?.purchased_courses_id &&
+            userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+              <Box
+                sx={{
+                  marginTop: 2,
+                  borderRadius: 2,
+                  background: 'rgba(197, 142, 254, 0.1)',
+                  color: '#fff',
+                  padding: 2,
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                }}
+              >
+                <h3>{t.your_rating}</h3>
+                <Rating
+                  disabled={
+                    !(
                       selectedCourse &&
                       userData &&
                       userData?.purchased_courses_id &&
                       userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
-                    ) {
-                      const { value: text } = await Swal.fire({
-                        background: '#171622',
-                        color: '#ffec3e',
-                        confirmButtonColor: '#c58efe',
-
-                        input: 'textarea',
-                        title: t.feedbackTitle,
-                        inputPlaceholder: t.typeMessage,
-                        inputAttributes: {
-                          'aria-label': t.typeMessage,
-                        },
-                        showCancelButton: true,
-                        confirmButtonText: t.submit,
-                        cancelButtonText: t.skip,
-                      })
-                      const response = await axios.post(
-                        urlFeedback +
-                          '?userId=' +
-                          userData.id +
-                          '&rating=' +
-                          newValue +
-                          '&lessonId=' +
-                          id +
-                          '&feedbackName=' +
-                          text
-                      )
-                      Swal.fire({
-                        title: t.thanks,
-                        background: '#171622',
-                        color: '#ffec3e',
-                        confirmButtonColor: '#c58efe',
-                      })
-                    }
-                  } else {
-                    Swal.fire({
-                      title: t.thanks,
-                      background: '#171622',
-                      color: '#ffec3e',
-                      confirmButtonColor: '#c58efe',
-                    })
+                    )
                   }
-                }
-              }}
-              emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
-              sx={{
-                fontSize: 22,
-                '& .MuiRating-iconFilled': {
-                  color: '#fff', // Color of selected stars
-                },
-              }}
-            />
-          </Box>
+                  onChange={async (event, newValue) => {
+                    if (newValue) {
+                      if (newValue < 5) {
+                        if (
+                          selectedCourse &&
+                          userData &&
+                          userData?.purchased_courses_id &&
+                          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                        ) {
+                          const { value: text } = await Swal.fire({
+                            background: '#171622',
+                            color: '#ffec3e',
+                            confirmButtonColor: '#c58efe',
+
+                            input: 'textarea',
+                            title: t.feedbackTitle,
+                            inputPlaceholder: t.typeMessage,
+                            inputAttributes: {
+                              'aria-label': t.typeMessage,
+                            },
+                            showCancelButton: true,
+                            confirmButtonText: t.submit,
+                            cancelButtonText: t.skip,
+                          })
+                          const response = await axios.post(
+                            urlFeedback +
+                              '?userId=' +
+                              userData.id +
+                              '&rating=' +
+                              newValue +
+                              '&lessonId=' +
+                              id +
+                              '&feedbackName=' +
+                              text
+                          )
+                          Swal.fire({
+                            title: t.thanks,
+                            background: '#171622',
+                            color: '#ffec3e',
+                            confirmButtonColor: '#c58efe',
+                          })
+                        }
+                      } else {
+                        Swal.fire({
+                          title: t.thanks,
+                          background: '#171622',
+                          color: '#ffec3e',
+                          confirmButtonColor: '#c58efe',
+                        })
+                      }
+                    }
+                  }}
+                  emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
+                  sx={{
+                    fontSize: 22,
+                    '& .MuiRating-iconFilled': {
+                      color: '#fff', // Color of selected stars
+                    },
+                  }}
+                />
+              </Box>
+            )}
+
           {userId && (
             <Box
               sx={{
@@ -1017,7 +1144,7 @@ const LessonDetails = () => {
                       autoComplete={'off'}
                       id='standard-name'
                       fullWidth
-                      placeholder={t.find_course}
+                      placeholder={t.gptPlaceholder}
                       value={dataGpt ? '' : message}
                       onChange={(e) => setMessage(e.target.value)}
                       multiline

@@ -268,17 +268,6 @@ const CourseDetails = () => {
               )}
             </div>
 
-            {width < 1200 && (
-              <CourseSidebar
-                duration={data?.data.duration ?? 0}
-                lessonsNum={lessSum ?? 0}
-                price={data?.data.price ?? 0}
-                priceDiscount={data?.data.priceDiscount ?? 0}
-                modules={data?.data.modules}
-                rating={data?.data.rating ?? 0}
-              />
-            )}
-
             <p className={s.courseSubTitle}>
               <span className={s.accentuated}>{t.course_description}</span>
             </p>
@@ -378,7 +367,16 @@ const CourseDetails = () => {
           >
             <Image className={s.courseImage} src={skillsImage} alt='skills' />
           </div> */}
-
+            {width < 1200 && (
+              <CourseSidebar
+                duration={data?.data.duration ?? 0}
+                lessonsNum={lessSum ?? 0}
+                price={data?.data.price ?? 0}
+                priceDiscount={data?.data.priceDiscount ?? 0}
+                modules={data?.data.modules}
+                rating={data?.data.rating ?? 0}
+              />
+            )}
             <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>
               <span className={s.accentuated}>{t.what_alumni_say}</span>
             </p>
