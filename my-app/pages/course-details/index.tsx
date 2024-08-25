@@ -47,6 +47,7 @@ interface Course {
   views: number
   data: CourseData
   is_active: boolean
+  created_at: any
 }
 interface Module {
   title: string
@@ -336,10 +337,20 @@ const CourseDetails = () => {
                 <p className={s.infoItemTitle}>{t.level}</p>
                 <p className={s.infoItemContent}>{data && data.data.level}</p>
               </li>
-              <li className={s.infoItem}>
-                <p className={s.infoItemTitle}>{t.start_date}</p>
-                <p className={s.infoItemContent}>{data && data.data.date}</p>
-              </li>
+              {data.data.type == 'with-lector' && (
+                <li className={s.infoItem}>
+                  <p className={s.infoItemTitle}>{t.start_date}</p>
+                  <p className={s.infoItemContent}>{data && data.data.date}</p>
+                </li>
+              )}
+              {data.data.type == 'self-education' && (
+                <li className={s.infoItem}>
+                  <p className={s.infoItemTitle}>{t.created_date}</p>
+                  <p className={s.infoItemContent}>
+                    {data && new Date(data.created_at).toISOString().split('T')[0]}
+                  </p>
+                </li>
+              )}
             </ul>
             {data && (
               <div className={s.descText}>

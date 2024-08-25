@@ -45,7 +45,7 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
             slidesPerView: 2,
           },
           1280: {
-            slidesPerView: smallScreen ? 2 : 3,
+            slidesPerView: smallScreen ? 3 : 4,
           },
         }}
       >

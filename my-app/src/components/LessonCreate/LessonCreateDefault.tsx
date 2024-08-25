@@ -94,7 +94,6 @@ const LessonCreateDefault = ({
 }: defaultCreation) => {
   const [lessonForm, setLessonForm] = useState({
     title: startData ? startData.title : '',
-    questionLimit: startData ? startData.questionLimit : null,
     image: startData ? startData.image : null,
   })
   const [lessonModules, setLessonModules] = useState<any>(
@@ -198,25 +197,6 @@ const LessonCreateDefault = ({
             setLessonForm({ ...lessonForm, title: e.target.value })
           }}
           value={lessonForm.title}
-          sx={{ ...textFieldColors }}
-        />
-        <TextField
-          autoComplete='off'
-          margin='normal'
-          id='QuestionLimit'
-          type='number'
-          label='Question Limit'
-          name='questionLimit'
-          InputProps={{
-            inputProps: { min: -1 },
-          }}
-          onChange={(e) => {
-            setLessonForm({
-              ...lessonForm,
-              questionLimit: Number(e.target.value),
-            })
-          }}
-          value={lessonForm.questionLimit || -1}
           sx={{ ...textFieldColors }}
         />
       </Box>
@@ -575,7 +555,6 @@ const LessonCreateDefault = ({
                   console.log(lessonForm.image)
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
                     title: lessonForm.title,
-                    questionLimit: lessonForm.questionLimit,
                     fields: lessonModules,
                     image: lessonForm.image,
                   })
@@ -594,7 +573,6 @@ const LessonCreateDefault = ({
                                 ...lessonForm,
                                 id: idLessonEdit,
                                 title: lessonForm.title,
-                                questionLimit: lessonForm.questionLimit,
                                 fields: lessonModules.map((module: any) => {
                                   return { type: module.type, value: module.value }
                                 }),
@@ -609,7 +587,6 @@ const LessonCreateDefault = ({
                     )
                     setLessonForm({
                       title: '',
-                      questionLimit: null,
                       image: null,
                     })
                     setIdLessonEdit(null)
@@ -638,7 +615,6 @@ const LessonCreateDefault = ({
                   const response = await axios.post(urlLesson + '?type=default', {
                     title: lessonForm.title,
                     image: lessonForm.image,
-                    questionLimit: lessonForm.questionLimit,
                     fields: lessonModules.map((module: any) => {
                       return { type: module.type, value: module.value }
                     }),
@@ -661,7 +637,6 @@ const LessonCreateDefault = ({
                                 ...lessonForm,
                                 id: resultResponse.lessonId,
                                 title: lessonForm.title,
-                                questionLimit: lessonForm.questionLimit,
                                 fields: lessonModules.map((module: any) => {
                                   return { type: module.type, value: module.value }
                                 }),
@@ -676,7 +651,6 @@ const LessonCreateDefault = ({
                     )
                     setLessonForm({
                       title: '',
-                      questionLimit: null,
                       image: null,
                     })
                   }

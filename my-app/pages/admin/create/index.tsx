@@ -3,17 +3,6 @@
 import courseImage from '../../src/assets/courseImage.png'
 import skillsImage from '../../src/assets/skillsImage.png'
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
-import Comments from '@/components/Comments/Comments'
-import CourseControlls from '@/components/CourseControlls/CourseControlls'
-import CourseMaterials from '@/components/CourseMaterials/CourseMaterials'
-import CourseSidebar from '@/components/CourseSidebar/CourseSidebar'
-import PlayButton from '@/components/PlayButton/PlayButton'
-import PopularCourses from '@/components/PopularCourses/PopularCourses'
-
-import SkillsList from '@/components/SkillsList/SkillsList'
-import ViewsCount from '@/components/ViewsCount/ViewsCount'
-import Layout from '@/components/Layout/Layout'
 import '../../../app/globals.css'
 import { Box, Grid, Button, Typography, CircularProgress } from '@mui/material'
 import LinearProgress from '@mui/material/LinearProgress'
@@ -142,6 +131,7 @@ const CourseCreate = () => {
   const [allSkillSelect, setAllSkillSelect] = useState<Array<Skill>>([])
   const [form, setForm] = useState<any>({
     title: '',
+    questionLimit: null,
     date: new Date().toISOString().split('T')[0],
     duration: null,
     lector: '',
@@ -168,7 +158,6 @@ const CourseCreate = () => {
     title: '',
     link: '',
     image: '',
-    questionLimit: null,
   })
   const [preview, setPreview] = useState('-1')
   const [editTrigger, setEditTrigger] = useState(false)
@@ -182,7 +171,6 @@ const CourseCreate = () => {
       title: '',
       link: '',
       image: '',
-      questionLimit: null,
     })
     setRichValueLesson([
       {
@@ -513,7 +501,6 @@ const CourseCreate = () => {
           },
         })
         const result = await response.json()
-
         const responseLesson = await fetch(urlLesson + 's', {
           headers: {
             'Content-Type': 'application/json',
@@ -576,6 +563,7 @@ const CourseCreate = () => {
         })
         setStoredModules(allLessons)
         setForm({
+          questionLimit: resultData[0].data.questionLimit,
           title: resultData[0].data.title,
           description: resultData[0].data.description,
           richtext: resultData[0].data.richtext,
@@ -676,7 +664,6 @@ const CourseCreate = () => {
     return (
       lessonToCompare[0].title === lessonForm.title &&
       lessonToCompare[0].link === lessonForm.link &&
-      lessonToCompare[0].questionLimit === lessonForm.questionLimit &&
       compareRichTexts(richValueLesson, lessonToCompare[0].description)
     )
   }
@@ -704,6 +691,7 @@ const CourseCreate = () => {
       form.lector != '' ||
       form.price != undefined ||
       form.priceDiscount != undefined ||
+      form.questionLimit != null ||
       modules.length != 0 ||
       language != '' ||
       level != '' ||
@@ -1205,7 +1193,26 @@ const CourseCreate = () => {
                         )}
                       />
                       <Button onClick={showSwalSkill}>Create skill</Button>
-
+                      <TextField
+                        fullWidth
+                        autoComplete='off'
+                        margin='normal'
+                        id='QuestionLimit'
+                        type='number'
+                        label='Question Limit'
+                        name='questionLimit'
+                        InputProps={{
+                          inputProps: { min: -1 },
+                        }}
+                        onChange={(e) => {
+                          setForm({
+                            ...form,
+                            questionLimit: Number(e.target.value),
+                          })
+                        }}
+                        value={form.questionLimit || -1}
+                        sx={{ ...textFieldColors }}
+                      />
                       {typeof mediaValue?.content == 'string' && (
                         <>
                           {mediaValue.type == 'image' ? (
@@ -1254,6 +1261,7 @@ const CourseCreate = () => {
                             onClick={(e) => {
                               setForm({
                                 title: '',
+                                questionLimit: null,
                                 date: new Date().toISOString().split('T')[0],
                                 duration: null,
                                 lector: '',
@@ -1264,7 +1272,6 @@ const CourseCreate = () => {
                                 title: '',
                                 link: '',
                                 image: '',
-                                questionLimit: null,
                               })
                               let selectedModulesArr: Array<Lesson> = []
                               modules.map((module: Module) => {
@@ -1400,102 +1407,6 @@ const CourseCreate = () => {
                                   }}
                                 >
                                   <Box
-                                    sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}
-                                  >
-                                    <Box sx={{ maxWidth: '100%', width: '100%' }}>
-                                      <Autocomplete
-                                        disablePortal
-                                        id='combo-box-demo'
-                                        getOptionLabel={(option: any) => option.title}
-                                        options={storedModules}
-                                        value={{ title: '' }}
-                                        fullWidth
-                                        renderInput={(params) => (
-                                          <TextField {...params} label='Stored lessons' />
-                                        )}
-                                        onChange={(event, value: any) => {
-                                          setEditTrigger(true)
-                                          setError({})
-                                          setModules(
-                                            modules.map((modulesElem, index) => {
-                                              if (
-                                                index == i &&
-                                                modulesElem.lessons.filter(
-                                                  (reDropElem) => reDropElem.id === value.id
-                                                ).length === 0
-                                              ) {
-                                                setStoredModules(
-                                                  storedModules.filter(
-                                                    (storedModule) => storedModule.id != value.id
-                                                  )
-                                                )
-                                                return {
-                                                  title: modulesElem.title,
-                                                  lessons: [
-                                                    ...modulesElem.lessons,
-                                                    {
-                                                      ...value,
-                                                    },
-                                                  ],
-                                                }
-                                              }
-                                              return modulesElem
-                                            })
-                                          )
-                                        }}
-                                        renderOption={(
-                                          props: object,
-                                          option: any,
-                                          state: object
-                                        ) => (
-                                          <div
-                                            // {...props}
-                                            style={{
-                                              display: 'flex',
-                                              justifyContent: 'space-between',
-                                            }}
-                                          >
-                                            <div {...props} style={{ width: '100%' }}>
-                                              {option.title}
-                                            </div>
-                                            <IconButton
-                                              key={'deleteButton_' + option.id}
-                                              aria-label='delete'
-                                              onClick={async (e) => {
-                                                Swal.fire({
-                                                  title: 'Do you want to delete the lesson?',
-                                                  background: '#171622',
-                                                  color: '#ffec3e',
-                                                  confirmButtonColor: '#ff2052',
-                                                  showCancelButton: true,
-                                                  confirmButtonText: 'Delete',
-                                                }).then(async (result) => {
-                                                  if (result.isConfirmed) {
-                                                    removeLessonIds(option.id)
-                                                    const response = await axios.delete(
-                                                      urlLesson + '?id=' + option.id
-                                                    )
-                                                    const resultResponse = response.data
-                                                    if (resultResponse) {
-                                                      setStoredModules(
-                                                        storedModules.filter(
-                                                          (lesson) => lesson.id != option.id
-                                                        )
-                                                      )
-                                                    }
-                                                  }
-                                                })
-                                              }}
-                                              sx={{}}
-                                            >
-                                              <DeleteIcon key={'deleteIcon_'} color='primary' />
-                                            </IconButton>
-                                          </div>
-                                        )}
-                                      />
-                                    </Box>
-                                  </Box>
-                                  <Box
                                     sx={{
                                       width: '100%',
                                       display: 'flex',
@@ -1622,7 +1533,102 @@ const CourseCreate = () => {
                                       })}
                                     </Box>
                                   </Box>
-
+                                  <Box
+                                    sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}
+                                  >
+                                    <Box sx={{ maxWidth: '100%', width: '100%' }}>
+                                      <Autocomplete
+                                        disablePortal
+                                        id='combo-box-demo'
+                                        getOptionLabel={(option: any) => option.title}
+                                        options={storedModules}
+                                        value={{ title: '' }}
+                                        fullWidth
+                                        renderInput={(params) => (
+                                          <TextField {...params} label='Stored lessons' />
+                                        )}
+                                        onChange={(event, value: any) => {
+                                          setEditTrigger(true)
+                                          setError({})
+                                          setModules(
+                                            modules.map((modulesElem, index) => {
+                                              if (
+                                                index == i &&
+                                                modulesElem.lessons.filter(
+                                                  (reDropElem) => reDropElem.id === value.id
+                                                ).length === 0
+                                              ) {
+                                                setStoredModules(
+                                                  storedModules.filter(
+                                                    (storedModule) => storedModule.id != value.id
+                                                  )
+                                                )
+                                                return {
+                                                  title: modulesElem.title,
+                                                  lessons: [
+                                                    ...modulesElem.lessons,
+                                                    {
+                                                      ...value,
+                                                    },
+                                                  ],
+                                                }
+                                              }
+                                              return modulesElem
+                                            })
+                                          )
+                                        }}
+                                        renderOption={(
+                                          props: object,
+                                          option: any,
+                                          state: object
+                                        ) => (
+                                          <div
+                                            // {...props}
+                                            style={{
+                                              display: 'flex',
+                                              justifyContent: 'space-between',
+                                            }}
+                                          >
+                                            <div {...props} style={{ width: '100%' }}>
+                                              {option.title}
+                                            </div>
+                                            <IconButton
+                                              key={'deleteButton_' + option.id}
+                                              aria-label='delete'
+                                              onClick={async (e) => {
+                                                Swal.fire({
+                                                  title: 'Do you want to delete the lesson?',
+                                                  background: '#171622',
+                                                  color: '#ffec3e',
+                                                  confirmButtonColor: '#ff2052',
+                                                  showCancelButton: true,
+                                                  confirmButtonText: 'Delete',
+                                                }).then(async (result) => {
+                                                  if (result.isConfirmed) {
+                                                    removeLessonIds(option.id)
+                                                    const response = await axios.delete(
+                                                      urlLesson + '?id=' + option.id
+                                                    )
+                                                    const resultResponse = response.data
+                                                    if (resultResponse) {
+                                                      setStoredModules(
+                                                        storedModules.filter(
+                                                          (lesson) => lesson.id != option.id
+                                                        )
+                                                      )
+                                                    }
+                                                  }
+                                                })
+                                              }}
+                                              sx={{}}
+                                            >
+                                              <DeleteIcon key={'deleteIcon_'} color='primary' />
+                                            </IconButton>
+                                          </div>
+                                        )}
+                                      />
+                                    </Box>
+                                  </Box>
                                   <Box
                                     sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}
                                   >
@@ -1632,7 +1638,6 @@ const CourseCreate = () => {
                                         setCreateLessonIndx(createLessonIndx === i ? -1 : i)
                                         setLessonForm({
                                           title: '',
-                                          questionLimit: null,
                                           image: null,
                                         })
                                         setRichValueLesson([

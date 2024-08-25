@@ -98,7 +98,7 @@ export const en = {
   forgot_my_password: 'Forgot password?',
   reset_password: 'Reset password',
   confirm: 'Confirm',
-  requestsLeft: 'requests left',
+  requestsLeft: 'questions left',
   askGpt: 'Ask a question',
   gptPlaceholder: 'Text your question here',
 }

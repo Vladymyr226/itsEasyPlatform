@@ -73,7 +73,6 @@ const LessonCreatePractice = ({
 }: practiceCreation) => {
   const [lessonForm, setLessonForm] = useState({
     title: startData ? startData.title : '',
-    questionLimit: startData ? startData.questionLimit : null,
   })
   const [taskModules, setTaskModules] = useState<any>(
     startData && startData.fields ? startData.fields : []
@@ -136,25 +135,6 @@ const LessonCreatePractice = ({
             setLessonForm({ ...lessonForm, title: e.target.value })
           }}
           value={lessonForm.title}
-          sx={{ ...textFieldColors }}
-        />
-        <TextField
-          autoComplete='off'
-          margin='normal'
-          id='QuestionLimit'
-          type='number'
-          label='Question Limit'
-          name='questionLimit'
-          InputProps={{
-            inputProps: { min: -1 },
-          }}
-          onChange={(e) => {
-            setLessonForm({
-              ...lessonForm,
-              questionLimit: Number(e.target.value),
-            })
-          }}
-          value={lessonForm.questionLimit || -1}
           sx={{ ...textFieldColors }}
         />
       </Box>
@@ -421,7 +401,6 @@ const LessonCreatePractice = ({
                 if (!found) {
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
                     title: lessonForm.title,
-                    questionLimit: lessonForm.questionLimit,
                     fields: taskModules,
                   })
                   const resultResponse = response.data
@@ -439,7 +418,6 @@ const LessonCreatePractice = ({
                                 ...lessonForm,
                                 id: idLessonEdit,
                                 title: lessonForm.title,
-                                questionLimit: lessonForm.questionLimit,
                                 fields: taskModules.map((module: any) => {
                                   return { type: module.type, value: module.value }
                                 }),
@@ -453,7 +431,6 @@ const LessonCreatePractice = ({
                     )
                     setLessonForm({
                       title: '',
-                      questionLimit: null,
                     })
                     setIdLessonEdit(null)
                     setValue(1)
@@ -480,7 +457,6 @@ const LessonCreatePractice = ({
                 if (!found) {
                   const response = await axios.post(urlLesson + '?type=practice', {
                     title: lessonForm.title,
-                    questionLimit: lessonForm.questionLimit,
                     fields: taskModules.map((module: any) => {
                       return { type: module.type, value: module.value }
                     }),
@@ -503,7 +479,6 @@ const LessonCreatePractice = ({
                                 ...lessonForm,
                                 id: resultResponse.lessonId,
                                 title: lessonForm.title,
-                                questionLimit: lessonForm.questionLimit,
                                 fields: taskModules.map((module: any) => {
                                   return { type: module.type, value: module.value }
                                 }),
@@ -517,7 +492,6 @@ const LessonCreatePractice = ({
                     )
                     setLessonForm({
                       title: '',
-                      questionLimit: null,
                     })
                   }
                   setCreateLessonIndx(-1)

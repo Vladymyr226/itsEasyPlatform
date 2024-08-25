@@ -77,7 +77,6 @@ interface LessonData {
   title: string
   link?: string
   description?: any
-  questionLimit?: number
   image?: any
   questions?: any
   fields?: any
@@ -102,7 +101,7 @@ const LessonDetails = () => {
   const [chatData, setChatData] = useState<any>()
   const [userId, setUserId] = useState<any>()
   const [lessonContext, setLessonContext] = useState<any>()
-
+  const [questionLimit, setQuestionLimit] = useState<number>()
   async function getPageData() {
     if (typeof window !== 'undefined') {
       setSelectedCourse(localStorage.getItem('SelectedCourse'))
@@ -180,7 +179,7 @@ const LessonDetails = () => {
             },
           })
           const resultCourse = await responseCourse.json()
-
+          setQuestionLimit(resultCourse.data.questionLimit)
           setModuleLessons(
             resultCourse.data.modules[Number(localStorage.getItem('SelectedModuleIndex'))].lessons
           )
@@ -226,9 +225,11 @@ const LessonDetails = () => {
         setChatData(chats[0])
         setChatDataId(chats[0].id)
         setTimeout(() => {
-          const lastItem = containerRef.current.lastElementChild
-          if (lastItem) {
-            lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+          if (containerRef.current) {
+            const lastItem = containerRef.current.lastElementChild
+            if (lastItem) {
+              lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            }
           }
         }, 1000)
       } else {
@@ -393,9 +394,11 @@ const LessonDetails = () => {
           },
         })
         setTimeout(() => {
-          const lastItem = containerRef.current.lastElementChild
-          if (lastItem) {
-            lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+          if (containerRef.current) {
+            const lastItem = containerRef.current.lastElementChild
+            if (lastItem) {
+              lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            }
           }
         }, 1)
       }
@@ -586,6 +589,8 @@ const LessonDetails = () => {
                                               ? '#008000'
                                               : '#FF0000'
                                             : null,
+                                        padding: 0.5,
+                                        marginTop: 0.5,
                                         color: '#fff',
                                         '&.Mui-checked': {
                                           color: '#fff',
@@ -1085,173 +1090,182 @@ const LessonDetails = () => {
               </Box>
             )}
 
-          {userId && (
-            <Box
-              sx={{
-                marginTop: 2,
-                borderRadius: 2,
-                background: '#201c2d',
-                color: '#fff',
-                padding: 2,
-                paddingRight: 0,
-                display: 'flex',
-                justifyContent: 'space-around',
-              }}
-            >
-              {chatData ? (
-                <Box sx={{ width: '100%' }}>
-                  <h2>{t.askGpt}</h2>
-                  <Box
-                    ref={containerRef}
-                    sx={{ overflow: 'scroll', maxHeight: '20rem', paddingRight: 2 }}
-                  >
-                    {chatData.data.messages &&
-                      chatData.data.messages.map((message: any, i: number) => {
-                        return (
-                          <Box
-                            key={'message_' + i}
-                            sx={{
-                              display: 'flex',
-                              justifyContent: message.from == 'user' ? 'end' : 'start',
-                            }}
-                          >
+          {selectedCourse &&
+            userData &&
+            userId &&
+            userData?.purchased_courses_id &&
+            userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+              <Box
+                sx={{
+                  marginTop: 2,
+                  borderRadius: 2,
+                  background: '#201c2d',
+                  color: '#fff',
+                  padding: 2,
+                  paddingRight: 0,
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                }}
+              >
+                {chatData ? (
+                  <Box sx={{ width: '100%' }}>
+                    <h2>{t.askGpt}</h2>
+                    <Box
+                      ref={containerRef}
+                      sx={{
+                        overflow: 'scroll',
+                        scrollbarWidth: 'none',
+                        maxHeight: '20rem',
+                        paddingRight: 2,
+                      }}
+                    >
+                      {chatData.data.messages &&
+                        chatData.data.messages.map((message: any, i: number) => {
+                          return (
                             <Box
+                              key={'message_' + i}
                               sx={{
-                                maxWidth: '70%',
-                                background: '#2a2439',
-                                marginTop: 0.5,
-                                marginBottom: 0.5,
-                                whiteSpace: 'pre-wrap',
-                                padding: 1.5,
-                                borderRadius: 2,
+                                display: 'flex',
+                                justifyContent: message.from == 'user' ? 'end' : 'start',
                               }}
                             >
-                              {message.value}
+                              <Box
+                                sx={{
+                                  maxWidth: '70%',
+                                  background: '#2a2439',
+                                  marginTop: 0.5,
+                                  marginBottom: 0.5,
+                                  whiteSpace: 'pre-wrap',
+                                  padding: 1.5,
+                                  borderRadius: 2,
+                                }}
+                              >
+                                {message.value}
+                              </Box>
                             </Box>
-                          </Box>
-                        )
-                      })}
-                    {dataGpt && (
-                      <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                      </div>
+                          )
+                        })}
+                      {dataGpt && (
+                        <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
+                          <div></div>
+                          <div></div>
+                          <div></div>
+                        </div>
+                      )}
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
+                      <TextField
+                        autoComplete={'off'}
+                        id='standard-name'
+                        fullWidth
+                        placeholder={t.gptPlaceholder}
+                        value={dataGpt ? '' : message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        multiline
+                        inputProps={{ style: { fontSize: 18 } }}
+                        sx={{
+                          width: '100%',
+                          background: '#171622',
+                          '& .MuiInputBase-root': {
+                            color: '#8b8b92',
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: '#8b8b92',
+                          },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: '#28263a',
+                            },
+                            '&:hover fieldset': {
+                              borderColor: '#28263a',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#28263a',
+                            },
+                          },
+                        }}
+                      />
+                      <Box
+                        sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+                      >
+                        <IconButton
+                          disabled={
+                            questionLimit != null
+                              ? chatData.data.messages.filter(
+                                  (message: any) => message.from == 'chat'
+                                ).length >= questionLimit
+                              : false
+                          }
+                          sx={{ background: '#2a2439' }}
+                          onClick={async (e: any) => {
+                            if (message.trim() != '') {
+                              // const response = await axios.put(
+                              //   urlChat +
+                              //     '?lessonId=' +
+                              //     id +
+                              //     '&userId=' +
+                              //     userData.id +
+                              //     '&chatId=' +
+                              //     chatDataId,
+                              //   {
+                              //     messages: chatData.data.messages
+                              //       ? [
+                              //           ...chatData.data.messages,
+                              //           { value: message, from: 'user', time: new Date() },
+                              //         ]
+                              //       : [{ value: message, from: 'user', time: new Date() }],
+                              //   }
+                              // )
+                              // if (response.status == 200) {
+                              setChatData({
+                                ...chatData,
+                                data: {
+                                  messages: [
+                                    ...chatData.data.messages,
+                                    { value: message, from: 'user', time: new Date() },
+                                  ],
+                                },
+                              })
+                              setDataGpt(true)
+                              setTimeout(() => {
+                                const lastItem = containerRef.current.lastElementChild
+                                if (lastItem) {
+                                  lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                                }
+                              }, 1)
+                              setTimeout(() => {
+                                handleGPT()
+                              }, 1000)
+                              // }
+                            }
+                          }}
+                        >
+                          <SendIcon sx={{ color: '#fff' }} />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                    {questionLimit != null ? (
+                      <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
+                        {data &&
+                          questionLimit -
+                            chatData.data.messages.filter((message: any) => message.from == 'chat')
+                              .length +
+                            ' ' +
+                            t.requestsLeft}
+                      </Box>
+                    ) : (
+                      <></>
                     )}
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
-                    <TextField
-                      autoComplete={'off'}
-                      id='standard-name'
-                      fullWidth
-                      placeholder={t.gptPlaceholder}
-                      value={dataGpt ? '' : message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      multiline
-                      inputProps={{ style: { fontSize: 18 } }}
-                      sx={{
-                        width: '100%',
-                        background: '#171622',
-                        '& .MuiInputBase-root': {
-                          color: '#8b8b92',
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: '#8b8b92',
-                        },
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': {
-                            borderColor: '#28263a',
-                          },
-                          '&:hover fieldset': {
-                            borderColor: '#28263a',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#28263a',
-                          },
-                        },
-                      }}
-                    />
-                    <Box
-                      sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
-                    >
-                      <IconButton
-                        disabled={
-                          data && data.data.questionLimit != null
-                            ? chatData.data.messages.filter(
-                                (message: any) => message.from == 'chat'
-                              ).length >= data.data.questionLimit
-                            : false
-                        }
-                        sx={{ background: '#2a2439' }}
-                        onClick={async (e: any) => {
-                          if (message.trim() != '') {
-                            // const response = await axios.put(
-                            //   urlChat +
-                            //     '?lessonId=' +
-                            //     id +
-                            //     '&userId=' +
-                            //     userData.id +
-                            //     '&chatId=' +
-                            //     chatDataId,
-                            //   {
-                            //     messages: chatData.data.messages
-                            //       ? [
-                            //           ...chatData.data.messages,
-                            //           { value: message, from: 'user', time: new Date() },
-                            //         ]
-                            //       : [{ value: message, from: 'user', time: new Date() }],
-                            //   }
-                            // )
-                            // if (response.status == 200) {
-                            setChatData({
-                              ...chatData,
-                              data: {
-                                messages: [
-                                  ...chatData.data.messages,
-                                  { value: message, from: 'user', time: new Date() },
-                                ],
-                              },
-                            })
-                            setDataGpt(true)
-                            setTimeout(() => {
-                              const lastItem = containerRef.current.lastElementChild
-                              if (lastItem) {
-                                lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                              }
-                            }, 1)
-                            setTimeout(() => {
-                              handleGPT()
-                            }, 1000)
-                            // }
-                          }
-                        }}
-                      >
-                        <SendIcon sx={{ color: '#fff' }} />
-                      </IconButton>
-                    </Box>
+                ) : selectedCourse ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <CircularProgress sx={{ color: '#fff' }} />
                   </Box>
-                  {data && data.data.questionLimit != null ? (
-                    <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
-                      {data &&
-                        data.data.questionLimit -
-                          chatData.data.messages.filter((message: any) => message.from == 'chat')
-                            .length +
-                          ' ' +
-                          t.requestsLeft}
-                    </Box>
-                  ) : (
-                    <></>
-                  )}
-                </Box>
-              ) : selectedCourse ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <CircularProgress sx={{ color: '#fff' }} />
-                </Box>
-              ) : (
-                <></>
-              )}
-            </Box>
-          )}
+                ) : (
+                  <></>
+                )}
+              </Box>
+            )}
         </Box>
       </Box>
     </Layout>

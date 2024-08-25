@@ -98,7 +98,7 @@ export const ru = {
   forgot_my_password: 'Забыл пароль?',
   reset_password: 'Сброс пароля',
   confirm: 'Подтвердить',
-  requestsLeft: 'запросов осталось',
+  requestsLeft: 'вопросов осталось',
   askGpt: 'Задать вопрос',
   gptPlaceholder: 'Введите свой вопрос здесь',
 }

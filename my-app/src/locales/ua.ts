@@ -98,7 +98,7 @@ export const ua = {
   forgot_my_password: 'Забув пароль?',
   reset_password: 'Скидання пароля',
   confirm: 'Підтвердити',
-  requestsLeft: 'запитів залишилось',
+  requestsLeft: 'питань залишилось',
   askGpt: 'Задати питання',
   gptPlaceholder: 'Напишіть своє запитання тут',
 }
