@@ -86,7 +86,7 @@ export const ua = {
   register_now: 'Зареєструватися зараз',
   login_now: 'Увійдіть зараз',
   username: 'Логін',
-  your_rating: 'Ваша оцінка:',
+  your_rating: 'Оцініть цей урок:',
   complete: 'Завершити',
   feedbackTitle: 'Не могли б ви надати більше деталей?',
   submit: 'Відправити',

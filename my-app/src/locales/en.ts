@@ -86,7 +86,7 @@ export const en = {
   register_now: 'Register now',
   login_now: 'Login now',
   username: 'Username',
-  your_rating: 'Your rate:',
+  your_rating: 'Rate this lesson:',
   complete: 'Complete',
   feedbackTitle: 'Could you please provide more details?',
   submit: 'Submit',

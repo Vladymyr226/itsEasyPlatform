@@ -32,7 +32,7 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
           dynamicBullets: true,
         }}
         className='mySwiper'
-        style={{ width: '100%' }}
+        style={{ width: '100%', paddingBottom: '40px' }}
         modules={[Navigation, Pagination]}
         navigation={true}
         spaceBetween={10}

@@ -100,6 +100,13 @@ const AllCoursesDetails = () => {
 
   async function getPageData() {
     if (typeof window !== 'undefined') {
+      const layoutType = localStorage.getItem('layoutType')
+      if (layoutType == 'list') {
+        setView('list')
+      }
+      if (layoutType == 'grid') {
+        setView('grid')
+      }
       const fullUrl = window.location.href
 
       const responseTag = await fetch(urlTag + 's', {
@@ -708,6 +715,7 @@ const AllCoursesDetails = () => {
             exclusive
             onChange={(e, newView) => {
               if (newView !== null) {
+                localStorage.setItem('layoutType', newView)
                 setView(newView)
               }
             }}

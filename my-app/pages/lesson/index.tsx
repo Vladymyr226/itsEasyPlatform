@@ -43,6 +43,7 @@ import RadioGroup from '@mui/material/RadioGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
+import ConfettiButton from '@/components/ConfettiButton/ConfettiButton'
 
 interface CourseData {
   title: string
@@ -258,34 +259,38 @@ const LessonDetails = () => {
   }, [])
   useEffect(() => {
     if (id && modules) {
-      modules.map((module: any) => {
-        module.lessons.map((less: any) => {
-          if (less.id == id) {
-            setData(undefined)
-            setTimeout(() => {
-              if (less.type == 'practice') {
-                const slateFields = less.data.fields.filter((field: any) => field.type == 'slate')
-                const value = slateFields
-                  .map((field: any) => {
-                    return field.value
-                      .map((line: any) => {
-                        return line.children
-                          .map((finalLine: any) => {
-                            console.log(finalLine)
-                            return finalLine.text
-                          })
-                          .toString()
-                      })
-                      .toString()
-                  })
-                  .toString()
-                setLessonContext(value)
-              }
-              setData(less)
-            }, 1)
-          }
-        })
-      })
+      setCompleteButtonState('ready')
+      setCheckAnswers(false)
+      // setAnswerForm(undefined)
+      getPageData()
+      // modules.map((module: any) => {
+      //   module.lessons.map((less: any) => {
+      //     if (less.id == id) {
+      //       setData(undefined)
+      //       setTimeout(() => {
+      //         if (less.type == 'practice') {
+      //           const slateFields = less.data.fields.filter((field: any) => field.type == 'slate')
+      //           const value = slateFields
+      //             .map((field: any) => {
+      //               return field.value
+      //                 .map((line: any) => {
+      //                   return line.children
+      //                     .map((finalLine: any) => {
+      //                       console.log(finalLine)
+      //                       return finalLine.text
+      //                     })
+      //                     .toString()
+      //                 })
+      //                 .toString()
+      //             })
+      //             .toString()
+      //           setLessonContext(value)
+      //         }
+      //         setData(less)
+      //       }, 1)
+      //     }
+      //   })
+      // })
       getPageData2(id, userData.id)
     }
   }, [id])
@@ -327,6 +332,7 @@ const LessonDetails = () => {
   const [checkAnswers, setCheckAnswers] = useState(false)
   const [resetAnswersBtn, setResetAnswersBtn] = useState(false)
   const [clearCheckBoxes, setClearCheckBoxes] = useState(false)
+  const [completeButtonState, setCompleteButtonState] = useState('ready')
 
   const [message, setMessage] = useState('')
 
@@ -409,7 +415,276 @@ const LessonDetails = () => {
     }
   }
 
-  console.log(chatData)
+  const RatingAndChat = () => {
+    return (
+      <Box>
+        {selectedCourse &&
+          userData &&
+          userData?.purchased_courses_id &&
+          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+            <Box
+              sx={{
+                marginTop: 2,
+                borderRadius: 2,
+                background: 'rgba(197, 142, 254, 0.1)',
+                color: '#fff',
+                padding: 2,
+                display: 'flex',
+                justifyContent: 'space-around',
+              }}
+            >
+              <h3>{t.your_rating}</h3>
+              <Rating
+                disabled={
+                  !(
+                    selectedCourse &&
+                    userData &&
+                    userData?.purchased_courses_id &&
+                    userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                  )
+                }
+                onChange={async (event, newValue) => {
+                  if (newValue) {
+                    if (newValue < 5) {
+                      if (
+                        selectedCourse &&
+                        userData &&
+                        userData?.purchased_courses_id &&
+                        userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                      ) {
+                        const { value: text } = await Swal.fire({
+                          background: '#171622',
+                          color: '#ffec3e',
+                          confirmButtonColor: '#c58efe',
+
+                          input: 'textarea',
+                          title: t.feedbackTitle,
+                          inputPlaceholder: t.typeMessage,
+                          inputAttributes: {
+                            'aria-label': t.typeMessage,
+                          },
+                          showCancelButton: true,
+                          confirmButtonText: t.submit,
+                          cancelButtonText: t.skip,
+                        })
+                        const response = await axios.post(
+                          urlFeedback +
+                            '?userId=' +
+                            userData.id +
+                            '&rating=' +
+                            newValue +
+                            '&lessonId=' +
+                            id +
+                            '&feedbackName=' +
+                            text
+                        )
+                        Swal.fire({
+                          title: t.thanks,
+                          background: '#171622',
+                          color: '#ffec3e',
+                          confirmButtonColor: '#c58efe',
+                        })
+                      }
+                    } else {
+                      Swal.fire({
+                        title: t.thanks,
+                        background: '#171622',
+                        color: '#ffec3e',
+                        confirmButtonColor: '#c58efe',
+                      })
+                    }
+                  }
+                }}
+                emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
+                sx={{
+                  fontSize: 22,
+                  '& .MuiRating-iconFilled': {
+                    color: '#fff', // Color of selected stars
+                  },
+                }}
+              />
+            </Box>
+          )}
+
+        {selectedCourse &&
+          userData &&
+          userId &&
+          userData?.purchased_courses_id &&
+          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+            <Box
+              sx={{
+                marginTop: 2,
+                borderRadius: 2,
+                background: '#201c2d',
+                color: '#fff',
+                padding: 2,
+                paddingRight: 0,
+                display: 'flex',
+                justifyContent: 'space-around',
+              }}
+            >
+              {chatData ? (
+                <Box sx={{ width: '100%' }}>
+                  <h2>{t.askGpt}</h2>
+                  <Box
+                    ref={containerRef}
+                    sx={{
+                      overflow: 'scroll',
+                      scrollbarWidth: 'none',
+                      maxHeight: '20rem',
+                      paddingRight: 2,
+                    }}
+                  >
+                    {chatData.data.messages &&
+                      chatData.data.messages.map((message: any, i: number) => {
+                        return (
+                          <Box
+                            key={'message_' + i}
+                            sx={{
+                              display: 'flex',
+                              justifyContent: message.from == 'user' ? 'end' : 'start',
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                maxWidth: '70%',
+                                background: '#2a2439',
+                                marginTop: 0.5,
+                                marginBottom: 0.5,
+                                whiteSpace: 'pre-wrap',
+                                padding: 1.5,
+                                borderRadius: 2,
+                              }}
+                            >
+                              {message.value}
+                            </Box>
+                          </Box>
+                        )
+                      })}
+                    {dataGpt && (
+                      <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                      </div>
+                    )}
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
+                    <TextField
+                      autoComplete={'off'}
+                      id='standard-name'
+                      fullWidth
+                      placeholder={t.gptPlaceholder}
+                      value={dataGpt ? '' : message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      multiline
+                      inputProps={{ style: { fontSize: 18 } }}
+                      sx={{
+                        width: '100%',
+                        background: '#171622',
+                        '& .MuiInputBase-root': {
+                          color: '#8b8b92',
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#8b8b92',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#28263a',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#28263a',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#28263a',
+                          },
+                        },
+                      }}
+                    />
+                    <Box
+                      sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+                    >
+                      <IconButton
+                        disabled={
+                          questionLimit != null
+                            ? chatData.data.messages.filter(
+                                (message: any) => message.from == 'chat'
+                              ).length >= questionLimit
+                            : false
+                        }
+                        sx={{ background: '#2a2439' }}
+                        onClick={async (e: any) => {
+                          if (message.trim() != '') {
+                            // const response = await axios.put(
+                            //   urlChat +
+                            //     '?lessonId=' +
+                            //     id +
+                            //     '&userId=' +
+                            //     userData.id +
+                            //     '&chatId=' +
+                            //     chatDataId,
+                            //   {
+                            //     messages: chatData.data.messages
+                            //       ? [
+                            //           ...chatData.data.messages,
+                            //           { value: message, from: 'user', time: new Date() },
+                            //         ]
+                            //       : [{ value: message, from: 'user', time: new Date() }],
+                            //   }
+                            // )
+                            // if (response.status == 200) {
+                            setChatData({
+                              ...chatData,
+                              data: {
+                                messages: [
+                                  ...chatData.data.messages,
+                                  { value: message, from: 'user', time: new Date() },
+                                ],
+                              },
+                            })
+                            setDataGpt(true)
+                            setTimeout(() => {
+                              const lastItem = containerRef.current.lastElementChild
+                              if (lastItem) {
+                                lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                              }
+                            }, 1)
+                            setTimeout(() => {
+                              handleGPT()
+                            }, 1000)
+                            // }
+                          }
+                        }}
+                      >
+                        <SendIcon sx={{ color: '#fff' }} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                  {questionLimit != null ? (
+                    <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
+                      {data &&
+                        questionLimit -
+                          chatData.data.messages.filter((message: any) => message.from == 'chat')
+                            .length +
+                          ' ' +
+                          t.requestsLeft}
+                    </Box>
+                  ) : (
+                    <></>
+                  )}
+                </Box>
+              ) : selectedCourse ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <CircularProgress sx={{ color: '#fff' }} />
+                </Box>
+              ) : (
+                <></>
+              )}
+            </Box>
+          )}
+      </Box>
+    )
+  }
   return (
     <Layout>
       <Box
@@ -798,75 +1073,11 @@ const LessonDetails = () => {
                     userData?.comleted_lessons_id.indexOf(id) == -1 && (
                       <>
                         {!resetAnswersBtn && (
-                          <Button
-                            variant='contained'
-                            sx={{ maxWidth: '500px', width: '50%' }}
-                            onClick={async (e) => {
-                              if (data.type == 'default' || data.type == 'practice') {
-                                const response = await axios.put(urlUser + '?id=' + userData.id, {
-                                  purchasedCoursesId: [...userData.purchased_courses_id],
-                                  favouriteCoursesId: [...userData.favourite_courses_id],
-                                  comletedLessonsId: [...userData.comleted_lessons_id, id],
-                                })
-                                const resultResponse = response.data
-                                const userId = localStorage.getItem('UserID')
-                                const responseUser = await fetch(urlUser + '/' + userId, {
-                                  headers: {
-                                    'Content-Type': 'application/json',
-                                  },
-                                })
-                                const resultUser = await responseUser.json()
-                                setCompletedLessonTrigger(!completedLessonTrigger)
-                                setUserData(resultUser)
-                                if (
-                                  resultResponse &&
-                                  moduleLessons &&
-                                  getLessonIndx() >= 0 &&
-                                  getLessonIndx() < moduleLessons?.length - 1
-                                ) {
-                                  setUserData({
-                                    ...userData,
-                                    comleted_lessons_id: [...userData.comleted_lessons_id, id],
-                                  })
-                                  if (moduleLessons) {
-                                    router.replace(
-                                      '/lesson?id=' + moduleLessons[getLessonIndx() + 1]
-                                    )
-                                    setId(Number(moduleLessons[getLessonIndx() + 1]))
-                                  }
-                                } else {
-                                  if (
-                                    resultResponse &&
-                                    Number(localStorage.getItem('SelectedModuleIndex')) <
-                                      (modules?.length ?? 0) - 1
-                                  ) {
-                                    const currentIndex = Number(
-                                      localStorage.getItem('SelectedModuleIndex')
-                                    )
-                                    localStorage.setItem(
-                                      'SelectedModuleIndex',
-                                      '' + (currentIndex + 1)
-                                    )
-                                    setCompletedLessonTrigger(!completedLessonTrigger)
-                                    const lessIndex = Number(
-                                      modules ? modules[currentIndex + 1].lessons[0].id : 0
-                                    )
-                                    router.replace('/lesson?id=' + lessIndex)
-                                    setId(lessIndex)
-                                  }
-                                }
-                              }
-                              if (data.type == 'quiz') {
-                                setCheckAnswers(true)
-                                let result = true
-                                data.data.questions.map((question: any, indx: number) => {
-                                  question.options.map((option: any, optionIndx: number) => {
-                                    if (option.correct != answerForm[indx][optionIndx]) {
-                                      result = false
-                                    }
-                                  })
-                                })
-                                if (result) {
+                          <Box>
+                            <ConfettiButton
+                              completeButtonState={completeButtonState}
+                              onClickFunction={async () => {
+                                if (data.type == 'default' || data.type == 'practice') {
                                   const response = await axios.put(urlUser + '?id=' + userData.id, {
                                     purchasedCoursesId: [...userData.purchased_courses_id],
                                     favouriteCoursesId: [...userData.favourite_courses_id],
@@ -880,22 +1091,201 @@ const LessonDetails = () => {
                                     },
                                   })
                                   const resultUser = await responseUser.json()
-                                  setCompletedLessonTrigger(!completedLessonTrigger)
-                                  setUserData(resultUser)
-                                  Swal.fire({
-                                    title: 'Great job!',
-                                    background: '#171622',
-                                    color: '#ffec3e',
-                                    confirmButtonColor: '#c58efe',
-                                  })
-                                } else {
-                                  setResetAnswersBtn(true)
+                                  setCompleteButtonState('complete')
+                                  setTimeout(() => {
+                                    setCompletedLessonTrigger(!completedLessonTrigger)
+                                    setUserData(resultUser)
+                                    if (
+                                      resultResponse &&
+                                      moduleLessons &&
+                                      getLessonIndx() >= 0 &&
+                                      getLessonIndx() < moduleLessons?.length - 1
+                                    ) {
+                                      setUserData({
+                                        ...userData,
+                                        comleted_lessons_id: [...userData.comleted_lessons_id, id],
+                                      })
+                                      if (moduleLessons) {
+                                        router.replace(
+                                          '/lesson?id=' + moduleLessons[getLessonIndx() + 1]
+                                        )
+                                        setId(Number(moduleLessons[getLessonIndx() + 1]))
+                                      }
+                                    } else {
+                                      if (
+                                        resultResponse &&
+                                        Number(localStorage.getItem('SelectedModuleIndex')) <
+                                          (modules?.length ?? 0) - 1
+                                      ) {
+                                        const currentIndex = Number(
+                                          localStorage.getItem('SelectedModuleIndex')
+                                        )
+                                        localStorage.setItem(
+                                          'SelectedModuleIndex',
+                                          '' + (currentIndex + 1)
+                                        )
+                                        setCompletedLessonTrigger(!completedLessonTrigger)
+                                        const lessIndex = Number(
+                                          modules ? modules[currentIndex + 1].lessons[0].id : 0
+                                        )
+                                        router.replace('/lesson?id=' + lessIndex)
+                                        setId(lessIndex)
+                                      }
+                                    }
+                                    setCompleteButtonState('ready')
+                                  }, 2500)
                                 }
-                              }
-                            }}
-                          >
-                            {t.complete}
-                          </Button>
+                                if (data.type == 'quiz') {
+                                  let result = true
+                                  data.data.questions.map((question: any, indx: number) => {
+                                    question.options.map((option: any, optionIndx: number) => {
+                                      if (option.correct != answerForm[indx][optionIndx]) {
+                                        result = false
+                                      }
+                                    })
+                                  })
+                                  if (result) {
+                                    const response = await axios.put(
+                                      urlUser + '?id=' + userData.id,
+                                      {
+                                        purchasedCoursesId: [...userData.purchased_courses_id],
+                                        favouriteCoursesId: [...userData.favourite_courses_id],
+                                        comletedLessonsId: [...userData.comleted_lessons_id, id],
+                                      }
+                                    )
+                                    const resultResponse = response.data
+                                    const userId = localStorage.getItem('UserID')
+                                    const responseUser = await fetch(urlUser + '/' + userId, {
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                      },
+                                    })
+                                    const resultUser = await responseUser.json()
+                                    setCompleteButtonState('complete')
+
+                                    setTimeout(() => {
+                                      setCompletedLessonTrigger(!completedLessonTrigger)
+                                      setUserData(resultUser)
+
+                                      setCheckAnswers(true)
+                                      Swal.fire({
+                                        title: 'Great job!',
+                                        background: '#171622',
+                                        color: '#ffec3e',
+                                        confirmButtonColor: '#c58efe',
+                                      })
+
+                                      // setCompleteButtonState('ready')
+                                    }, 2500)
+                                  } else {
+                                    setTimeout(() => {
+                                      setCheckAnswers(true)
+                                      setResetAnswersBtn(true)
+                                      setCompleteButtonState('ready')
+                                    }, 2500)
+                                  }
+                                }
+                              }}
+                            />
+                          </Box>
+                          // <Button
+                          //   variant='contained'
+                          //   sx={{ maxWidth: '500px', width: '50%' }}
+                          //   onClick={async (e) => {
+                          //     if (data.type == 'default' || data.type == 'practice') {
+                          //       const response = await axios.put(urlUser + '?id=' + userData.id, {
+                          //         purchasedCoursesId: [...userData.purchased_courses_id],
+                          //         favouriteCoursesId: [...userData.favourite_courses_id],
+                          //         comletedLessonsId: [...userData.comleted_lessons_id, id],
+                          //       })
+                          //       const resultResponse = response.data
+                          //       const userId = localStorage.getItem('UserID')
+                          //       const responseUser = await fetch(urlUser + '/' + userId, {
+                          //         headers: {
+                          //           'Content-Type': 'application/json',
+                          //         },
+                          //       })
+                          //       const resultUser = await responseUser.json()
+                          //       setCompletedLessonTrigger(!completedLessonTrigger)
+                          //       setUserData(resultUser)
+                          //       if (
+                          //         resultResponse &&
+                          //         moduleLessons &&
+                          //         getLessonIndx() >= 0 &&
+                          //         getLessonIndx() < moduleLessons?.length - 1
+                          //       ) {
+                          //         setUserData({
+                          //           ...userData,
+                          //           comleted_lessons_id: [...userData.comleted_lessons_id, id],
+                          //         })
+                          //         if (moduleLessons) {
+                          //           router.replace(
+                          //             '/lesson?id=' + moduleLessons[getLessonIndx() + 1]
+                          //           )
+                          //           setId(Number(moduleLessons[getLessonIndx() + 1]))
+                          //         }
+                          //       } else {
+                          //         if (
+                          //           resultResponse &&
+                          //           Number(localStorage.getItem('SelectedModuleIndex')) <
+                          //             (modules?.length ?? 0) - 1
+                          //         ) {
+                          //           const currentIndex = Number(
+                          //             localStorage.getItem('SelectedModuleIndex')
+                          //           )
+                          //           localStorage.setItem(
+                          //             'SelectedModuleIndex',
+                          //             '' + (currentIndex + 1)
+                          //           )
+                          //           setCompletedLessonTrigger(!completedLessonTrigger)
+                          //           const lessIndex = Number(
+                          //             modules ? modules[currentIndex + 1].lessons[0].id : 0
+                          //           )
+                          //           router.replace('/lesson?id=' + lessIndex)
+                          //           setId(lessIndex)
+                          //         }
+                          //       }
+                          //     }
+                          //     if (data.type == 'quiz') {
+                          //       setCheckAnswers(true)
+                          //       let result = true
+                          //       data.data.questions.map((question: any, indx: number) => {
+                          //         question.options.map((option: any, optionIndx: number) => {
+                          //           if (option.correct != answerForm[indx][optionIndx]) {
+                          //             result = false
+                          //           }
+                          //         })
+                          //       })
+                          //       if (result) {
+                          //         const response = await axios.put(urlUser + '?id=' + userData.id, {
+                          //           purchasedCoursesId: [...userData.purchased_courses_id],
+                          //           favouriteCoursesId: [...userData.favourite_courses_id],
+                          //           comletedLessonsId: [...userData.comleted_lessons_id, id],
+                          //         })
+                          //         const resultResponse = response.data
+                          //         const userId = localStorage.getItem('UserID')
+                          //         const responseUser = await fetch(urlUser + '/' + userId, {
+                          //           headers: {
+                          //             'Content-Type': 'application/json',
+                          //           },
+                          //         })
+                          //         const resultUser = await responseUser.json()
+                          //         setCompletedLessonTrigger(!completedLessonTrigger)
+                          //         setUserData(resultUser)
+                          //         Swal.fire({
+                          //           title: 'Great job!',
+                          //           background: '#171622',
+                          //           color: '#ffec3e',
+                          //           confirmButtonColor: '#c58efe',
+                          //         })
+                          //       } else {
+                          //         setResetAnswersBtn(true)
+                          //       }
+                          //     }
+                          //   }}
+                          // >
+                          //   {t.complete}
+                          // </Button>
                         )}
                         {resetAnswersBtn && (
                           <Button
@@ -1002,271 +1392,13 @@ const LessonDetails = () => {
               <></>
             )}
           </Box>
-          {selectedCourse &&
-            userData &&
-            userData?.purchased_courses_id &&
-            userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
-              <Box
-                sx={{
-                  marginTop: 2,
-                  borderRadius: 2,
-                  background: 'rgba(197, 142, 254, 0.1)',
-                  color: '#fff',
-                  padding: 2,
-                  display: 'flex',
-                  justifyContent: 'space-around',
-                }}
-              >
-                <h3>{t.your_rating}</h3>
-                <Rating
-                  disabled={
-                    !(
-                      selectedCourse &&
-                      userData &&
-                      userData?.purchased_courses_id &&
-                      userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
-                    )
-                  }
-                  onChange={async (event, newValue) => {
-                    if (newValue) {
-                      if (newValue < 5) {
-                        if (
-                          selectedCourse &&
-                          userData &&
-                          userData?.purchased_courses_id &&
-                          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
-                        ) {
-                          const { value: text } = await Swal.fire({
-                            background: '#171622',
-                            color: '#ffec3e',
-                            confirmButtonColor: '#c58efe',
-
-                            input: 'textarea',
-                            title: t.feedbackTitle,
-                            inputPlaceholder: t.typeMessage,
-                            inputAttributes: {
-                              'aria-label': t.typeMessage,
-                            },
-                            showCancelButton: true,
-                            confirmButtonText: t.submit,
-                            cancelButtonText: t.skip,
-                          })
-                          const response = await axios.post(
-                            urlFeedback +
-                              '?userId=' +
-                              userData.id +
-                              '&rating=' +
-                              newValue +
-                              '&lessonId=' +
-                              id +
-                              '&feedbackName=' +
-                              text
-                          )
-                          Swal.fire({
-                            title: t.thanks,
-                            background: '#171622',
-                            color: '#ffec3e',
-                            confirmButtonColor: '#c58efe',
-                          })
-                        }
-                      } else {
-                        Swal.fire({
-                          title: t.thanks,
-                          background: '#171622',
-                          color: '#ffec3e',
-                          confirmButtonColor: '#c58efe',
-                        })
-                      }
-                    }
-                  }}
-                  emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
-                  sx={{
-                    fontSize: 22,
-                    '& .MuiRating-iconFilled': {
-                      color: '#fff', // Color of selected stars
-                    },
-                  }}
-                />
-              </Box>
-            )}
-
-          {selectedCourse &&
-            userData &&
-            userId &&
-            userData?.purchased_courses_id &&
-            userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
-              <Box
-                sx={{
-                  marginTop: 2,
-                  borderRadius: 2,
-                  background: '#201c2d',
-                  color: '#fff',
-                  padding: 2,
-                  paddingRight: 0,
-                  display: 'flex',
-                  justifyContent: 'space-around',
-                }}
-              >
-                {chatData ? (
-                  <Box sx={{ width: '100%' }}>
-                    <h2>{t.askGpt}</h2>
-                    <Box
-                      ref={containerRef}
-                      sx={{
-                        overflow: 'scroll',
-                        scrollbarWidth: 'none',
-                        maxHeight: '20rem',
-                        paddingRight: 2,
-                      }}
-                    >
-                      {chatData.data.messages &&
-                        chatData.data.messages.map((message: any, i: number) => {
-                          return (
-                            <Box
-                              key={'message_' + i}
-                              sx={{
-                                display: 'flex',
-                                justifyContent: message.from == 'user' ? 'end' : 'start',
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  maxWidth: '70%',
-                                  background: '#2a2439',
-                                  marginTop: 0.5,
-                                  marginBottom: 0.5,
-                                  whiteSpace: 'pre-wrap',
-                                  padding: 1.5,
-                                  borderRadius: 2,
-                                }}
-                              >
-                                {message.value}
-                              </Box>
-                            </Box>
-                          )
-                        })}
-                      {dataGpt && (
-                        <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                        </div>
-                      )}
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
-                      <TextField
-                        autoComplete={'off'}
-                        id='standard-name'
-                        fullWidth
-                        placeholder={t.gptPlaceholder}
-                        value={dataGpt ? '' : message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        multiline
-                        inputProps={{ style: { fontSize: 18 } }}
-                        sx={{
-                          width: '100%',
-                          background: '#171622',
-                          '& .MuiInputBase-root': {
-                            color: '#8b8b92',
-                          },
-                          '& .MuiInputLabel-root': {
-                            color: '#8b8b92',
-                          },
-                          '& .MuiOutlinedInput-root': {
-                            '& fieldset': {
-                              borderColor: '#28263a',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: '#28263a',
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: '#28263a',
-                            },
-                          },
-                        }}
-                      />
-                      <Box
-                        sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
-                      >
-                        <IconButton
-                          disabled={
-                            questionLimit != null
-                              ? chatData.data.messages.filter(
-                                  (message: any) => message.from == 'chat'
-                                ).length >= questionLimit
-                              : false
-                          }
-                          sx={{ background: '#2a2439' }}
-                          onClick={async (e: any) => {
-                            if (message.trim() != '') {
-                              // const response = await axios.put(
-                              //   urlChat +
-                              //     '?lessonId=' +
-                              //     id +
-                              //     '&userId=' +
-                              //     userData.id +
-                              //     '&chatId=' +
-                              //     chatDataId,
-                              //   {
-                              //     messages: chatData.data.messages
-                              //       ? [
-                              //           ...chatData.data.messages,
-                              //           { value: message, from: 'user', time: new Date() },
-                              //         ]
-                              //       : [{ value: message, from: 'user', time: new Date() }],
-                              //   }
-                              // )
-                              // if (response.status == 200) {
-                              setChatData({
-                                ...chatData,
-                                data: {
-                                  messages: [
-                                    ...chatData.data.messages,
-                                    { value: message, from: 'user', time: new Date() },
-                                  ],
-                                },
-                              })
-                              setDataGpt(true)
-                              setTimeout(() => {
-                                const lastItem = containerRef.current.lastElementChild
-                                if (lastItem) {
-                                  lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                                }
-                              }, 1)
-                              setTimeout(() => {
-                                handleGPT()
-                              }, 1000)
-                              // }
-                            }
-                          }}
-                        >
-                          <SendIcon sx={{ color: '#fff' }} />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                    {questionLimit != null ? (
-                      <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
-                        {data &&
-                          questionLimit -
-                            chatData.data.messages.filter((message: any) => message.from == 'chat')
-                              .length +
-                            ' ' +
-                            t.requestsLeft}
-                      </Box>
-                    ) : (
-                      <></>
-                    )}
-                  </Box>
-                ) : selectedCourse ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <CircularProgress sx={{ color: '#fff' }} />
-                  </Box>
-                ) : (
-                  <></>
-                )}
-              </Box>
-            )}
+          <Box sx={{ display: { xs: 'none', md: 'inline' } }}>
+            <RatingAndChat />
+          </Box>
         </Box>
+      </Box>
+      <Box sx={{ display: { xs: 'inline', md: 'none' } }}>
+        <RatingAndChat />
       </Box>
     </Layout>
   )

@@ -24,6 +24,7 @@ import Paper from '@mui/material/Paper'
 import { useRouter } from 'next/router'
 import { getLocale } from '@/utils/getLocale'
 import PopularCourses from '@/components/PopularCourses/PopularCourses'
+import ConfettiButton from '@/components/ConfettiButton/ConfettiButton'
 
 interface CourseData {
   title: string
