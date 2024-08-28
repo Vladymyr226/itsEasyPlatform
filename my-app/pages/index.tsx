@@ -65,6 +65,12 @@ export default function HomePage() {
   const [searchField, setSearchField] = useState<string>('')
   async function getPageData() {
     if (typeof window !== 'undefined') {
+      const responseTest = await fetch(testUrl + '?userId=9&lessonId=3', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      console.log(responseTest)
       const responseTag = await fetch(urlTag + 's', {
         headers: {
           'Content-Type': 'application/json',
@@ -132,7 +138,7 @@ export default function HomePage() {
     setDataDisplay(filteredRes)
   }
   const [isShownHints, setIsShownHints] = useState(false)
-
+  const testUrl = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback/id`
   return (
     <Layout>
       <div className={s.homePage}>

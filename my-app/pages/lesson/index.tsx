@@ -44,6 +44,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 import ConfettiButton from '@/components/ConfettiButton/ConfettiButton'
+import courseShadow from '../../src/assets/shadows/courseHoverShadow.png'
+import { styled } from '@mui/material/styles'
 
 interface CourseData {
   title: string
@@ -87,6 +89,272 @@ interface Lesson {
   data: LessonData
   type: string
 }
+
+// ;<Checkbox
+//   defaultChecked={answerForm[indx][optionIndx]}
+//   disabled={checkAnswers}
+//   onChange={(e) => {
+//     let tmpArr: any = answerForm
+//     tmpArr[indx][optionIndx] = e.target.checked
+//     setAnswerForm(tmpArr)
+//   }}
+//   inputProps={{ 'aria-label': 'controlled' }}
+//   style={{}}
+//   sx={{
+//     backgroundColor: '#fff',
+//     background:
+//       checkAnswers && answerForm && (answerForm[indx][optionIndx] || option.correct)
+//         ? answerForm[indx][optionIndx] == option.correct
+//           ? '#008000'
+//           : '#FF0000'
+//         : null,
+//     padding: 0.5,
+//     marginTop: 0.5,
+//     color: '#be89f5',
+//     '&:hover': {
+//       backgroundColor: '#171622',
+//       borderRadius: 0,
+//       padding: 0,
+//       margin: 0.5,
+//       marginTop: 1,
+//     },
+//     '&.Mui-checked': {
+//       color: '#fff',
+//     },
+//   }}
+// />
+
+const BpIcon = styled('span')(({ theme }) => ({
+  borderRadius: 3,
+  marginTop: 3,
+  width: 18,
+  height: 18,
+  backgroundColor: '#312e25',
+  border: '2px solid #c58efe',
+  '.Mui-focusVisible &': {
+    outline: '2px auto rgba(19,124,189,.6)',
+    outlineOffset: 2,
+  },
+  'input:hover ~ &': {
+    border: '2px solid #ffec3e',
+  },
+}))
+
+const BpCheckedIcon = styled(BpIcon)({
+  backgroundColor: '#ffec3e',
+  border: '2px solid #ffec3e',
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath" +
+    " fill='%23312e25' d='M12 5c-.28 0-.53.11-.71.29L7 9.59l-2.29-2.3a1.003 1.003 0 00-1.42 1.42l3 3c.18.18.43.29.71.29s.53-.11.71-.29l5-5A1.003 1.003 0 0012 5z'/%3E%3C/svg%3E\")",
+  '&::before': {
+    display: 'block',
+    content: '""',
+  },
+  // Меняем только цвет стрелки при наведении, если чекбокс нажат
+  'input:checked:hover ~ &': {
+    backgroundColor: '#c58efe',
+  },
+})
+const BpTrueIcon = styled(BpIcon)({
+  backgroundColor: '#008000',
+  border: '2px solid #008000',
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath" +
+    " fill='%23312e25' d='M12 5c-.28 0-.53.11-.71.29L7 9.59l-2.29-2.3a1.003 1.003 0 00-1.42 1.42l3 3c.18.18.43.29.71.29s.53-.11.71-.29l5-5A1.003 1.003 0 0012 5z'/%3E%3C/svg%3E\")",
+  '&::before': {
+    display: 'block',
+    content: '""',
+  },
+  // Меняем только цвет стрелки при наведении, если чекбокс нажат
+  'input:checked:hover ~ &': {
+    backgroundColor: '#c58efe',
+  },
+})
+const BpFalseIcon = styled(BpIcon)({
+  backgroundColor: '#FF0000',
+  border: '2px solid #FF0000',
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath" +
+    " fill='%23312e25' d='M12 5c-.28 0-.53.11-.71.29L7 9.59l-2.29-2.3a1.003 1.003 0 00-1.42 1.42l3 3c.18.18.43.29.71.29s.53-.11.71-.29l5-5A1.003 1.003 0 0012 5z'/%3E%3C/svg%3E\")",
+  '&::before': {
+    display: 'block',
+    content: '""',
+  },
+  // Меняем только цвет стрелки при наведении, если чекбокс нажат
+  'input:checked:hover ~ &': {
+    backgroundColor: '#c58efe',
+  },
+})
+
+// Inspired by blueprintjs
+function BpCheckbox(props: any) {
+  return (
+    <Checkbox
+      sx={{
+        '&:hover': { bgcolor: 'transparent' },
+      }}
+      disableRipple
+      color='default'
+      checkedIcon={
+        props.correct == -1 ? (
+          <BpCheckedIcon />
+        ) : props.correct == 1 ? (
+          <BpTrueIcon />
+        ) : (
+          <BpFalseIcon />
+        )
+      }
+      icon={
+        props.correct == -1 ? <BpIcon /> : props.correct == 1 ? <BpTrueIcon /> : <BpFalseIcon />
+      }
+      inputProps={{ 'aria-label': 'Checkbox demo' }}
+      {...props}
+    />
+  )
+}
+
+// Custom styled components for radio buttons
+const BpIconRadio = styled('span')(({ theme }) => ({
+  borderRadius: '50%', // Make it round for radio
+  marginTop: 3,
+  width: 18,
+  height: 18,
+  backgroundColor: '#312e25',
+  border: '2px solid #c58efe',
+  '.Mui-focusVisible &': {
+    outline: '2px auto rgba(19,124,189,.6)',
+    outlineOffset: 2,
+  },
+  'input:hover ~ &': {
+    border: '2px solid #ffec3e',
+  },
+}))
+const BpIconRadioTrue = styled('span')(({ theme }) => ({
+  borderRadius: '50%', // Make it round for radio
+  marginTop: 3,
+  width: 18,
+  height: 18,
+  backgroundColor: '#008000',
+  border: '2px solid #008000',
+  '.Mui-focusVisible &': {
+    outline: '2px auto rgba(19,124,189,.6)',
+    outlineOffset: 2,
+  },
+  'input:hover ~ &': {
+    border: '2px solid #008000',
+  },
+}))
+const BpIconRadioFalse = styled('span')(({ theme }) => ({
+  borderRadius: '50%', // Make it round for radio
+  marginTop: 3,
+  width: 18,
+  height: 18,
+  backgroundColor: '#FF0000',
+  border: '2px solid #FF0000',
+  '.Mui-focusVisible &': {
+    outline: '2px auto rgba(19,124,189,.6)',
+    outlineOffset: 2,
+  },
+  'input:hover ~ &': {
+    border: '2px solid #FF0000',
+  },
+}))
+
+const BpCheckedIconRadio = styled(BpIcon)({
+  borderRadius: '50%', // Make it round for radio
+  backgroundColor: '#ffec3e',
+  border: '2px solid #ffec3e',
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle" +
+    " fill='%23312e25' cx='8' cy='8' r='5'/%3E%3C/svg%3E\")", // Changed path to circle for radio
+  '&::before': {
+    display: 'block',
+    content: '""',
+  },
+  'input:checked:hover ~ &': {
+    backgroundColor: '#ffec3e',
+  },
+})
+const BpCheckedIconRadioTrue = styled(BpIcon)({
+  borderRadius: '50%', // Make it round for radio
+  backgroundColor: '#008000',
+  border: '2px solid #008000',
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle" +
+    " fill='%23312e25' cx='8' cy='8' r='5'/%3E%3C/svg%3E\")", // Changed path to circle for radio
+  '&::before': {
+    display: 'block',
+    content: '""',
+  },
+  'input:checked:hover ~ &': {
+    backgroundColor: '#008000',
+  },
+})
+const BpCheckedIconRadioFalse = styled(BpIcon)({
+  borderRadius: '50%', // Make it round for radio
+  backgroundColor: '#FF0000',
+  border: '2px solid #FF0000',
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle" +
+    " fill='%23312e25' cx='8' cy='8' r='5'/%3E%3C/svg%3E\")", // Changed path to circle for radio
+  '&::before': {
+    display: 'block',
+    content: '""',
+  },
+  'input:checked:hover ~ &': {
+    backgroundColor: '#FF0000',
+  },
+})
+
+// Custom Radio component
+function BpRadioButton(props: any) {
+  console.log(props.correct)
+  return (
+    <Box
+      className={s.optionWrapper}
+      sx={{
+        position: 'relative',
+        zIndex: 1,
+        // answerForm[indx][optionIndx]
+      }}
+    >
+      <Radio
+        sx={{
+          '&:hover': { bgcolor: 'transparent' },
+        }}
+        disableRipple
+        color='default'
+        checkedIcon={
+          props.correct == -1 ? (
+            <BpCheckedIconRadio />
+          ) : props.correct == 1 ? (
+            <BpCheckedIconRadioTrue />
+          ) : (
+            <BpCheckedIconRadioFalse />
+          )
+        }
+        icon={
+          props.correct == -1 ? (
+            <BpIconRadio />
+          ) : props.correct == 1 ? (
+            <BpIconRadioTrue />
+          ) : (
+            <BpIconRadioFalse />
+          )
+        }
+        inputProps={{ 'aria-label': 'Radio demo' }}
+        {...props}
+      />
+      <Image
+        className={s.shadow}
+        src={courseShadow}
+        alt='shadow'
+        style={props.correct == -1 ? (props.dispayChecked ? { opacity: 1 } : {}) : {}}
+      />
+    </Box>
+  )
+}
+
 const LessonDetails = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Lesson>()
@@ -259,6 +527,7 @@ const LessonDetails = () => {
   }, [])
   useEffect(() => {
     if (id && modules) {
+      gptField.current.value = ''
       setCompleteButtonState('ready')
       setCheckAnswers(false)
       // setAnswerForm(undefined)
@@ -328,13 +597,12 @@ const LessonDetails = () => {
   }
   const router = useRouter()
   const [completedLessonTrigger, setCompletedLessonTrigger] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(false)
   const [answerForm, setAnswerForm] = useState<any>()
   const [checkAnswers, setCheckAnswers] = useState(false)
   const [resetAnswersBtn, setResetAnswersBtn] = useState(false)
   const [clearCheckBoxes, setClearCheckBoxes] = useState(false)
   const [completeButtonState, setCompleteButtonState] = useState('ready')
-
-  const [message, setMessage] = useState('')
 
   const t = getLocale()
 
@@ -355,11 +623,11 @@ const LessonDetails = () => {
               role: 'system',
               content:
                 'You are an assistant for a web application that offers IT courses and should provide brief and accurate answers only to questions on IT topics' +
-                (lessonContext
-                  ? '. Here is the context of the lesson (' + lessonContext + ')'
-                  : '') +
-                '. The answer should be given in the language in which the question is written. Here is the message: ' +
-                message,
+                  (lessonContext
+                    ? '. Here is the context of the lesson (' + lessonContext + ')'
+                    : '') +
+                  '. The answer should be given in the language in which the question is written. Here is the message: ' +
+                  gptField.current.value ?? '',
             },
           ],
         },
@@ -379,11 +647,11 @@ const LessonDetails = () => {
           messages: chatData.data.messages
             ? [
                 ...chatData.data.messages,
-                { value: message, from: 'user', time: new Date() },
+                { value: gptField.current.value ?? '', from: 'user', time: new Date() },
                 { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
               ]
             : [
-                { value: message, from: 'user', time: new Date() },
+                { value: gptField.current.value ?? '', from: 'user', time: new Date() },
                 { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
               ],
         }
@@ -394,7 +662,7 @@ const LessonDetails = () => {
           data: {
             messages: [
               ...chatData.data.messages,
-              { value: message, from: 'user', time: new Date() },
+              { value: gptField.current.value ?? '', from: 'user', time: new Date() },
               { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
             ],
           },
@@ -408,285 +676,23 @@ const LessonDetails = () => {
           }
         }, 1)
       }
-      setMessage('')
+      gptField.current.value = ''
       setDataGpt(false)
     } catch (error) {
       console.error('Ошибка при отправке запроса:', error)
     }
   }
 
-  const RatingAndChat = () => {
-    return (
-      <Box>
-        {selectedCourse &&
-          userData &&
-          userData?.purchased_courses_id &&
-          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
-            <Box
-              sx={{
-                marginTop: 2,
-                borderRadius: 2,
-                background: 'rgba(197, 142, 254, 0.1)',
-                color: '#fff',
-                padding: 2,
-                display: 'flex',
-                justifyContent: 'space-around',
-              }}
-            >
-              <h3>{t.your_rating}</h3>
-              <Rating
-                disabled={
-                  !(
-                    selectedCourse &&
-                    userData &&
-                    userData?.purchased_courses_id &&
-                    userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
-                  )
-                }
-                onChange={async (event, newValue) => {
-                  if (newValue) {
-                    if (newValue < 5) {
-                      if (
-                        selectedCourse &&
-                        userData &&
-                        userData?.purchased_courses_id &&
-                        userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
-                      ) {
-                        const { value: text } = await Swal.fire({
-                          background: '#171622',
-                          color: '#ffec3e',
-                          confirmButtonColor: '#c58efe',
-
-                          input: 'textarea',
-                          title: t.feedbackTitle,
-                          inputPlaceholder: t.typeMessage,
-                          inputAttributes: {
-                            'aria-label': t.typeMessage,
-                          },
-                          showCancelButton: true,
-                          confirmButtonText: t.submit,
-                          cancelButtonText: t.skip,
-                        })
-                        const response = await axios.post(
-                          urlFeedback +
-                            '?userId=' +
-                            userData.id +
-                            '&rating=' +
-                            newValue +
-                            '&lessonId=' +
-                            id +
-                            '&feedbackName=' +
-                            text
-                        )
-                        Swal.fire({
-                          title: t.thanks,
-                          background: '#171622',
-                          color: '#ffec3e',
-                          confirmButtonColor: '#c58efe',
-                        })
-                      }
-                    } else {
-                      Swal.fire({
-                        title: t.thanks,
-                        background: '#171622',
-                        color: '#ffec3e',
-                        confirmButtonColor: '#c58efe',
-                      })
-                    }
-                  }
-                }}
-                emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
-                sx={{
-                  fontSize: 22,
-                  '& .MuiRating-iconFilled': {
-                    color: '#fff', // Color of selected stars
-                  },
-                }}
-              />
-            </Box>
-          )}
-
-        {selectedCourse &&
-          userData &&
-          userId &&
-          userData?.purchased_courses_id &&
-          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
-            <Box
-              sx={{
-                marginTop: 2,
-                borderRadius: 2,
-                background: '#201c2d',
-                color: '#fff',
-                padding: 2,
-                paddingRight: 0,
-                display: 'flex',
-                justifyContent: 'space-around',
-              }}
-            >
-              {chatData ? (
-                <Box sx={{ width: '100%' }}>
-                  <h2>{t.askGpt}</h2>
-                  <Box
-                    ref={containerRef}
-                    sx={{
-                      overflow: 'scroll',
-                      scrollbarWidth: 'none',
-                      maxHeight: '20rem',
-                      paddingRight: 2,
-                    }}
-                  >
-                    {chatData.data.messages &&
-                      chatData.data.messages.map((message: any, i: number) => {
-                        return (
-                          <Box
-                            key={'message_' + i}
-                            sx={{
-                              display: 'flex',
-                              justifyContent: message.from == 'user' ? 'end' : 'start',
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                maxWidth: '70%',
-                                background: '#2a2439',
-                                marginTop: 0.5,
-                                marginBottom: 0.5,
-                                whiteSpace: 'pre-wrap',
-                                padding: 1.5,
-                                borderRadius: 2,
-                              }}
-                            >
-                              {message.value}
-                            </Box>
-                          </Box>
-                        )
-                      })}
-                    {dataGpt && (
-                      <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                      </div>
-                    )}
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
-                    <TextField
-                      autoComplete={'off'}
-                      id='standard-name'
-                      fullWidth
-                      placeholder={t.gptPlaceholder}
-                      value={dataGpt ? '' : message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      multiline
-                      inputProps={{ style: { fontSize: 18 } }}
-                      sx={{
-                        width: '100%',
-                        background: '#171622',
-                        '& .MuiInputBase-root': {
-                          color: '#8b8b92',
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: '#8b8b92',
-                        },
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': {
-                            borderColor: '#28263a',
-                          },
-                          '&:hover fieldset': {
-                            borderColor: '#28263a',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#28263a',
-                          },
-                        },
-                      }}
-                    />
-                    <Box
-                      sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
-                    >
-                      <IconButton
-                        disabled={
-                          questionLimit != null
-                            ? chatData.data.messages.filter(
-                                (message: any) => message.from == 'chat'
-                              ).length >= questionLimit
-                            : false
-                        }
-                        sx={{ background: '#2a2439' }}
-                        onClick={async (e: any) => {
-                          if (message.trim() != '') {
-                            // const response = await axios.put(
-                            //   urlChat +
-                            //     '?lessonId=' +
-                            //     id +
-                            //     '&userId=' +
-                            //     userData.id +
-                            //     '&chatId=' +
-                            //     chatDataId,
-                            //   {
-                            //     messages: chatData.data.messages
-                            //       ? [
-                            //           ...chatData.data.messages,
-                            //           { value: message, from: 'user', time: new Date() },
-                            //         ]
-                            //       : [{ value: message, from: 'user', time: new Date() }],
-                            //   }
-                            // )
-                            // if (response.status == 200) {
-                            setChatData({
-                              ...chatData,
-                              data: {
-                                messages: [
-                                  ...chatData.data.messages,
-                                  { value: message, from: 'user', time: new Date() },
-                                ],
-                              },
-                            })
-                            setDataGpt(true)
-                            setTimeout(() => {
-                              const lastItem = containerRef.current.lastElementChild
-                              if (lastItem) {
-                                lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                              }
-                            }, 1)
-                            setTimeout(() => {
-                              handleGPT()
-                            }, 1000)
-                            // }
-                          }
-                        }}
-                      >
-                        <SendIcon sx={{ color: '#fff' }} />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                  {questionLimit != null ? (
-                    <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
-                      {data &&
-                        questionLimit -
-                          chatData.data.messages.filter((message: any) => message.from == 'chat')
-                            .length +
-                          ' ' +
-                          t.requestsLeft}
-                    </Box>
-                  ) : (
-                    <></>
-                  )}
-                </Box>
-              ) : selectedCourse ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <CircularProgress sx={{ color: '#fff' }} />
-                </Box>
-              ) : (
-                <></>
-              )}
-            </Box>
-          )}
-      </Box>
-    )
+  const gptField = useRef<any>()
+  const textRef = useRef<any>()
+  const showRefContent = () => {
+    console.log('gptField: ' + gptField.current.value)
   }
   return (
     <Layout>
+      <div className='App'>
+        <button onClick={showRefContent}>Click</button>
+      </div>
       <Box
         sx={{
           display: 'flex',
@@ -725,9 +731,11 @@ const LessonDetails = () => {
                   )}
                 </Box>
               )}
-              <h1 style={{ textAlign: 'left', color: '#ffec3e', marginBottom: '20px' }}>
-                <b>{data && data.data.title}</b>
-              </h1>
+              {data.type != 'quiz' && (
+                <h1 style={{ textAlign: 'left', color: '#ffec3e', marginBottom: '20px' }}>
+                  <b>{data && data.data.title}</b>
+                </h1>
+              )}
               <Box>
                 {/* {data.type == 'default' && (
                 <Box sx={{ overflowY: 'auto', scrollbarWidth: 'none' }}>
@@ -831,13 +839,23 @@ const LessonDetails = () => {
                   </Box>
                 )}
                 {data.type == 'quiz' && (
-                  <Box>
+                  <Box
+                    sx={{
+                      background: '#2c223b',
+                      color: '#fff',
+                      borderRadius: '20px',
+                      padding: '20px',
+                    }}
+                  >
+                    <h1 style={{ textAlign: 'left', marginTop: '10px' }}>
+                      <b>{data && data.data.title}</b>
+                    </h1>
                     {data.data.questions.map((question: any, indx: number) => {
                       return (
                         <Box key={'Question_' + indx}>
-                          <h1 style={{ textAlign: 'left', color: '#fff', marginBottom: '20px' }}>
+                          <h2 style={{ textAlign: 'left', color: '#fff', marginBottom: '20px' }}>
                             <b>{indx + 1 + '. ' + question.title}</b>
-                          </h1>
+                          </h2>
                           {question.options.filter((option: any) => option.correct).length > 1 ? (
                             question.options.map((option: any, optionIndx: number) => {
                               return (
@@ -846,32 +864,49 @@ const LessonDetails = () => {
                                   sx={{ display: 'flex', color: '#fff', marginTop: 1 }}
                                 >
                                   {!clearCheckBoxes && (
-                                    <Checkbox
-                                      defaultChecked={answerForm[indx][optionIndx]}
-                                      disabled={checkAnswers}
-                                      onChange={(e) => {
-                                        let tmpArr: any = answerForm
-                                        tmpArr[indx][optionIndx] = e.target.checked
-                                        setAnswerForm(tmpArr)
-                                      }}
-                                      inputProps={{ 'aria-label': 'controlled' }}
+                                    <Box
+                                      className={s.optionWrapper}
                                       sx={{
-                                        background:
+                                        position: 'relative',
+                                        zIndex: 1,
+                                        // answerForm[indx][optionIndx]
+                                      }}
+                                    >
+                                      <BpCheckbox
+                                        defaultChecked={answerForm[indx][optionIndx]}
+                                        disabled={checkAnswers}
+                                        onChange={(e: any) => {
+                                          let tmpArr: any = answerForm
+                                          tmpArr[indx][optionIndx] = e.target.checked
+                                          setAnswerForm(tmpArr)
+                                          setRefreshTrigger(!refreshTrigger)
+                                        }}
+                                        inputProps={{ 'aria-label': 'controlled' }}
+                                        correct={
                                           checkAnswers &&
                                           answerForm &&
                                           (answerForm[indx][optionIndx] || option.correct)
                                             ? answerForm[indx][optionIndx] == option.correct
-                                              ? '#008000'
-                                              : '#FF0000'
-                                            : null,
-                                        padding: 0.5,
-                                        marginTop: 0.5,
-                                        color: '#fff',
-                                        '&.Mui-checked': {
-                                          color: '#fff',
-                                        },
-                                      }}
-                                    />
+                                              ? 1
+                                              : 0
+                                            : -1
+                                        }
+                                      />
+                                      <Image
+                                        className={s.shadow}
+                                        src={courseShadow}
+                                        alt='shadow'
+                                        style={
+                                          checkAnswers &&
+                                          answerForm &&
+                                          (answerForm[indx][optionIndx] || option.correct)
+                                            ? {}
+                                            : answerForm[indx][optionIndx]
+                                            ? { opacity: 1 }
+                                            : {}
+                                        }
+                                      />
+                                    </Box>
                                   )}
                                   <b style={{ marginTop: '10px', marginLeft: '10px' }}>
                                     {option.title}
@@ -907,8 +942,8 @@ const LessonDetails = () => {
                                             },
                                           }}
                                           control={
-                                            <Radio
-                                              onClick={(e) => {
+                                            <BpRadioButton
+                                              onClick={(e: any) => {
                                                 let tmpArr: any = answerForm
                                                 console.log(tmpArr)
                                                 tmpArr[indx] = tmpArr[indx].map(() => {
@@ -917,21 +952,34 @@ const LessonDetails = () => {
 
                                                 tmpArr[indx][optionIndx] = true
                                                 setAnswerForm(tmpArr)
+                                                setRefreshTrigger(!refreshTrigger)
                                               }}
-                                              sx={{
-                                                background:
-                                                  checkAnswers &&
-                                                  answerForm &&
-                                                  (answerForm[indx][optionIndx] || option.correct)
-                                                    ? answerForm[indx][optionIndx] == option.correct
-                                                      ? '#008000'
-                                                      : '#FF0000'
-                                                    : null,
-                                                color: '#fff',
-                                                '&.Mui-disabled': { color: '#fff' },
-                                                '&.Mui-checked': { color: '#fff' },
-                                              }}
+                                              dispayChecked={answerForm[indx][optionIndx]}
+                                              correct={
+                                                checkAnswers &&
+                                                answerForm &&
+                                                (answerForm[indx][optionIndx] || option.correct)
+                                                  ? answerForm[indx][optionIndx] == option.correct
+                                                    ? 1
+                                                    : 0
+                                                  : -1
+                                              }
                                             />
+
+                                            //   sx={{
+                                            //     background:
+                                            //       checkAnswers &&
+                                            //       answerForm &&
+                                            //       (answerForm[indx][optionIndx] || option.correct)
+                                            //         ? answerForm[indx][optionIndx] == option.correct
+                                            //           ? '#008000'
+                                            //           : '#FF0000'
+                                            //         : null,
+                                            //     color: '#fff',
+                                            //     '&.Mui-disabled': { color: '#fff' },
+                                            //     '&.Mui-checked': { color: '#fff' },
+                                            //   }}
+                                            // />
                                           }
                                           label={option.title}
                                         />
@@ -1355,6 +1403,193 @@ const LessonDetails = () => {
                   </Button>
                 )}
               </Box>
+              {selectedCourse &&
+                userData &&
+                userId &&
+                userData?.purchased_courses_id &&
+                userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+                  <Box
+                    sx={{
+                      marginTop: 2,
+                      borderRadius: 2,
+                      background: '#201c2d',
+                      color: '#fff',
+                      padding: 2,
+                      paddingRight: 0,
+                      display: 'flex',
+                      justifyContent: 'space-around',
+                    }}
+                  >
+                    {chatData ? (
+                      <Box sx={{ width: '100%' }}>
+                        <h2>{t.askGpt}</h2>
+                        <Box
+                          ref={containerRef}
+                          sx={{
+                            overflow: 'scroll',
+                            scrollbarWidth: 'none',
+                            maxHeight: '20rem',
+                            paddingRight: 2,
+                          }}
+                        >
+                          {chatData.data.messages &&
+                            chatData.data.messages.map((message: any, i: number) => {
+                              return (
+                                <Box
+                                  key={'message_' + i}
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: message.from == 'user' ? 'end' : 'start',
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      maxWidth: '70%',
+                                      background: '#2a2439',
+                                      marginTop: 0.5,
+                                      marginBottom: 0.5,
+                                      whiteSpace: 'pre-wrap',
+                                      padding: 1.5,
+                                      borderRadius: 2,
+                                    }}
+                                  >
+                                    {message.value}
+                                  </Box>
+                                </Box>
+                              )
+                            })}
+                          {dataGpt && (
+                            <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
+                              <div></div>
+                              <div></div>
+                              <div></div>
+                            </div>
+                          )}
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
+                          <TextField
+                            inputRef={gptField}
+                            autoComplete={'off'}
+                            id='standard-name'
+                            fullWidth
+                            placeholder={t.gptPlaceholder}
+                            multiline
+                            inputProps={{ style: { fontSize: 18 } }}
+                            sx={{
+                              width: '100%',
+                              background: '#171622',
+                              '& .MuiInputBase-root': {
+                                color: '#8b8b92',
+                              },
+                              '& .MuiInputLabel-root': {
+                                color: '#8b8b92',
+                              },
+                              '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                  borderColor: '#28263a',
+                                },
+                                '&:hover fieldset': {
+                                  borderColor: '#28263a',
+                                },
+                                '&.Mui-focused fieldset': {
+                                  borderColor: '#28263a',
+                                },
+                              },
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <IconButton
+                              disabled={
+                                questionLimit != null
+                                  ? chatData.data.messages.filter(
+                                      (message: any) => message.from == 'chat'
+                                    ).length >= questionLimit
+                                  : false
+                              }
+                              sx={{ background: '#2a2439' }}
+                              onClick={async (e: any) => {
+                                if (gptField.current.value.trim() != '') {
+                                  // const response = await axios.put(
+                                  //   urlChat +
+                                  //     '?lessonId=' +
+                                  //     id +
+                                  //     '&userId=' +
+                                  //     userData.id +
+                                  //     '&chatId=' +
+                                  //     chatDataId,
+                                  //   {
+                                  //     messages: chatData.data.messages
+                                  //       ? [
+                                  //           ...chatData.data.messages,
+                                  //           { value: message, from: 'user', time: new Date() },
+                                  //         ]
+                                  //       : [{ value: message, from: 'user', time: new Date() }],
+                                  //   }
+                                  // )
+                                  // if (response.status == 200) {
+                                  setChatData({
+                                    ...chatData,
+                                    data: {
+                                      messages: [
+                                        ...chatData.data.messages,
+                                        {
+                                          value: gptField.current.value ?? '',
+                                          from: 'user',
+                                          time: new Date(),
+                                        },
+                                      ],
+                                    },
+                                  })
+                                  setDataGpt(true)
+                                  setTimeout(() => {
+                                    const lastItem = containerRef.current.lastElementChild
+                                    if (lastItem) {
+                                      lastItem.scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'nearest',
+                                      })
+                                    }
+                                  }, 1)
+                                  setTimeout(() => {
+                                    handleGPT()
+                                  }, 1000)
+                                  // }
+                                }
+                              }}
+                            >
+                              <SendIcon sx={{ color: '#fff' }} />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                        {questionLimit != null ? (
+                          <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
+                            {data &&
+                              questionLimit -
+                                chatData.data.messages.filter(
+                                  (message: any) => message.from == 'chat'
+                                ).length +
+                                ' ' +
+                                t.requestsLeft}
+                          </Box>
+                        ) : (
+                          <></>
+                        )}
+                      </Box>
+                    ) : selectedCourse ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <CircularProgress sx={{ color: '#fff' }} />
+                      </Box>
+                    ) : (
+                      <></>
+                    )}
+                  </Box>
+                )}
             </Box>
           ) : (
             <Box
@@ -1393,12 +1628,188 @@ const LessonDetails = () => {
             )}
           </Box>
           <Box sx={{ display: { xs: 'none', md: 'inline' } }}>
-            <RatingAndChat />
+            <Box>
+              {selectedCourse &&
+                userData &&
+                userData?.purchased_courses_id &&
+                userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+                  <Box
+                    sx={{
+                      marginTop: 2,
+                      borderRadius: 2,
+                      background: 'rgba(197, 142, 254, 0.1)',
+                      color: '#fff',
+                      padding: 2,
+                      display: 'flex',
+                      justifyContent: 'space-around',
+                    }}
+                  >
+                    <h3>{t.your_rating}</h3>
+                    <Rating
+                      disabled={
+                        !(
+                          selectedCourse &&
+                          userData &&
+                          userData?.purchased_courses_id &&
+                          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                        )
+                      }
+                      onChange={async (event, newValue) => {
+                        if (newValue) {
+                          if (newValue < 5) {
+                            if (
+                              selectedCourse &&
+                              userData &&
+                              userData?.purchased_courses_id &&
+                              userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                            ) {
+                              const { value: text } = await Swal.fire({
+                                background: '#171622',
+                                color: '#ffec3e',
+                                confirmButtonColor: '#c58efe',
+
+                                input: 'textarea',
+                                title: t.feedbackTitle,
+                                inputPlaceholder: t.typeMessage,
+                                inputAttributes: {
+                                  'aria-label': t.typeMessage,
+                                },
+                                showCancelButton: true,
+                                confirmButtonText: t.submit,
+                                cancelButtonText: t.skip,
+                              })
+                              const response = await axios.post(
+                                urlFeedback +
+                                  '?userId=' +
+                                  userData.id +
+                                  '&rating=' +
+                                  newValue +
+                                  '&lessonId=' +
+                                  id +
+                                  '&feedbackName=' +
+                                  text
+                              )
+                              Swal.fire({
+                                title: t.thanks,
+                                background: '#171622',
+                                color: '#ffec3e',
+                                confirmButtonColor: '#c58efe',
+                              })
+                            }
+                          } else {
+                            Swal.fire({
+                              title: t.thanks,
+                              background: '#171622',
+                              color: '#ffec3e',
+                              confirmButtonColor: '#c58efe',
+                            })
+                          }
+                        }
+                      }}
+                      emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
+                      sx={{
+                        fontSize: 22,
+                        '& .MuiRating-iconFilled': {
+                          color: '#fff', // Color of selected stars
+                        },
+                      }}
+                    />
+                  </Box>
+                )}
+            </Box>
           </Box>
         </Box>
       </Box>
       <Box sx={{ display: { xs: 'inline', md: 'none' } }}>
-        <RatingAndChat />
+        <Box>
+          {selectedCourse &&
+            userData &&
+            userData?.purchased_courses_id &&
+            userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+              <Box
+                sx={{
+                  marginTop: 2,
+                  borderRadius: 2,
+                  background: 'rgba(197, 142, 254, 0.1)',
+                  color: '#fff',
+                  padding: 2,
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                }}
+              >
+                <h3>{t.your_rating}</h3>
+                <Rating
+                  disabled={
+                    !(
+                      selectedCourse &&
+                      userData &&
+                      userData?.purchased_courses_id &&
+                      userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                    )
+                  }
+                  onChange={async (event, newValue) => {
+                    if (newValue) {
+                      if (newValue < 5) {
+                        if (
+                          selectedCourse &&
+                          userData &&
+                          userData?.purchased_courses_id &&
+                          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                        ) {
+                          const { value: text } = await Swal.fire({
+                            background: '#171622',
+                            color: '#ffec3e',
+                            confirmButtonColor: '#c58efe',
+
+                            input: 'textarea',
+                            title: t.feedbackTitle,
+                            inputPlaceholder: t.typeMessage,
+                            inputAttributes: {
+                              'aria-label': t.typeMessage,
+                            },
+                            showCancelButton: true,
+                            confirmButtonText: t.submit,
+                            cancelButtonText: t.skip,
+                          })
+                          const response = await axios.post(
+                            urlFeedback +
+                              '?userId=' +
+                              userData.id +
+                              '&rating=' +
+                              newValue +
+                              '&lessonId=' +
+                              id +
+                              '&feedbackName=' +
+                              text
+                          )
+                          Swal.fire({
+                            title: t.thanks,
+                            background: '#171622',
+                            color: '#ffec3e',
+                            confirmButtonColor: '#c58efe',
+                          })
+                        }
+                      } else {
+                        Swal.fire({
+                          title: t.thanks,
+                          background: '#171622',
+                          color: '#ffec3e',
+                          confirmButtonColor: '#c58efe',
+                        })
+                      }
+                    }
+                  }}
+                  emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
+                  sx={{
+                    fontSize: 22,
+                    '& .MuiRating-iconFilled': {
+                      color: '#fff', // Color of selected stars
+                    },
+                  }}
+                />
+              </Box>
+            )}
+        </Box>
       </Box>
     </Layout>
   )
