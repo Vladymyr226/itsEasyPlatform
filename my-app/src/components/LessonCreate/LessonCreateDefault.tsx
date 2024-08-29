@@ -552,7 +552,6 @@ const LessonCreateDefault = ({
                   })
                 })
                 if (!found) {
-                  console.log(lessonForm.image)
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
                     title: lessonForm.title,
                     fields: lessonModules,

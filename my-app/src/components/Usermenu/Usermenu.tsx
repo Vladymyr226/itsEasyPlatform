@@ -15,8 +15,16 @@ import { useRouter } from 'next/navigation'
 
 const Usermenu = () => {
   const [isUsermenuShown, setIsUsermenuShown] = useState(false)
+  const [isUsermenuShownForDropModal, setIsUsermenuShownForDropModal] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  useEffect(() => {
+    if (!isUsermenuShownForDropModal) {
+      setTimeout(() => {
+        setIsUsermenuShown(false)
+      }, 200)
+    }
+  }, [isUsermenuShownForDropModal])
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = 'hidden'
@@ -30,12 +38,20 @@ const Usermenu = () => {
   const router = useRouter()
   return (
     <div className={s.userAvatarWrapper}>
-      <div onClick={() => setIsUsermenuShown(true)} className={s.userAvatar}>
+      <div
+        onClick={() => {
+          if (!isUsermenuShown) {
+            setIsUsermenuShown(true)
+            setIsUsermenuShownForDropModal(true)
+          }
+        }}
+        className={s.userAvatar}
+      >
         AB
       </div>
 
       {isUsermenuShown && (
-        <DropModal isUsermenu={true} setIsDropModalShown={setIsUsermenuShown}>
+        <DropModal isUsermenu={true} setIsDropModalShown={setIsUsermenuShownForDropModal}>
           <Link href={'/personal-cabinet/my-courses'}>
             <div className={s.usermenuItem}>
               <Image src={study} alt='study' />

@@ -216,24 +216,6 @@ const CourseDetails = () => {
                           alt='course'
                         />
                         {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
-                        <div className={s.courseStatsWrapper}>
-                          <div
-                            style={{
-                              position: 'absolute',
-                              background: '#000',
-                              borderRadius: '12px',
-                              width: '100%',
-                              height: '100%',
-                              opacity: '0.3',
-                            }}
-                          >
-                            &nbsp;
-                          </div>
-                          <div style={{ padding: '10px', zIndex: 99 }}>
-                            {data && <Rating rating={data?.data.rating} />}
-                            <ViewsCount views={data?.views} />
-                          </div>
-                        </div>
                       </Box>
                     </>
                   ) : (
@@ -245,24 +227,6 @@ const CourseDetails = () => {
                       />
                       {!play && <PlayButton onClickPlay={setPlay} videoRef={videoRef} />}
                       {play && <PauseButton onClickPlay={setPlay} videoRef={videoRef} />}
-                      <div className={s.courseStatsWrapper}>
-                        <div
-                          style={{
-                            position: 'absolute',
-                            background: '#000',
-                            borderRadius: '12px',
-                            width: '100%',
-                            height: '100%',
-                            opacity: '0.3',
-                          }}
-                        >
-                          &nbsp;
-                        </div>
-                        <div style={{ padding: '10px', zIndex: 99 }}>
-                          {data && <Rating rating={data?.data.rating} />}
-                          <ViewsCount views={data?.views} />
-                        </div>
-                      </div>
                     </>
                   )}
                 </>
@@ -386,6 +350,7 @@ const CourseDetails = () => {
                 priceDiscount={data?.data.priceDiscount ?? 0}
                 modules={data?.data.modules}
                 rating={data?.data.rating ?? 0}
+                views={data?.views ?? 0}
               />
             )}
             <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>
@@ -457,6 +422,7 @@ const CourseDetails = () => {
                   priceDiscount={data?.data.priceDiscount ?? 0}
                   modules={data?.data.modules}
                   rating={data?.data.rating ?? 0}
+                  views={data?.views ?? 0}
                 />
               )}
             </div>

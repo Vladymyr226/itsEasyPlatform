@@ -1,16 +1,41 @@
 .courseCard {
+  background: #191825;
+  border-radius: 20px;
   display: flex;
   flex-direction: column-reverse;
   width: 100%;
   justify-content: space-between;
   gap: 35px;
-
+  overflow: hidden;
   margin-top: 80px;
 }
+.shadow {
+  display: block;
 
+  opacity: 0;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  z-index: -1;
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+.courseImageWrapper {
+  position: relative;
+  cursor: pointer;
+}
+.courseImageWrapper:hover .shadow {
+  opacity: 1;
+}
 @media screen and (min-width: 1200px) {
   .courseCard {
-    height: 400px;
+    height: 450px;
+
     margin-top: 150px;
     flex-direction: row;
     gap: 50px;

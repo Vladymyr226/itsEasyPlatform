@@ -308,7 +308,6 @@ const BpCheckedIconRadioFalse = styled(BpIcon)({
 
 // Custom Radio component
 function BpRadioButton(props: any) {
-  console.log(props.correct)
   return (
     <Box
       className={s.optionWrapper}
@@ -402,6 +401,12 @@ const LessonDetails = () => {
               })
             })
           )
+          if (
+            resultUser?.comleted_lessons_id &&
+            resultUser?.comleted_lessons_id.indexOf(id) == -1
+          ) {
+            setCompleteButtonState('ready')
+          }
         }
         if (result.type == 'default') {
           const slateFields = result.data.fields.filter((field: any) => field.type == 'slate')
@@ -411,7 +416,6 @@ const LessonDetails = () => {
                 .map((line: any) => {
                   return line.children
                     .map((finalLine: any) => {
-                      console.log(finalLine)
                       return finalLine.text
                     })
                     .toString()
@@ -429,7 +433,6 @@ const LessonDetails = () => {
                 .map((line: any) => {
                   return line.children
                     .map((finalLine: any) => {
-                      console.log(finalLine)
                       return finalLine.text
                     })
                     .toString()
@@ -506,7 +509,6 @@ const LessonDetails = () => {
           messages: [],
         })
         const resultResponse2 = responsePost.data
-        console.log(resultResponse2)
         if (resultResponse2) {
           setChatData({
             id: resultResponse2.chatId,
@@ -602,7 +604,7 @@ const LessonDetails = () => {
   const [checkAnswers, setCheckAnswers] = useState(false)
   const [resetAnswersBtn, setResetAnswersBtn] = useState(false)
   const [clearCheckBoxes, setClearCheckBoxes] = useState(false)
-  const [completeButtonState, setCompleteButtonState] = useState('ready')
+  const [completeButtonState, setCompleteButtonState] = useState('loading')
 
   const t = getLocale()
 
@@ -684,15 +686,8 @@ const LessonDetails = () => {
   }
 
   const gptField = useRef<any>()
-  const textRef = useRef<any>()
-  const showRefContent = () => {
-    console.log('gptField: ' + gptField.current.value)
-  }
   return (
     <Layout>
-      <div className='App'>
-        <button onClick={showRefContent}>Click</button>
-      </div>
       <Box
         sx={{
           display: 'flex',
@@ -945,7 +940,6 @@ const LessonDetails = () => {
                                             <BpRadioButton
                                               onClick={(e: any) => {
                                                 let tmpArr: any = answerForm
-                                                console.log(tmpArr)
                                                 tmpArr[indx] = tmpArr[indx].map(() => {
                                                   return false
                                                 })
@@ -1118,6 +1112,19 @@ const LessonDetails = () => {
                     userData?.purchased_courses_id &&
                     userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 &&
                     userData?.comleted_lessons_id &&
+                    userData?.comleted_lessons_id.indexOf(id) != -1 &&
+                    data.type == 'quiz' && (
+                      <Box>
+                        <ConfettiButton
+                          completeButtonState={'complete'}
+                          onClickFunction={async () => {}}
+                        />
+                      </Box>
+                    )}
+                  {userData &&
+                    userData?.purchased_courses_id &&
+                    userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 &&
+                    userData?.comleted_lessons_id &&
                     userData?.comleted_lessons_id.indexOf(id) == -1 && (
                       <>
                         {!resetAnswersBtn && (
@@ -1236,104 +1243,6 @@ const LessonDetails = () => {
                               }}
                             />
                           </Box>
-                          // <Button
-                          //   variant='contained'
-                          //   sx={{ maxWidth: '500px', width: '50%' }}
-                          //   onClick={async (e) => {
-                          //     if (data.type == 'default' || data.type == 'practice') {
-                          //       const response = await axios.put(urlUser + '?id=' + userData.id, {
-                          //         purchasedCoursesId: [...userData.purchased_courses_id],
-                          //         favouriteCoursesId: [...userData.favourite_courses_id],
-                          //         comletedLessonsId: [...userData.comleted_lessons_id, id],
-                          //       })
-                          //       const resultResponse = response.data
-                          //       const userId = localStorage.getItem('UserID')
-                          //       const responseUser = await fetch(urlUser + '/' + userId, {
-                          //         headers: {
-                          //           'Content-Type': 'application/json',
-                          //         },
-                          //       })
-                          //       const resultUser = await responseUser.json()
-                          //       setCompletedLessonTrigger(!completedLessonTrigger)
-                          //       setUserData(resultUser)
-                          //       if (
-                          //         resultResponse &&
-                          //         moduleLessons &&
-                          //         getLessonIndx() >= 0 &&
-                          //         getLessonIndx() < moduleLessons?.length - 1
-                          //       ) {
-                          //         setUserData({
-                          //           ...userData,
-                          //           comleted_lessons_id: [...userData.comleted_lessons_id, id],
-                          //         })
-                          //         if (moduleLessons) {
-                          //           router.replace(
-                          //             '/lesson?id=' + moduleLessons[getLessonIndx() + 1]
-                          //           )
-                          //           setId(Number(moduleLessons[getLessonIndx() + 1]))
-                          //         }
-                          //       } else {
-                          //         if (
-                          //           resultResponse &&
-                          //           Number(localStorage.getItem('SelectedModuleIndex')) <
-                          //             (modules?.length ?? 0) - 1
-                          //         ) {
-                          //           const currentIndex = Number(
-                          //             localStorage.getItem('SelectedModuleIndex')
-                          //           )
-                          //           localStorage.setItem(
-                          //             'SelectedModuleIndex',
-                          //             '' + (currentIndex + 1)
-                          //           )
-                          //           setCompletedLessonTrigger(!completedLessonTrigger)
-                          //           const lessIndex = Number(
-                          //             modules ? modules[currentIndex + 1].lessons[0].id : 0
-                          //           )
-                          //           router.replace('/lesson?id=' + lessIndex)
-                          //           setId(lessIndex)
-                          //         }
-                          //       }
-                          //     }
-                          //     if (data.type == 'quiz') {
-                          //       setCheckAnswers(true)
-                          //       let result = true
-                          //       data.data.questions.map((question: any, indx: number) => {
-                          //         question.options.map((option: any, optionIndx: number) => {
-                          //           if (option.correct != answerForm[indx][optionIndx]) {
-                          //             result = false
-                          //           }
-                          //         })
-                          //       })
-                          //       if (result) {
-                          //         const response = await axios.put(urlUser + '?id=' + userData.id, {
-                          //           purchasedCoursesId: [...userData.purchased_courses_id],
-                          //           favouriteCoursesId: [...userData.favourite_courses_id],
-                          //           comletedLessonsId: [...userData.comleted_lessons_id, id],
-                          //         })
-                          //         const resultResponse = response.data
-                          //         const userId = localStorage.getItem('UserID')
-                          //         const responseUser = await fetch(urlUser + '/' + userId, {
-                          //           headers: {
-                          //             'Content-Type': 'application/json',
-                          //           },
-                          //         })
-                          //         const resultUser = await responseUser.json()
-                          //         setCompletedLessonTrigger(!completedLessonTrigger)
-                          //         setUserData(resultUser)
-                          //         Swal.fire({
-                          //           title: 'Great job!',
-                          //           background: '#171622',
-                          //           color: '#ffec3e',
-                          //           confirmButtonColor: '#c58efe',
-                          //         })
-                          //       } else {
-                          //         setResetAnswersBtn(true)
-                          //       }
-                          //     }
-                          //   }}
-                          // >
-                          //   {t.complete}
-                          // </Button>
                         )}
                         {resetAnswersBtn && (
                           <Button
@@ -1356,6 +1265,7 @@ const LessonDetails = () => {
                             Reset quiz
                           </Button>
                         )}
+                        {}
                       </>
                     )}
                 </Box>
@@ -1403,7 +1313,8 @@ const LessonDetails = () => {
                   </Button>
                 )}
               </Box>
-              {selectedCourse &&
+              {questionLimit != -1 &&
+                selectedCourse &&
                 userData &&
                 userId &&
                 userData?.purchased_courses_id &&
@@ -1506,7 +1417,7 @@ const LessonDetails = () => {
                           >
                             <IconButton
                               disabled={
-                                questionLimit != null
+                                questionLimit && questionLimit != 0
                                   ? chatData.data.messages.filter(
                                       (message: any) => message.from == 'chat'
                                     ).length >= questionLimit
@@ -1567,7 +1478,7 @@ const LessonDetails = () => {
                             </IconButton>
                           </Box>
                         </Box>
-                        {questionLimit != null ? (
+                        {questionLimit != null && questionLimit != 0 ? (
                           <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
                             {data &&
                               questionLimit -

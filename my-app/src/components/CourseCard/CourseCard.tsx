@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import CourseDescription from '../CourseDescription/CourseDescription'
 import CourseImage from '../CourseImage/CourseImage'
 import s from './CourseCard.module.css'
+import courseShadow from '../../../src/assets/shadows/courseHoverShadow.png'
+import Image from 'next/image'
 
 interface CourseCardProps {
   title: string
@@ -29,24 +31,27 @@ const CourseCard = (props: CourseCardProps) => {
   }, [])
 
   return (
-    <div className={`${s.courseCard} ${props.toLeft ? s.reverse : ''}`}>
-      <CourseDescription
-        title={props.title}
-        language={props.language}
-        level={props.level}
-        date={props.date}
-        type={props.type}
-        description={props.description}
-        rating={props.rating}
-        id={props.id}
-        mediaValue={props.mediaValue}
-        createdAt={props.createdAt}
-        views={props.views}
-      />
+    <div className={`${s.courseImageWrapper} `}>
+      <div className={`${s.courseCard} ${props.toLeft ? s.reverse : ''}`}>
+        <CourseDescription
+          title={props.title}
+          language={props.language}
+          level={props.level}
+          date={props.date}
+          type={props.type}
+          description={props.description}
+          rating={props.rating}
+          id={props.id}
+          mediaValue={props.mediaValue}
+          createdAt={props.createdAt}
+          views={props.views}
+        />
 
-      {width >= 1200 && (
-        <CourseImage mediaValue={props.mediaValue} rating={props.rating} views={props.views} />
-      )}
+        {width >= 1200 && (
+          <CourseImage mediaValue={props.mediaValue} rating={props.rating} views={props.views} />
+        )}
+        <Image className={s.shadow} src={courseShadow} alt='shadow' />
+      </div>
     </div>
   )
 }

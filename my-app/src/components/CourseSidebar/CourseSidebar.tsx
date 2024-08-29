@@ -94,6 +94,7 @@ const CourseSidebar = ({
   groupPrice,
   rating,
   duration,
+  views,
 }: {
   duration: number
   price: number
@@ -102,6 +103,7 @@ const CourseSidebar = ({
   lessonsNum: number
   groupPrice?: number
   rating: number
+  views: number
 }) => {
   const [width, setWidth] = useState(0)
   const [lessonsSum, setLessonsSum] = useState(0)
@@ -155,6 +157,7 @@ const CourseSidebar = ({
 
       <div className={s.courseStatsWrapper}>
         <Rating rating={rating} isBig={true} />
+        <ViewsCount views={views} />
         {/* <ViewsCount /> */}
       </div>
 

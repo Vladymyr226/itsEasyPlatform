@@ -37,7 +37,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
   }, [])
   const t = getLocale()
   return (
-    <div className={s.courseDescription}>
+    <div className={s.courseDescription} style={{ padding: '20px' }}>
       <div className={s.descHeader}>
         <h2 className={s.descTitle}>
           {props.title}

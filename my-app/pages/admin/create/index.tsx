@@ -257,7 +257,9 @@ const CourseCreate = () => {
       language == '' ||
       level == '' ||
       type == '' ||
-      status == ''
+      status == '' ||
+      form.questionLimit == null ||
+      form.questionLimit < -1
     ) {
       Swal.fire({
         title: 'Validation failed!',
@@ -510,7 +512,6 @@ const CourseCreate = () => {
         const resultData = result.getCourses.filter(
           (course: any) => course.id == fullUrl.split('_id=')[1]
         )
-        console.log(resultLesson.getLessons)
         let allLessons = resultLesson.getLessons.map((lesson: any) => {
           return {
             id: lesson.id,
@@ -1195,6 +1196,7 @@ const CourseCreate = () => {
                       <Button onClick={showSwalSkill}>Create skill</Button>
                       <TextField
                         fullWidth
+                        required
                         autoComplete='off'
                         margin='normal'
                         id='QuestionLimit'
@@ -1205,12 +1207,13 @@ const CourseCreate = () => {
                           inputProps: { min: -1 },
                         }}
                         onChange={(e) => {
+                          setEditTrigger(true)
                           setForm({
                             ...form,
                             questionLimit: Number(e.target.value),
                           })
                         }}
-                        value={form.questionLimit || -1}
+                        value={form.questionLimit ? form.questionLimit : null}
                         sx={{ ...textFieldColors }}
                       />
                       {typeof mediaValue?.content == 'string' && (

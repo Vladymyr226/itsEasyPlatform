@@ -20,7 +20,9 @@ const DropModal = ({ children, setIsDropModalShown, indents, isUsermenu }: DropM
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (divRef.current && !divRef.current.contains(event.target as Node)) {
+        // setTimeout(() => {
         setIsDropModalShown(false)
+        // }, 200)
       }
     }
 

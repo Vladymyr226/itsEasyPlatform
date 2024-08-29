@@ -70,7 +70,6 @@ export default function HomePage() {
           'Content-Type': 'application/json',
         },
       })
-      console.log(responseTest)
       const responseTag = await fetch(urlTag + 's', {
         headers: {
           'Content-Type': 'application/json',

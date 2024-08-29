@@ -7,7 +7,29 @@
 
   margin-top: 35px;
 }
+.shadow {
+  display: block;
 
+  opacity: 0;
+  left: 50%;
+  top: 53%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  z-index: -1;
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+.courseImageWrapper {
+  position: relative;
+  cursor: pointer;
+}
+.courseImageWrapper:hover .shadow {
+  opacity: 1;
+}
 .priceWrapper {
   display: flex;
   align-items: center;
