@@ -99,6 +99,8 @@ export const ua = {
   reset_password: 'Скидання пароля',
   confirm: 'Підтвердити',
   requestsLeft: 'питань залишилось',
-  askGpt: 'Задати питання',
+  askGpt: 'Задайте запитання AI-Tutor',
   gptPlaceholder: 'Напишіть своє запитання тут',
+  hourShort: 'год',
+  minuteShort: 'хв',
 }

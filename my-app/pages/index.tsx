@@ -344,7 +344,7 @@ export default function HomePage() {
               )
             })
           ) : (
-            <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '150px' }}>
+            <h1 style={{ color: '#c7c6c6', textAlign: 'center', marginTop: '150px' }}>
               {t.nothing_found}
             </h1>
           )

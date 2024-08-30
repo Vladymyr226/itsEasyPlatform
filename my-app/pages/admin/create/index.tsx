@@ -158,6 +158,8 @@ const CourseCreate = () => {
     title: '',
     link: '',
     image: '',
+    hours: 0,
+    minutes: 0,
   })
   const [preview, setPreview] = useState('-1')
   const [editTrigger, setEditTrigger] = useState(false)
@@ -171,6 +173,8 @@ const CourseCreate = () => {
       title: '',
       link: '',
       image: '',
+      hours: 0,
+      minutes: 0,
     })
     setRichValueLesson([
       {
@@ -1275,6 +1279,8 @@ const CourseCreate = () => {
                                 title: '',
                                 link: '',
                                 image: '',
+                                hours: 0,
+                                minutes: 0,
                               })
                               let selectedModulesArr: Array<Lesson> = []
                               modules.map((module: Module) => {
@@ -1320,7 +1326,9 @@ const CourseCreate = () => {
                             fontWeight: 'bold',
                           }}
                           onClick={(e) => {
-                            handleSubmit('')
+                            if (!id && editTrigger) {
+                              handleSubmit('')
+                            }
                             setValue(1)
                           }}
                         >
@@ -1642,6 +1650,8 @@ const CourseCreate = () => {
                                         setLessonForm({
                                           title: '',
                                           image: null,
+                                          hours: 0,
+                                          minutes: 0,
                                         })
                                         setRichValueLesson([
                                           {

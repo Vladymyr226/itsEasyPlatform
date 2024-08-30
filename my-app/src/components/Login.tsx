@@ -23,10 +23,10 @@ const textFieldColors = {
       borderColor: '#ffec3e',
     },
   },
-  color: '#fff',
+  color: '#c7c6c6',
   input: {
-    color: '#fff',
-    borderColor: '#fff',
+    color: '#c7c6c6',
+    borderColor: '#c7c6c6',
   },
 }
 const url = `${process.env.NEXT_BACK_HOST_API}/auth/login?`
@@ -159,7 +159,7 @@ const Login = () => {
             textAlign: 'right',
             fontSize: '14px',
             '&:hover': {
-              color: '#fff',
+              color: '#c7c6c6',
               cursor: 'pointer',
             },
           }}
@@ -195,7 +195,7 @@ const Login = () => {
                 textAlign: 'right',
                 fontSize: '14px',
                 '&:hover': {
-                  color: '#fff',
+                  color: '#c7c6c6',
                   cursor: 'pointer',
                 },
               }}

@@ -51,7 +51,7 @@ const LanguageSwitcher = () => {
           >
             <div style={{ height: '20px', width: '20px' }}>
               <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 6' width='35' height='20'>
-                <rect fill='#fff' width='9' height='3' />
+                <rect fill='#c7c6c6' width='9' height='3' />
                 <rect fill='#d52b1e' y='3' width='9' height='3' />
                 <rect fill='#0039a6' y='2' width='9' height='2' />
               </svg>
@@ -98,7 +98,7 @@ const LanguageSwitcher = () => {
                   <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
                 </clipPath>
                 <path d='M0,0v30h50v-30z' fill='#012169' />
-                <path d='M0,0 50,30M50,0 0,30' stroke='#fff' stroke-width='6' />
+                <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' stroke-width='6' />
                 <path
                   d='M0,0 50,30M50,0 0,30'
                   clip-path='url(#t)'
@@ -108,7 +108,7 @@ const LanguageSwitcher = () => {
                 <path
                   d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
                   fill='#C8102E'
-                  stroke='#FFF'
+                  stroke='#c7c6c6'
                   stroke-width='2'
                 />
               </svg>
@@ -149,7 +149,7 @@ const LanguageSwitcher = () => {
             >
               <div style={{ height: '20px', width: '20px' }}>
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 6' width='35' height='20'>
-                  <rect fill='#fff' width='9' height='3' />
+                  <rect fill='#c7c6c6' width='9' height='3' />
                   <rect fill='#d52b1e' y='3' width='9' height='3' />
                   <rect fill='#0039a6' y='2' width='9' height='2' />
                 </svg>
@@ -208,7 +208,7 @@ const LanguageSwitcher = () => {
                     <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
                   </clipPath>
                   <path d='M0,0v30h50v-30z' fill='#012169' />
-                  <path d='M0,0 50,30M50,0 0,30' stroke='#fff' stroke-width='6' />
+                  <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' stroke-width='6' />
                   <path
                     d='M0,0 50,30M50,0 0,30'
                     clip-path='url(#t)'
@@ -218,7 +218,7 @@ const LanguageSwitcher = () => {
                   <path
                     d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
                     fill='#C8102E'
-                    stroke='#FFF'
+                    stroke='#c7c6c6'
                     stroke-width='2'
                   />
                 </svg>

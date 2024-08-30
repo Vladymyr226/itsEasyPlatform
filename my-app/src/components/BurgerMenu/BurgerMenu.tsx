@@ -60,7 +60,7 @@ const BurgerMenu = () => {
               <Link href={'/'}>
                 <li
                   className={targetSite == '' ? s.active : ''}
-                  style={{ color: targetSite != '' ? '#fff' : '' }}
+                  style={{ color: targetSite != '' ? '#c7c6c6' : '' }}
                 >
                   {t.home}
                 </li>
@@ -68,7 +68,7 @@ const BurgerMenu = () => {
               <Link href={'/allCourses'}>
                 <li
                   className={targetSite == 'allCourses' ? s.active : ''}
-                  style={{ color: targetSite != 'allCourses' ? '#fff' : '' }}
+                  style={{ color: targetSite != 'allCourses' ? '#c7c6c6' : '' }}
                 >
                   {t.courses}
                 </li>

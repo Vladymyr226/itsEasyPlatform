@@ -16,7 +16,7 @@
   left: 50%;
   top: 60%;
   transform: translate(-50%, -50%);
-  width: 120%;
+  width: 110%;
   height: 120%;
   z-index: -1;
   position: absolute;
@@ -36,7 +36,7 @@
   .courseCard {
     height: 450px;
 
-    margin-top: 150px;
+    margin-top: 75px;
     flex-direction: row;
     gap: 50px;
   }

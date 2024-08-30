@@ -101,7 +101,7 @@ interface Lesson {
 //   inputProps={{ 'aria-label': 'controlled' }}
 //   style={{}}
 //   sx={{
-//     backgroundColor: '#fff',
+//     backgroundColor: '#c7c6c6',
 //     background:
 //       checkAnswers && answerForm && (answerForm[indx][optionIndx] || option.correct)
 //         ? answerForm[indx][optionIndx] == option.correct
@@ -119,7 +119,7 @@ interface Lesson {
 //       marginTop: 1,
 //     },
 //     '&.Mui-checked': {
-//       color: '#fff',
+//       color: '#c7c6c6',
 //     },
 //   }}
 // />
@@ -735,7 +735,7 @@ const LessonDetails = () => {
                 {/* {data.type == 'default' && (
                 <Box sx={{ overflowY: 'auto', scrollbarWidth: 'none' }}>
                   <Box
-                    sx={{ width: '100%', height: 'max-content', color: '#fff', padding: '15px' }}
+                    sx={{ width: '100%', height: 'max-content', color: '#c7c6c6', padding: '15px' }}
                   >
                     <SlateView value={data && data.data.description} />
                   </Box>
@@ -752,7 +752,7 @@ const LessonDetails = () => {
                                 sx={{
                                   width: '100%',
                                   height: 'max-content',
-                                  color: '#fff',
+                                  color: '#c7c6c6',
                                   padding: '15px',
                                 }}
                               >
@@ -775,7 +775,7 @@ const LessonDetails = () => {
                               //   sx={{
                               //     width: '100%',
                               //     height: '900px',
-                              //     color: '#fff',
+                              //     color: '#c7c6c6',
                               //     padding: '15px',
                               //   }}
                               // >
@@ -784,7 +784,7 @@ const LessonDetails = () => {
                               <Box
                                 sx={{
                                   width: '100%',
-                                  color: '#fff',
+                                  color: '#c7c6c6',
                                   padding: '15px',
                                 }}
                               >
@@ -809,7 +809,7 @@ const LessonDetails = () => {
                                 sx={{
                                   width: '100%',
                                   height: 'max-content',
-                                  color: '#fff',
+                                  color: '#c7c6c6',
                                   padding: '15px',
                                 }}
                               >
@@ -821,7 +821,7 @@ const LessonDetails = () => {
                                 sx={{
                                   width: '100%',
                                   height: 'max-content',
-                                  color: '#fff',
+                                  color: '#c7c6c6',
                                   padding: '15px',
                                 }}
                               >
@@ -837,7 +837,7 @@ const LessonDetails = () => {
                   <Box
                     sx={{
                       background: '#2c223b',
-                      color: '#fff',
+                      color: '#c7c6c6',
                       borderRadius: '20px',
                       padding: '20px',
                     }}
@@ -848,7 +848,7 @@ const LessonDetails = () => {
                     {data.data.questions.map((question: any, indx: number) => {
                       return (
                         <Box key={'Question_' + indx}>
-                          <h2 style={{ textAlign: 'left', color: '#fff', marginBottom: '20px' }}>
+                          <h2 style={{ textAlign: 'left', color: '#c7c6c6', marginBottom: '20px' }}>
                             <b>{indx + 1 + '. ' + question.title}</b>
                           </h2>
                           {question.options.filter((option: any) => option.correct).length > 1 ? (
@@ -856,7 +856,7 @@ const LessonDetails = () => {
                               return (
                                 <Box
                                   key={'QuestionOption_' + indx}
-                                  sx={{ display: 'flex', color: '#fff', marginTop: 1 }}
+                                  sx={{ display: 'flex', color: '#c7c6c6', marginTop: 1 }}
                                 >
                                   {!clearCheckBoxes && (
                                     <Box
@@ -914,7 +914,7 @@ const LessonDetails = () => {
                               key={'QuestionOption_' + indx}
                               sx={{
                                 display: 'flex',
-                                color: '#fff',
+                                color: '#c7c6c6',
                                 marginTop: 1,
                                 paddingLeft: 1.5,
                               }}
@@ -931,9 +931,9 @@ const LessonDetails = () => {
                                           key={'QuestionOption_' + indx + '_' + option.title}
                                           value={option.title}
                                           sx={{
-                                            color: '#fff',
+                                            color: '#c7c6c6',
                                             '& .MuiFormControlLabel-label.Mui-disabled': {
-                                              color: '#fff !important',
+                                              color: '#c7c6c6 !important',
                                             },
                                           }}
                                           control={
@@ -969,9 +969,9 @@ const LessonDetails = () => {
                                             //           ? '#008000'
                                             //           : '#FF0000'
                                             //         : null,
-                                            //     color: '#fff',
-                                            //     '&.Mui-disabled': { color: '#fff' },
-                                            //     '&.Mui-checked': { color: '#fff' },
+                                            //     color: '#c7c6c6',
+                                            //     '&.Mui-disabled': { color: '#c7c6c6' },
+                                            //     '&.Mui-checked': { color: '#c7c6c6' },
                                             //   }}
                                             // />
                                           }
@@ -1000,7 +1000,7 @@ const LessonDetails = () => {
                                 sx={{
                                   width: '100%',
                                   height: 'max-content',
-                                  color: '#fff',
+                                  color: '#c7c6c6',
                                   padding: '15px',
                                 }}
                               >
@@ -1023,7 +1023,7 @@ const LessonDetails = () => {
                                 sx={{
                                   width: '100%',
                                   height: 'max-content',
-                                  color: '#fff',
+                                  color: '#c7c6c6',
                                   padding: '15px',
                                 }}
                               >
@@ -1048,7 +1048,7 @@ const LessonDetails = () => {
                                 sx={{
                                   width: '100%',
                                   height: 'max-content',
-                                  color: '#fff',
+                                  color: '#c7c6c6',
                                   padding: '15px',
                                 }}
                               >
@@ -1102,7 +1102,7 @@ const LessonDetails = () => {
                       }
                     }}
                     startIcon={<ArrowBackIosIcon />}
-                    sx={{ color: '#fff' }}
+                    sx={{ color: '#c7c6c6' }}
                   >
                     {t.previous}
                   </Button>
@@ -1307,7 +1307,7 @@ const LessonDetails = () => {
                       }
                     }}
                     endIcon={<ArrowForwardIosIcon />}
-                    sx={{ color: '#fff' }}
+                    sx={{ color: '#c7c6c6' }}
                   >
                     {t.next}
                   </Button>
@@ -1324,7 +1324,7 @@ const LessonDetails = () => {
                       marginTop: 2,
                       borderRadius: 2,
                       background: '#201c2d',
-                      color: '#fff',
+                      color: '#c7c6c6',
                       padding: 2,
                       paddingRight: 0,
                       display: 'flex',
@@ -1333,7 +1333,7 @@ const LessonDetails = () => {
                   >
                     {chatData ? (
                       <Box sx={{ width: '100%' }}>
-                        <h2>{t.askGpt}</h2>
+                        <h2 style={{ color: '#ffec3e' }}>{t.askGpt}</h2>
                         <Box
                           ref={containerRef}
                           sx={{
@@ -1474,12 +1474,12 @@ const LessonDetails = () => {
                                 }
                               }}
                             >
-                              <SendIcon sx={{ color: '#fff' }} />
+                              <SendIcon sx={{ color: '#c7c6c6' }} />
                             </IconButton>
                           </Box>
                         </Box>
                         {questionLimit != null && questionLimit != 0 ? (
-                          <Box sx={{ color: '#fff', marginTop: '5px', marginLeft: '10px' }}>
+                          <Box sx={{ color: '#c7c6c6', marginTop: '5px', marginLeft: '10px' }}>
                             {data &&
                               questionLimit -
                                 chatData.data.messages.filter(
@@ -1494,7 +1494,7 @@ const LessonDetails = () => {
                       </Box>
                     ) : selectedCourse ? (
                       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <CircularProgress sx={{ color: '#fff' }} />
+                        <CircularProgress sx={{ color: '#c7c6c6' }} />
                       </Box>
                     ) : (
                       <></>
@@ -1532,7 +1532,7 @@ const LessonDetails = () => {
               <Box
                 sx={{ display: 'flex', justifyContent: 'center', marginTop: 10, marginBottom: 10 }}
               >
-                <CircularProgress sx={{ color: '#fff' }} />
+                <CircularProgress sx={{ color: '#c7c6c6' }} />
               </Box>
             ) : (
               <></>
@@ -1549,7 +1549,7 @@ const LessonDetails = () => {
                       marginTop: 2,
                       borderRadius: 2,
                       background: 'rgba(197, 142, 254, 0.1)',
-                      color: '#fff',
+                      color: '#c7c6c6',
                       padding: 2,
                       display: 'flex',
                       justifyContent: 'space-around',
@@ -1621,7 +1621,7 @@ const LessonDetails = () => {
                       sx={{
                         fontSize: 22,
                         '& .MuiRating-iconFilled': {
-                          color: '#fff', // Color of selected stars
+                          color: '#ffec3e', // Color of selected stars
                         },
                       }}
                     />
@@ -1642,7 +1642,7 @@ const LessonDetails = () => {
                   marginTop: 2,
                   borderRadius: 2,
                   background: 'rgba(197, 142, 254, 0.1)',
-                  color: '#fff',
+                  color: '#c7c6c6',
                   padding: 2,
                   display: 'flex',
                   justifyContent: 'space-around',
@@ -1714,7 +1714,7 @@ const LessonDetails = () => {
                   sx={{
                     fontSize: 22,
                     '& .MuiRating-iconFilled': {
-                      color: '#fff', // Color of selected stars
+                      color: '#ffec3e', // Color of selected stars
                     },
                   }}
                 />

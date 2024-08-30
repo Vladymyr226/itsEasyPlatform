@@ -129,7 +129,7 @@
 
 @media screen and (min-width: 800px) {
   .titleRight {
-    margin-right: -40px;
+    margin-right: -20px;
     min-width: 120px;
     align-items: center;
 
@@ -148,7 +148,7 @@
   }
 
   .titleRight {
-    margin-right: -40px;
+    margin-right: -20px;
     min-width: 120px;
     align-items: center;
 

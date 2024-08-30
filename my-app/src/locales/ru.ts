@@ -99,6 +99,8 @@ export const ru = {
   reset_password: 'Сброс пароля',
   confirm: 'Подтвердить',
   requestsLeft: 'вопросов осталось',
-  askGpt: 'Задать вопрос',
+  askGpt: 'Задайте вопрос AI-Tutor',
   gptPlaceholder: 'Введите свой вопрос здесь',
+  hourShort: 'ч',
+  minuteShort: 'мин',
 }

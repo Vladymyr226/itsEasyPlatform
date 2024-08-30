@@ -174,7 +174,7 @@ const MyCourses = () => {
   return (
     <Layout>
       <Box sx={{ display: 'inline' }}>
-        <Box sx={{ width: '100%', color: '#fff', minHeight: '40rem' }}>
+        <Box sx={{ width: '100%', color: '#c7c6c6', minHeight: '40rem' }}>
           <Grid
             container
             sx={{ gap: 20, justifyContent: { xs: 'center', md: 'left' }, paddingTop: 10 }}
@@ -191,7 +191,7 @@ const MyCourses = () => {
                   )
                 })
               ) : (
-                <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                <h1 style={{ color: '#c7c6c6', textAlign: 'center', marginTop: '100px' }}>
                   Nothing was found
                 </h1>
               )

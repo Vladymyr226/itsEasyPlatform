@@ -34,7 +34,7 @@
   outline: none;
 }
 .textOutput {
-  background: #fff;
+  background: #c7c6c6;
   overflow: scroll;
 }
 .codeToTextWrapper button {
@@ -47,10 +47,10 @@
 }
 .done {
   background: #44c767;
-  color: #fff;
+  color: #c7c6c6;
 }
 .clear {
-  background: #fff;
+  background: #c7c6c6;
   color: #a9a4a4;
   border: 1px solid lightgray;
 }

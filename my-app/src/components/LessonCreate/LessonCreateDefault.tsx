@@ -55,10 +55,10 @@ const textFieldColors = {
   //     borderColor: '#ffec3e',
   //   },
   // },
-  // color: '#fff',
+  // color: '#c7c6c6',
   // input: {
-  //   color: '#fff',
-  //   borderColor: '#fff',
+  //   color: '#c7c6c6',
+  //   borderColor: '#c7c6c6',
   // },
 }
 const url = `${process.env.NEXT_BACK_HOST_API}/auth/login?`
@@ -95,6 +95,8 @@ const LessonCreateDefault = ({
   const [lessonForm, setLessonForm] = useState({
     title: startData ? startData.title : '',
     image: startData ? startData.image : null,
+    hours: startData ? startData.hours : 0,
+    minutes: startData ? startData.minutes : 0,
   })
   const [lessonModules, setLessonModules] = useState<any>(
     startData && startData.fields ? startData.fields : []
@@ -182,6 +184,40 @@ const LessonCreateDefault = ({
 
   return (
     <Box>
+      <Box sx={{ display: 'flex' }}>
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          id='hours'
+          type='number'
+          label='Hours'
+          name='hours'
+          autoFocus
+          autoComplete='off'
+          onChange={(e) => {
+            setLessonForm({ ...lessonForm, hours: e.target.value })
+          }}
+          value={lessonForm.hours}
+          sx={{ ...textFieldColors }}
+        />
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          id='minutes'
+          type='number'
+          label='Minutes'
+          name='minutes'
+          autoFocus
+          autoComplete='off'
+          onChange={(e) => {
+            setLessonForm({ ...lessonForm, minutes: e.target.value })
+          }}
+          value={lessonForm.minutes}
+          sx={{ ...textFieldColors }}
+        />
+      </Box>
       <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField
           margin='normal'
@@ -556,6 +592,8 @@ const LessonCreateDefault = ({
                     title: lessonForm.title,
                     fields: lessonModules,
                     image: lessonForm.image,
+                    hours: lessonForm.hours,
+                    minutes: lessonForm.minutes,
                   })
                   const resultResponse = response.data
                   if (resultResponse) {
@@ -587,6 +625,8 @@ const LessonCreateDefault = ({
                     setLessonForm({
                       title: '',
                       image: null,
+                      hours: 0,
+                      minutes: 0,
                     })
                     setIdLessonEdit(null)
                     setValue(1)
@@ -614,6 +654,8 @@ const LessonCreateDefault = ({
                   const response = await axios.post(urlLesson + '?type=default', {
                     title: lessonForm.title,
                     image: lessonForm.image,
+                    hours: lessonForm.hours,
+                    minutes: lessonForm.minutes,
                     fields: lessonModules.map((module: any) => {
                       return { type: module.type, value: module.value }
                     }),
@@ -651,6 +693,8 @@ const LessonCreateDefault = ({
                     setLessonForm({
                       title: '',
                       image: null,
+                      hours: 0,
+                      minutes: 0,
                     })
                   }
                   setCreateLessonIndx(-1)

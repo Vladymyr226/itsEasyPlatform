@@ -99,6 +99,8 @@ export const en = {
   reset_password: 'Reset password',
   confirm: 'Confirm',
   requestsLeft: 'questions left',
-  askGpt: 'Ask a question',
+  askGpt: 'Ask AI-Tutor a Question',
   gptPlaceholder: 'Text your question here',
+  hourShort: 'h',
+  minuteShort: 'min',
 }

@@ -33,10 +33,10 @@ const textFieldColors = {
   //     borderColor: '#ffec3e',
   //   },
   // },
-  // color: '#fff',
+  // color: '#c7c6c6',
   // input: {
-  //   color: '#fff',
-  //   borderColor: '#fff',
+  //   color: '#c7c6c6',
+  //   borderColor: '#c7c6c6',
   // },
 }
 const url = `${process.env.NEXT_BACK_HOST_API}/auth/login?`
@@ -72,6 +72,8 @@ const LessonCreateQuiz = ({
 }: quizCreation) => {
   const [lessonForm, setLessonForm] = useState({
     title: startData ? startData.title : '',
+    hours: startData ? startData.hours : 0,
+    minutes: startData ? startData.minutes : 0,
   })
   const [questionModules, setQuestionModules] = useState<any>(
     startData && startData.questions ? startData.questions : []
@@ -127,6 +129,40 @@ const LessonCreateQuiz = ({
   }
   return (
     <Box>
+      <Box sx={{ display: 'flex' }}>
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          id='hours'
+          type='number'
+          label='Hours'
+          name='hours'
+          autoFocus
+          autoComplete='off'
+          onChange={(e) => {
+            setLessonForm({ ...lessonForm, hours: e.target.value })
+          }}
+          value={lessonForm.hours}
+          sx={{ ...textFieldColors }}
+        />
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          id='minutes'
+          type='number'
+          label='Minutes'
+          name='minutes'
+          autoFocus
+          autoComplete='off'
+          onChange={(e) => {
+            setLessonForm({ ...lessonForm, minutes: e.target.value })
+          }}
+          value={lessonForm.minutes}
+          sx={{ ...textFieldColors }}
+        />
+      </Box>
       <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField
           margin='normal'
@@ -457,6 +493,8 @@ const LessonCreateQuiz = ({
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
                     title: lessonForm.title,
                     questions: questionModules,
+                    hours: lessonForm.hours,
+                    minutes: lessonForm.minutes,
                   })
                   const resultResponse = response.data
                   if (resultResponse) {
@@ -484,6 +522,8 @@ const LessonCreateQuiz = ({
                     )
                     setLessonForm({
                       title: '',
+                      hours: 0,
+                      minutes: 0,
                     })
                     setIdLessonEdit(null)
                     setValue(1)
@@ -511,6 +551,8 @@ const LessonCreateQuiz = ({
                   const response = await axios.post(urlLesson + '?type=quiz', {
                     title: lessonForm.title,
                     questions: questionModules,
+                    hours: lessonForm.hours,
+                    minutes: lessonForm.minutes,
                   })
                   const resultResponse = response.data
                   if (resultResponse) {
@@ -541,6 +583,8 @@ const LessonCreateQuiz = ({
                     )
                     setLessonForm({
                       title: '',
+                      hours: 0,
+                      minutes: 0,
                     })
                   }
                   setCreateLessonIndx(-1)

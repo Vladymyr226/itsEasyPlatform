@@ -236,7 +236,7 @@ const AllCoursesDetails = () => {
       padding: 0,
     },
     '&& .Mui-selected': {
-      color: '#fff',
+      color: '#c7c6c6',
       background: '#45444e',
     },
   }))
@@ -278,15 +278,15 @@ const AllCoursesDetails = () => {
           PaperComponent={CustomPaper}
           sx={{
             maxWidth: '100%',
-            color: '#fff',
+            color: '#c7c6c6',
             '&[aria-selected="true"]': {
               borderColor: 'rgba(255, 255, 255, 0.3)',
             },
             '& .MuiChip-label': {
-              color: '#fff',
+              color: '#c7c6c6',
             },
             '& .MuiChip-deleteIcon': {
-              color: '#fff',
+              color: '#c7c6c6',
             },
             '& .MuiSvgIcon-root': {
               color: 'rgba(255, 255, 255, 0.3)',
@@ -329,7 +329,7 @@ const AllCoursesDetails = () => {
                 variant='filled'
                 label={item.name_of_tag}
                 sx={{
-                  color: '#fff',
+                  color: '#c7c6c6',
                   height: '22px',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
                   '& .MuiChip-label': {},
@@ -350,7 +350,7 @@ const AllCoursesDetails = () => {
               sx={{
                 '.MuiInputBase-input': {
                   height: '8px',
-                  color: '#fff',
+                  color: '#c7c6c6',
                 },
               }}
             />
@@ -363,7 +363,7 @@ const AllCoursesDetails = () => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 background: '#171622',
-                color: '#fff',
+                color: '#c7c6c6',
                 '&:hover': {
                   backgroundColor: '#2e2d38',
                 },
@@ -399,20 +399,20 @@ const AllCoursesDetails = () => {
             sx: {
               '& .MuiMenuItem-root': {
                 background: '#171622',
-                color: '#fff',
+                color: '#c7c6c6',
               },
               '& .MuiMenuItem-root:hover': {
                 backgroundColor: '#2e2d38',
               },
               '&& .Mui-selected': {
-                color: '#fff',
+                color: '#c7c6c6',
                 background: '#45444e',
               },
             },
           }}
           sx={{
             maxWidth: '100%',
-            color: '#fff',
+            color: '#c7c6c6',
             height: 40,
             '& .MuiSvgIcon-root': {
               color: 'rgba(255, 255, 255, 0.3)',
@@ -456,20 +456,20 @@ const AllCoursesDetails = () => {
             sx: {
               '& .MuiMenuItem-root': {
                 background: '#171622',
-                color: '#fff',
+                color: '#c7c6c6',
               },
               '& .MuiMenuItem-root:hover': {
                 backgroundColor: '#2e2d38',
               },
               '&& .Mui-selected': {
-                color: '#fff',
+                color: '#c7c6c6',
                 background: '#45444e',
               },
             },
           }}
           sx={{
             maxWidth: '100%',
-            color: '#fff',
+            color: '#c7c6c6',
             height: 40,
             '& .MuiSvgIcon-root': {
               color: 'rgba(255, 255, 255, 0.3)',
@@ -495,7 +495,7 @@ const AllCoursesDetails = () => {
                       width='20'
                       height='12'
                     >
-                      <rect fill='#fff' width='9' height='3' />
+                      <rect fill='#c7c6c6' width='9' height='3' />
                       <rect fill='#d52b1e' y='3' width='9' height='3' />
                       <rect fill='#0039a6' y='2' width='9' height='2' />
                     </svg>
@@ -517,7 +517,7 @@ const AllCoursesDetails = () => {
                         <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
                       </clipPath>
                       <path d='M0,0v30h50v-30z' fill='#012169' />
-                      <path d='M0,0 50,30M50,0 0,30' stroke='#fff' stroke-width='6' />
+                      <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' stroke-width='6' />
                       <path
                         d='M0,0 50,30M50,0 0,30'
                         clip-path='url(#t)'
@@ -527,7 +527,7 @@ const AllCoursesDetails = () => {
                       <path
                         d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
                         fill='#C8102E'
-                        stroke='#FFF'
+                        stroke='#c7c6c6'
                         stroke-width='2'
                       />
                     </svg>
@@ -542,7 +542,7 @@ const AllCoursesDetails = () => {
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <div style={{ height: '20px', width: '20px', position: 'relative' }}>
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 6' width='35' height='20'>
-                  <rect fill='#fff' width='9' height='3' />
+                  <rect fill='#c7c6c6' width='9' height='3' />
                   <rect fill='#d52b1e' y='3' width='9' height='3' />
                   <rect fill='#0039a6' y='2' width='9' height='2' />
                 </svg>
@@ -569,7 +569,7 @@ const AllCoursesDetails = () => {
                     <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
                   </clipPath>
                   <path d='M0,0v30h50v-30z' fill='#012169' />
-                  <path d='M0,0 50,30M50,0 0,30' stroke='#fff' stroke-width='6' />
+                  <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' stroke-width='6' />
                   <path
                     d='M0,0 50,30M50,0 0,30'
                     clip-path='url(#t)'
@@ -579,7 +579,7 @@ const AllCoursesDetails = () => {
                   <path
                     d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
                     fill='#C8102E'
-                    stroke='#FFF'
+                    stroke='#c7c6c6'
                     stroke-width='2'
                   />
                 </svg>
@@ -612,20 +612,20 @@ const AllCoursesDetails = () => {
             sx: {
               '& .MuiMenuItem-root': {
                 background: '#171622',
-                color: '#fff',
+                color: '#c7c6c6',
               },
               '& .MuiMenuItem-root:hover': {
                 backgroundColor: '#2e2d38',
               },
               '&& .Mui-selected': {
-                color: '#fff',
+                color: '#c7c6c6',
                 background: '#45444e',
               },
             },
           }}
           sx={{
             maxWidth: '100%',
-            color: '#fff',
+            color: '#c7c6c6',
             height: 40,
             '& .MuiSvgIcon-root': {
               color: 'rgba(255, 255, 255, 0.3)',
@@ -655,7 +655,7 @@ const AllCoursesDetails = () => {
       >
         <Button
           variant='text'
-          sx={{ borderRadius: 0, marginTop: 3, width: '20rem', color: '#fff' }}
+          sx={{ borderRadius: 0, marginTop: 3, width: '20rem', color: '#c7c6c6' }}
           onClick={(e) => {
             setDate('')
             setPrice([0, maxPrice ?? 1000])
@@ -723,17 +723,23 @@ const AllCoursesDetails = () => {
           >
             <ToggleButton value='list' aria-label='list' sx={{}}>
               <ViewStreamIcon
-                sx={{ fontSize: 20, color: view == 'list' ? '#fff' : 'rgba(255, 255, 255, 0.2)' }}
+                sx={{
+                  fontSize: 20,
+                  color: view == 'list' ? '#c7c6c6' : 'rgba(255, 255, 255, 0.2)',
+                }}
               />
             </ToggleButton>
             <ToggleButton value='grid' aria-label='grid' sx={{}}>
               <GridViewIcon
-                sx={{ fontSize: 20, color: view == 'grid' ? '#fff' : 'rgba(255, 255, 255, 0.2)' }}
+                sx={{
+                  fontSize: 20,
+                  color: view == 'grid' ? '#c7c6c6' : 'rgba(255, 255, 255, 0.2)',
+                }}
               />
             </ToggleButton>
           </ToggleButtonGroup>
         </Box>
-        <Box sx={{ width: '100%', color: '#fff', minHeight: '40rem' }}>
+        <Box sx={{ width: '100%', color: '#c7c6c6', minHeight: '40rem', marginTop: -7 }}>
           {view == 'list' && (
             <>
               {dataDisplay ? (
@@ -759,7 +765,7 @@ const AllCoursesDetails = () => {
                     )
                   })
                 ) : (
-                  <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                  <h1 style={{ color: '#c7c6c6', textAlign: 'center', marginTop: '100px' }}>
                     Nothing was found
                   </h1>
                 )
@@ -787,7 +793,7 @@ const AllCoursesDetails = () => {
                     })}
                   </Grid>
                 ) : (
-                  <h1 style={{ color: '#fff', textAlign: 'center', marginTop: '100px' }}>
+                  <h1 style={{ color: '#c7c6c6', textAlign: 'center', marginTop: '100px' }}>
                     Nothing was found
                   </h1>
                 )
