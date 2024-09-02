@@ -52,6 +52,7 @@ interface Course {
   views: number
 }
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
+const urlFavourite = `${process.env.NEXT_BACK_HOST_API}/auth/favorite`
 export default function HomePage() {
   const t = getLocale()
   const router = useRouter()
@@ -65,11 +66,6 @@ export default function HomePage() {
   const [searchField, setSearchField] = useState<string>('')
   async function getPageData() {
     if (typeof window !== 'undefined') {
-      const responseTest = await fetch(testUrl + '?userId=9&lessonId=3', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
       const responseTag = await fetch(urlTag + 's', {
         headers: {
           'Content-Type': 'application/json',
@@ -81,6 +77,12 @@ export default function HomePage() {
           return tag
         })
       )
+      const responseFav = await fetch(urlFavourite + '?userId=8&courseId=4', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      console.log(responseFav)
       const response = await fetch(url + 's?isActive=true', {
         headers: {
           'Content-Type': 'application/json',

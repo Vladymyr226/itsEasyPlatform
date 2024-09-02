@@ -1337,8 +1337,9 @@ const LessonDetails = () => {
                         <Box
                           ref={containerRef}
                           sx={{
-                            overflow: 'scroll',
-                            scrollbarWidth: 'none',
+                            overflowY: 'auto',
+                            scrollbarWidth: 'thin',
+                            scrollbarColor: '#8b8b92 transparent',
                             maxHeight: '20rem',
                             paddingRight: 2,
                           }}

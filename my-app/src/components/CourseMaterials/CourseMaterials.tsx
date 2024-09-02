@@ -76,7 +76,7 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
                       onClick={(e) => localStorage.setItem('SelectedModuleIndex', index + '')}
                     >
                       <span style={{ cursor: 'pointer', textDecoration: 'none', color: '#c7c6c6' }}>
-                        {t.preview}
+                        {lesson.data.title}
                       </span>
                     </Link>
                   </div>

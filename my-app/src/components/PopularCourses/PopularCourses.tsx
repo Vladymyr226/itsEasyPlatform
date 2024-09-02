@@ -1,5 +1,5 @@
+// Import necessary libraries and components
 import s from './PopularCourses.module.css'
-
 import popularCourseImage from '../../assets/popularCourse.png'
 import clock from '../../assets/greyClock.svg'
 import notebook from '../../assets/greyNotebook.svg'
@@ -8,25 +8,53 @@ import courseShadow from '../../../src/assets/shadows/courseHoverShadow.png'
 import Image from 'next/image'
 import Rating from '../Rating/Rating'
 import { useRouter } from 'next/navigation'
-
 import React, { useRef, useState } from 'react'
-// Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
-
-// Import Swiper styles
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-
-// import required modules
 import { A11y, Navigation, Pagination } from 'swiper/modules'
 import { Box } from '@mui/material'
 import { getLocale } from '@/utils/getLocale'
+
 const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolean }) => {
   const router = useRouter()
+  const swiperRef = useRef<any>(null) // Create a ref for the Swiper
 
   return (
     <>
+      {/* Custom Navigation Buttons */}
+      <div className={s.navigationButtons}>
+        <button className={s.prevButton} onClick={() => swiperRef.current?.slidePrev()}>
+          <svg
+            width='37.5px'
+            height='60px'
+            viewBox='256 56.768 563.568 903.232'
+            version='1.1'
+            xmlns='http://www.w3.org/2000/svg'
+          >
+            <path
+              d='M768 903.232l-50.432 56.768L256 512l461.568-448 50.432 56.768L364.928 512z'
+              fill='#007aff'
+            />
+          </svg>
+        </button>
+        <button className={s.nextButton} onClick={() => swiperRef.current?.slideNext()}>
+          <svg
+            width='34px'
+            height='60px'
+            viewBox='256 64 512 896'
+            version='1.1'
+            xmlns='http://www.w3.org/2000/svg'
+          >
+            <path
+              d='M256 120.768L306.432 64 768 512l-461.568 448L256 903.232 659.072 512z'
+              fill='#007aff'
+            />
+          </svg>
+        </button>
+      </div>
+
       <Swiper
         pagination={{
           dynamicBullets: true,
@@ -34,7 +62,12 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
         className='mySwiper'
         style={{ width: '100%', paddingBottom: '40px' }}
         modules={[Navigation, Pagination]}
-        navigation={true}
+        // Disable default Swiper navigation and use custom buttons
+        navigation={{
+          prevEl: `.${s.prevButton}`,
+          nextEl: `.${s.nextButton}`,
+        }}
+        onSwiper={(swiper) => (swiperRef.current = swiper)} // Reference the Swiper instance
         spaceBetween={10}
         breakpoints={{
           480: {
@@ -58,145 +91,143 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
           })
           const t = getLocale()
           return (
-            <>
-              <SwiperSlide
-                className={s.courseItem}
-                key={'popularCourse_' + course.id}
-                style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-              >
-                <div className={`${s.courseImageWrapper} `}>
-                  <div style={{ width: '100%', maxWidth: '330px' }}>
-                    <div className={s.courseItemHeader} style={{ width: '100%' }}>
-                      {course.data.mediaValue.type == 'image' ? (
-                        <img
-                          className={s.courseItemHeader}
-                          src={course.data.mediaValue.content}
-                          alt='programmer'
-                          style={{
-                            objectFit: 'cover',
-                          }}
-                        />
-                      ) : (
-                        <video
-                          className={s.courseItemHeader}
-                          src={course.data.mediaValue.content}
-                          style={{ width: '100%', objectFit: 'cover' }}
-                        />
-                      )}
-                    </div>
-                    <div className={s.courseItemFooter}>
-                      <p className={s.courseTitle}>
-                        <span className={s.accentuated} style={{ textWrap: 'wrap' }}>
-                          {course.data.title}
-                        </span>
-                      </p>
-                      <ul className={s.courseInfo}>
-                        <li style={{ display: 'flex', gap: '10px' }}>
-                          <span className={s.accentuated}>{t.language}</span>
-                          {course.data.language == 'RU' && (
-                            <div style={{ height: '20px', width: '10px' }}>
-                              <svg
-                                xmlns='http://www.w3.org/2000/svg'
-                                viewBox='0 0 9 6'
-                                width='20'
-                                height='10'
-                              >
-                                <rect fill='#c7c6c6' width='9' height='3' />
-                                <rect fill='#d52b1e' y='3' width='9' height='3' />
-                                <rect fill='#0039a6' y='2' width='9' height='2' />
-                              </svg>
-                            </div>
-                          )}
-                          {course.data.language == 'UA' && (
-                            <div style={{ height: '20px', width: '20px', position: 'relative' }}>
-                              <svg xmlns='http://www.w3.org/2000/svg' width='20' height='10'>
-                                <rect width='1200' height='5' fill='#0057B7' />
-                                <rect width='1200' height='5' y='5' fill='#FFD700' />
-                              </svg>
-                            </div>
-                          )}
-                          {course.data.language == 'EN' && (
-                            <div style={{ height: '20px', width: '20px', position: 'relative' }}>
-                              <svg
-                                xmlns='http://www.w3.org/2000/svg'
-                                viewBox='0 0 50 30'
-                                width='20'
-                                height='10'
-                              >
-                                <clipPath id='t'>
-                                  <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
-                                </clipPath>
-                                <path d='M0,0v30h50v-30z' fill='#012169' />
-                                <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' stroke-width='6' />
-                                <path
-                                  d='M0,0 50,30M50,0 0,30'
-                                  clip-path='url(#t)'
-                                  stroke='#C8102E'
-                                  stroke-width='4'
-                                />
-                                <path
-                                  d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
-                                  fill='#C8102E'
-                                  stroke='#c7c6c6'
-                                  stroke-width='2'
-                                />
-                              </svg>
-                            </div>
-                          )}
-                        </li>
-                        <li>
-                          <span className={s.accentuated}>{t.type}</span>
-                          {course.data.type == 'with-lector'
-                            ? ' ' + t.with_lector
-                            : ' ' + t.self_education}
-                        </li>
-                        {course.data.type == 'with-lector' ? (
-                          <li>
-                            <span className={s.accentuated}>Преподаёт</span> {course.data.lector}
-                          </li>
-                        ) : (
-                          <li>&nbsp;</li>
+            <SwiperSlide
+              className={s.courseItem}
+              key={'popularCourse_' + course.id}
+              style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+            >
+              <div className={`${s.courseImageWrapper}`}>
+                <div style={{ width: '100%', maxWidth: '330px' }}>
+                  <div className={s.courseItemHeader} style={{ width: '100%' }}>
+                    {course.data.mediaValue.type == 'image' ? (
+                      <img
+                        className={s.courseItemHeader}
+                        src={course.data.mediaValue.content}
+                        alt='programmer'
+                        style={{
+                          objectFit: 'cover',
+                        }}
+                      />
+                    ) : (
+                      <video
+                        className={s.courseItemHeader}
+                        src={course.data.mediaValue.content}
+                        style={{ width: '100%', objectFit: 'cover' }}
+                      />
+                    )}
+                  </div>
+                  <div className={s.courseItemFooter}>
+                    <p className={s.courseTitle}>
+                      <span className={s.accentuated} style={{ textWrap: 'wrap' }}>
+                        {course.data.title}
+                      </span>
+                    </p>
+                    <ul className={s.courseInfo}>
+                      <li style={{ display: 'flex', gap: '10px' }}>
+                        <span className={s.accentuated}>{t.language}</span>
+                        {course.data.language == 'RU' && (
+                          <div style={{ height: '20px', width: '10px' }}>
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              viewBox='0 0 9 6'
+                              width='20'
+                              height='10'
+                            >
+                              <rect fill='#c7c6c6' width='9' height='3' />
+                              <rect fill='#d52b1e' y='3' width='9' height='3' />
+                              <rect fill='#0039a6' y='2' width='9' height='2' />
+                            </svg>
+                          </div>
                         )}
-                      </ul>
-                      <Rating isBig={true} isSmall={true} rating={course.data.rating} />
-                      <ul className={s.courseDetails}>
+                        {course.data.language == 'UA' && (
+                          <div style={{ height: '20px', width: '20px', position: 'relative' }}>
+                            <svg xmlns='http://www.w3.org/2000/svg' width='20' height='10'>
+                              <rect width='1200' height='5' fill='#0057B7' />
+                              <rect width='1200' height='5' y='5' fill='#FFD700' />
+                            </svg>
+                          </div>
+                        )}
+                        {course.data.language == 'EN' && (
+                          <div style={{ height: '20px', width: '20px', position: 'relative' }}>
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              viewBox='0 0 50 30'
+                              width='20'
+                              height='10'
+                            >
+                              <clipPath id='t'>
+                                <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
+                              </clipPath>
+                              <path d='M0,0v30h50v-30z' fill='#012169' />
+                              <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' stroke-width='6' />
+                              <path
+                                d='M0,0 50,30M50,0 0,30'
+                                clip-path='url(#t)'
+                                stroke='#C8102E'
+                                stroke-width='4'
+                              />
+                              <path
+                                d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
+                                fill='#C8102E'
+                                stroke='#c7c6c6'
+                                stroke-width='2'
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </li>
+                      <li>
+                        <span className={s.accentuated}>{t.type}</span>
+                        {course.data.type == 'with-lector'
+                          ? ' ' + t.with_lector
+                          : ' ' + t.self_education}
+                      </li>
+                      {course.data.type == 'with-lector' ? (
                         <li>
-                          <Image src={notebook} alt='notebook' /> {tmpSum} {t.lectures}
+                          <span className={s.accentuated}>Преподаёт</span> {course.data.lector}
                         </li>
-                        <li>
-                          <Image src={stat} alt='stat' /> {course.data.level}
-                        </li>
-                      </ul>
-                      <div style={{ display: 'flex' }}>
-                        <button
-                          className={s.courseButton}
-                          onClick={(e) => {
-                            localStorage.setItem('SelectedCourseIndex', course.id)
-                            router.push('/course-details?id=' + course.id)
-                          }}
-                        >
-                          {t.learn_more}
-                        </button>
-                        <div className={s.priceWrapper}>
-                          {course.data.priceDiscount && course.data.priceDiscount > 0 ? (
-                            <span className={s.prevPrice}>${course.data.price}</span>
-                          ) : (
-                            <></>
-                          )}
-                          <span className={s.currentPrice}>
-                            $
-                            {course.data.priceDiscount && course.data.priceDiscount > 0
-                              ? course.data.priceDiscount
-                              : course.data.price}
-                          </span>
-                        </div>
+                      ) : (
+                        <li>&nbsp;</li>
+                      )}
+                    </ul>
+                    <Rating isBig={true} isSmall={true} rating={course.data.rating} />
+                    <ul className={s.courseDetails}>
+                      <li>
+                        <Image src={notebook} alt='notebook' /> {tmpSum} {t.lectures}
+                      </li>
+                      <li>
+                        <Image src={stat} alt='stat' /> {course.data.level}
+                      </li>
+                    </ul>
+                    <div style={{ display: 'flex' }}>
+                      <button
+                        className={s.courseButton}
+                        onClick={(e) => {
+                          localStorage.setItem('SelectedCourseIndex', course.id)
+                          router.push('/course-details?id=' + course.id)
+                        }}
+                      >
+                        {t.learn_more}
+                      </button>
+                      <div className={s.priceWrapper}>
+                        {course.data.priceDiscount && course.data.priceDiscount > 0 ? (
+                          <span className={s.prevPrice}>${course.data.price}</span>
+                        ) : (
+                          <></>
+                        )}
+                        <span className={s.currentPrice}>
+                          $
+                          {course.data.priceDiscount && course.data.priceDiscount > 0
+                            ? course.data.priceDiscount
+                            : course.data.price}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <Image className={s.shadow} src={courseShadow} alt='shadow' />
                 </div>
-              </SwiperSlide>
-            </>
+                <Image className={s.shadow} src={courseShadow} alt='shadow' />
+              </div>
+            </SwiperSlide>
           )
         })}
       </Swiper>
