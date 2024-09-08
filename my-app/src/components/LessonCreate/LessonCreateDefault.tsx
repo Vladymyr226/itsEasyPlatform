@@ -98,6 +98,8 @@ const LessonCreateDefault = ({
     hours: startData ? startData.hours : 0,
     minutes: startData ? startData.minutes : 0,
   })
+  const startLessonTitle = startData ? startData.title : null
+
   const [lessonModules, setLessonModules] = useState<any>(
     startData && startData.fields ? startData.fields : []
   )
@@ -587,7 +589,7 @@ const LessonCreateDefault = ({
                       found = true
                   })
                 })
-                if (!found) {
+                if (!found || (startData && startLessonTitle == lessonForm.title)) {
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
                     title: lessonForm.title,
                     fields: lessonModules,

@@ -668,7 +668,7 @@ const LessonDetails = () => {
           display: 'flex',
           justifyContent: 'center',
 
-          flexDirection: { xs: 'column-reverse', md: 'row' },
+          flexDirection: { xs: 'column', md: 'row' },
           gap: { xs: '50px', md: null },
         }}
       >

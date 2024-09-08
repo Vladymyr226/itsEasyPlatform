@@ -34,7 +34,7 @@
 }
 @media screen and (min-width: 1200px) {
   .courseCard {
-    height: 450px;
+    min-height: 450px;
 
     margin-top: 75px;
     flex-direction: row;

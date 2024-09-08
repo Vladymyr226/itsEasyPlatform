@@ -68,7 +68,7 @@ const Prices = ({
           const resultResponse = response.data
         }}
       >
-        Купить сейчас
+        {t.buy_now}
       </button>
       {groupPrice && (
         <div>
