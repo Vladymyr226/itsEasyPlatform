@@ -9,6 +9,7 @@ import { Box } from '@mui/material'
 import { useRouter as detailedRouter } from 'next/router'
 const LanguageSwitcher = () => {
   const [isLanguageShown, setIsLanguageShown] = useState(false)
+  const [isLanguageShownForDropModal, setIsLanguageShownForDropModal] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const routerLocale = detailedRouter()
   useEffect(() => {
@@ -25,7 +26,11 @@ const LanguageSwitcher = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (divRef.current && !divRef.current.contains(event.target as Node)) {
-        setIsLanguageShown(false)
+        if (!isLanguageShownForDropModal) {
+          setTimeout(() => {
+            setIsLanguageShown(false)
+          }, 200)
+        }
       }
     }
 
@@ -37,7 +42,18 @@ const LanguageSwitcher = () => {
 
   return (
     <div className={s.languageSwitcher}>
-      <div onClick={() => setIsLanguageShown(true)} style={{ display: 'flex', gap: '4px' }}>
+      <div
+        onClick={() => {
+          if (!isLanguageShown) {
+            setIsLanguageShown(true)
+            setIsLanguageShownForDropModal(true)
+          } else {
+            setIsLanguageShown(false)
+            setIsLanguageShownForDropModal(false)
+          }
+        }}
+        style={{ display: 'flex', gap: '4px' }}
+      >
         {routerLocale.locale == 'ru' && (
           <Box
             sx={{

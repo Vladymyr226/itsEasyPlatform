@@ -194,10 +194,10 @@ const CourseDetails = () => {
         <div className={s.coursePage}>
           <div className={s.leftSide}>
             <div className={s.courseTitle}>
-              <h1>
+              <h2>
                 {data && data.data.title}
                 {/* <span className={s.accentuated}>Frontend</span> разработчик */}
-              </h1>
+              </h2>
               <CourseControlls />
             </div>
 

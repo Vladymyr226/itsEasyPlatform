@@ -103,4 +103,5 @@ export const ua = {
   gptPlaceholder: 'Напишіть своє запитання тут',
   hourShort: 'год',
   minuteShort: 'хв',
+  mailTaken: 'Ця електронна адреса вже зайнята іншим користувачем',
 }

@@ -39,7 +39,7 @@ const CourseLessonMaterials = ({
   }
   const [userData, setUserData] = useState<any>()
   const [course, setCourse] = useState<any>()
-  console.log(course)
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
       if (localStorage.getItem('SelectedCourse')) {
@@ -86,7 +86,7 @@ const CourseLessonMaterials = ({
         <div className={s.materialsAccordion} style={{ marginTop: '0px' }}>
           <div style={{ padding: '16px' }}>
             <Link href={'/course-details?id=' + course.id}>
-              <h2 style={{ color: '#fff' }}>{course.data.title}</h2>
+              <h2 style={{ color: '#ffec3e' }}>{course.data.title}</h2>
             </Link>
           </div>
           {modules.map((module: any, index: number) => (

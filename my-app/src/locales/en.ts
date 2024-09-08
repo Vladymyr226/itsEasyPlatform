@@ -103,4 +103,5 @@ export const en = {
   gptPlaceholder: 'Text your question here',
   hourShort: 'h',
   minuteShort: 'min',
+  mailTaken: 'This email is already taken by another user',
 }

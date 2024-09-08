@@ -128,15 +128,25 @@ const Registration = () => {
         })
         router.push('/')
       }
-    } catch (error) {
-      alert(error)
-      Swal.fire({
-        title: 'Sign up failure!',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
-        icon: 'error',
-      })
+    } catch (error: any) {
+      if (error.response.status == 409) {
+        Swal.fire({
+          title: t.mailTaken,
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
+      } else {
+        Swal.fire({
+          title: 'Sign up failure!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'error',
+        })
+      }
+
       return
     }
   }

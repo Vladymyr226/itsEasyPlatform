@@ -103,4 +103,5 @@ export const ru = {
   gptPlaceholder: 'Введите свой вопрос здесь',
   hourShort: 'ч',
   minuteShort: 'мин',
+  mailTaken: 'Этот адрес электронной почты уже занят другим пользователем',
 }

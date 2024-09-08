@@ -525,43 +525,18 @@ const LessonDetails = () => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
       getPageData()
+      setCompleteButtonState('ready')
     }
   }, [])
   useEffect(() => {
     if (id && modules) {
-      gptField.current.value = ''
+      if (gptField.current) {
+        gptField.current.value = ''
+      }
+
       setCompleteButtonState('ready')
       setCheckAnswers(false)
-      // setAnswerForm(undefined)
       getPageData()
-      // modules.map((module: any) => {
-      //   module.lessons.map((less: any) => {
-      //     if (less.id == id) {
-      //       setData(undefined)
-      //       setTimeout(() => {
-      //         if (less.type == 'practice') {
-      //           const slateFields = less.data.fields.filter((field: any) => field.type == 'slate')
-      //           const value = slateFields
-      //             .map((field: any) => {
-      //               return field.value
-      //                 .map((line: any) => {
-      //                   return line.children
-      //                     .map((finalLine: any) => {
-      //                       console.log(finalLine)
-      //                       return finalLine.text
-      //                     })
-      //                     .toString()
-      //                 })
-      //                 .toString()
-      //             })
-      //             .toString()
-      //           setLessonContext(value)
-      //         }
-      //         setData(less)
-      //       }, 1)
-      //     }
-      //   })
-      // })
       getPageData2(id, userData.id)
     }
   }, [id])
