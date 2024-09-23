@@ -1561,32 +1561,34 @@ const CourseCreate = () => {
                                         onChange={(event, value: any) => {
                                           setEditTrigger(true)
                                           setError({})
-                                          setModules(
-                                            modules.map((modulesElem, index) => {
-                                              if (
-                                                index == i &&
-                                                modulesElem.lessons.filter(
-                                                  (reDropElem) => reDropElem.id === value.id
-                                                ).length === 0
-                                              ) {
-                                                setStoredModules(
-                                                  storedModules.filter(
-                                                    (storedModule) => storedModule.id != value.id
+                                          if (value) {
+                                            setModules(
+                                              modules.map((modulesElem, index) => {
+                                                if (
+                                                  index == i &&
+                                                  modulesElem.lessons.filter(
+                                                    (reDropElem) => reDropElem.id === value.id
+                                                  ).length === 0
+                                                ) {
+                                                  setStoredModules(
+                                                    storedModules.filter(
+                                                      (storedModule) => storedModule.id != value.id
+                                                    )
                                                   )
-                                                )
-                                                return {
-                                                  title: modulesElem.title,
-                                                  lessons: [
-                                                    ...modulesElem.lessons,
-                                                    {
-                                                      ...value,
-                                                    },
-                                                  ],
+                                                  return {
+                                                    title: modulesElem.title,
+                                                    lessons: [
+                                                      ...modulesElem.lessons,
+                                                      {
+                                                        ...value,
+                                                      },
+                                                    ],
+                                                  }
                                                 }
-                                              }
-                                              return modulesElem
-                                            })
-                                          )
+                                                return modulesElem
+                                              })
+                                            )
+                                          }
                                         }}
                                         renderOption={(
                                           props: object,

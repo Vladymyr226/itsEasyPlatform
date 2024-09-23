@@ -698,9 +698,9 @@ const LessonCreateDefault = ({
                       hours: 0,
                       minutes: 0,
                     })
+                    setCreateLessonIndx(-1)
+                    setValue(1)
                   }
-                  setCreateLessonIndx(-1)
-                  setValue(1)
                 } else {
                   Swal.fire({
                     title: 'Lesson name is already taken!',

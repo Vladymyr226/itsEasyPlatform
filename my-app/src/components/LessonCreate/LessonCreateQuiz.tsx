@@ -586,9 +586,9 @@ const LessonCreateQuiz = ({
                       hours: 0,
                       minutes: 0,
                     })
+                    setCreateLessonIndx(-1)
+                    setValue(1)
                   }
-                  setCreateLessonIndx(-1)
-                  setValue(1)
                 } else {
                   Swal.fire({
                     title: 'Course name is already taken!',
