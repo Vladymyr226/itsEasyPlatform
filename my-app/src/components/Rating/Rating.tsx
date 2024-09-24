@@ -1,8 +1,5 @@
 import s from './Rating.module.css'
 
-import fillStar from '../../assets/fillStar.svg'
-import almostFillStar from '../../assets/almostFillStar.svg'
-import Image from 'next/image'
 import RatingMui from '@mui/material/Rating'
 import { getLocale } from '@/utils/getLocale'
 const Rating = ({

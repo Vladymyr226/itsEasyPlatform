@@ -62,19 +62,6 @@ const TableColumns = () => {
 }
 const AdminFeedbackTable = () => {
   const [data, setData] = useState<Array<any>>()
-  function getUniqueValues(array: any) {
-    const uniqueValues: any = []
-    const seenValues: any = {}
-
-    for (const value of array) {
-      if (!seenValues[value.lesson_id]) {
-        uniqueValues.push(value.lesson_id)
-        seenValues[value.lesson_id] = true
-      }
-    }
-
-    return uniqueValues
-  }
 
   async function getPageData() {
     if (typeof window !== 'undefined') {

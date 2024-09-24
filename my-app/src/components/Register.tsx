@@ -1,5 +1,4 @@
 import Typography from '@mui/material/Typography'
-import { createTheme } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useState } from 'react'

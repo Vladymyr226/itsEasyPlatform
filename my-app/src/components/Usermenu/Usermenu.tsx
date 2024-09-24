@@ -3,7 +3,6 @@ import DropModal from '../../components/DropModal/DropModal'
 import { useEffect, useState } from 'react'
 import study from '../../assets/study.svg'
 import heart from '../../assets/emptyHeart.svg'
-import teacher from '../../assets/teacher.svg'
 import logout from '../../assets/logout.svg'
 import RequestModal from '../../components/RequestModal/RequestModal'
 import Image from 'next/image'
@@ -62,16 +61,6 @@ const Usermenu = () => {
             <Image src={heart} alt='heart' />
             <p>{t.my_favorites}</p>
           </div>
-          {/* <div
-            onClick={() => {
-              setIsModalOpen(true)
-              setIsUsermenuShown(false)
-            }}
-            className={s.usermenuItem}
-          >
-            <Image src={teacher} alt='teacher' />
-            <p>{t.become_a_lector}</p>
-          </div> */}
           <div
             className={s.usermenuItem}
             onClick={(e) => {

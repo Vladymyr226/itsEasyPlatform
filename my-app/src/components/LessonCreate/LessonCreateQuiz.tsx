@@ -1,47 +1,12 @@
-import Typography from '@mui/material/Typography'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
 import { useRef, useState } from 'react'
 import axios from 'axios'
-import { setCookie } from 'cookies-next'
 import Swal from 'sweetalert2'
 import { Box, Button, TextField, IconButton } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import { getLocale } from '@/utils/getLocale'
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Autocomplete,
-  Checkbox,
-} from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Checkbox } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-const textFieldColors = {
-  // '& label.Mui-focused': {
-  //   color: '#ffec3e',
-  // },
-  // '& .MuiOutlinedInput-root': {
-  //   '& fieldset': { borderColor: '#ffec3e' },
-  //   '&:hover fieldset': {
-  //     borderColor: '#ffec3e',
-  //   },
-  //   '&.Mui-focused fieldset': {
-  //     borderColor: '#ffec3e',
-  //   },
-  // },
-  // color: '#c7c6c6',
-  // input: {
-  //   color: '#c7c6c6',
-  //   borderColor: '#c7c6c6',
-  // },
-}
-const url = `${process.env.NEXT_BACK_HOST_API}/auth/login?`
-const urlReset = `${process.env.NEXT_BACK_HOST_API}/auth/request-reset-password?`
-const urlReset2 = `${process.env.NEXT_BACK_HOST_API}/auth/reset-password?`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 
 interface quizCreation {
@@ -144,7 +109,6 @@ const LessonCreateQuiz = ({
             setLessonForm({ ...lessonForm, hours: e.target.value })
           }}
           value={lessonForm.hours}
-          sx={{ ...textFieldColors }}
         />
         <TextField
           margin='normal'
@@ -160,7 +124,6 @@ const LessonCreateQuiz = ({
             setLessonForm({ ...lessonForm, minutes: e.target.value })
           }}
           value={lessonForm.minutes}
-          sx={{ ...textFieldColors }}
         />
       </Box>
       <Box sx={{ display: 'flex', gap: 1 }}>
@@ -178,7 +141,6 @@ const LessonCreateQuiz = ({
             setLessonForm({ ...lessonForm, title: e.target.value })
           }}
           value={lessonForm.title}
-          sx={{ ...textFieldColors }}
         />
       </Box>
       <Box sx={{ width: '100%' }}>
@@ -220,7 +182,7 @@ const LessonCreateQuiz = ({
                           )
                         }}
                         value={element.title}
-                        sx={{ ...textFieldColors, marginRight: 10 }}
+                        sx={{ marginRight: 10 }}
                       />
                       <IconButton
                         color='error'
@@ -356,7 +318,7 @@ const LessonCreateQuiz = ({
                                     )
                                   }}
                                   value={option.title}
-                                  sx={{ ...textFieldColors, marginRight: 10 }}
+                                  sx={{ marginRight: 10 }}
                                 />
                               </Box>
 

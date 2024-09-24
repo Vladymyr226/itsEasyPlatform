@@ -1,48 +1,15 @@
 'use client'
-import s from '../CourseDetails.module.css'
-import skillsImage from '../../../src/assets/skillsImage.png'
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
-import Comments from '@/components/Comments/Comments'
-import CourseControlls from '@/components/CourseControlls/CourseControlls'
-import CourseMaterials from '@/components/CourseMaterials/CourseMaterials'
-import CourseSidebar from '@/components/CourseSidebar/CourseSidebar'
-import PlayButton from '@/components/PlayButton/PlayButton'
-import { PauseButton } from '@/components/PlayButton/PlayButton'
-
-import PopularCourses from '@/components/PopularCourses/PopularCourses'
-import Rating from '@/components/Rating/Rating'
-import SkillsList from '@/components/SkillsList/SkillsList'
-import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../app/globals.css'
-import SlateView from '@/components/SlateEditor/View'
 import { Box, Button } from '@mui/material'
-import YouTube, { YouTubeProps } from 'react-youtube'
-
-import { YouTubeProp } from '@/utils/interfaces'
-import { useRouter } from 'next/navigation'
-import { useRouter as detailedRouter } from 'next/router'
-import Drawer from '@mui/material/Drawer'
-import List from '@mui/material/List'
-import Divider from '@mui/material/Divider'
-import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
-import InboxIcon from '@mui/icons-material/MoveToInbox'
-import MailIcon from '@mui/icons-material/Mail'
-import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import TextField from '@mui/material/TextField'
-import Slider from '@mui/material/Slider'
-import { InputLabel, IconButton, Chip, ToggleButtonGroup, ToggleButton, Grid } from '@mui/material'
+import { InputLabel, Chip, ToggleButtonGroup, ToggleButton, Grid } from '@mui/material'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Autocomplete from '@mui/material/Autocomplete'
-import { TabPanelProps, Module, Tag } from '@/utils/interfaces'
-import OutlinedInput from '@mui/material/OutlinedInput'
+import { Course, Tag } from '@/utils/interfaces'
 import CourseCard from '@/components/CourseCard/CourseCard'
-import ClearIcon from '@mui/icons-material/Clear'
 import { styled } from '@mui/material/styles'
 
 import Popper from '@mui/material/Popper'
@@ -51,52 +18,14 @@ import GridViewIcon from '@mui/icons-material/GridView'
 import ViewStreamIcon from '@mui/icons-material/ViewStream'
 import CourseGridCard from '@/components/CourseGridCard/CourseGridCard'
 import { getLocale } from '@/utils/getLocale'
-const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 
+const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
-const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
-interface LessonData {
-  title: string
-  link: string
-  description: any
-}
-interface Lesson {
-  id: string
-  data: LessonData
-}
-interface mediaDataValue {
-  type: string
-  content: string
-}
-interface CourseData {
-  title: string
-  language: string
-  level: string
-  date: string
-  type: string
-  description: any
-  rating: number
-  duration: number
-  lector: string
-  modules: any
-  price: number
-  mediaValue: mediaDataValue
-}
-interface Course {
-  id: string
-  data: CourseData
-  is_active: boolean
-  created_at: string
-  views: number
-}
+
 const AllCoursesDetails = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<any>()
   const [dataDisplay, setDataDisplay] = useState<any>()
-
-  const [moduleLessons, setModuleLessons] = useState<Array<string>>()
-  const [play, setPlay] = useState(false)
-  const videoRef = useRef(null)
 
   async function getPageData() {
     if (typeof window !== 'undefined') {
@@ -107,8 +36,6 @@ const AllCoursesDetails = () => {
       if (layoutType == 'grid') {
         setView('grid')
       }
-      const fullUrl = window.location.href
-
       const responseTag = await fetch(urlTag + 's', {
         headers: {
           'Content-Type': 'application/json',
@@ -147,15 +74,6 @@ const AllCoursesDetails = () => {
       getPageData()
     }
   }, [])
-
-  const router = useRouter()
-  const routerLocale = detailedRouter()
-
-  const [open, setOpen] = useState(false)
-
-  const toggleDrawer = (newOpen: any) => () => {
-    setOpen(newOpen)
-  }
   const [date, setDate] = useState('')
 
   const [price, setPrice] = useState([0, 10000])
@@ -184,10 +102,6 @@ const AllCoursesDetails = () => {
     } = event
     setType(typeof type === 'string' ? type.split(',') : value)
   }
-  const handlePriceChange = (event: any, newValue: any) => {
-    setPrice(newValue)
-  }
-
   const handleApply = () => {
     let filteredRes = data
     if (date) {
@@ -243,7 +157,6 @@ const AllCoursesDetails = () => {
   const [view, setView] = useState('list')
   const t = getLocale()
   const DrawerList = (
-    // <Box sx={{ width: 250 }} role='presentation'>
     <Box
       sx={{
         padding: 2,
@@ -679,9 +592,6 @@ const AllCoursesDetails = () => {
     const secondDate = new Date(date2)
 
     return secondDate > firstDate
-  }
-  function arrayContainsAll(superset: any, subset: any) {
-    return subset.every((element: any) => superset.includes(element))
   }
   function arraysHaveCommonElements(array1: any, array2: any) {
     return array1.some((element: any) => array2.includes(element))

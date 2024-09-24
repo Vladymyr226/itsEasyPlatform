@@ -7,15 +7,8 @@ import { Box, Button, Typography } from '@mui/material'
 import ResetPassword from '@/components/ResetPassword'
 import { useRouter } from 'next/router'
 const AdminLogin = () => {
-  const [width, setWidth] = useState(0)
-
   const router = useRouter()
   const { id } = router.query
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setWidth(window.innerWidth)
-    }
-  }, [])
 
   return (
     <Layout>

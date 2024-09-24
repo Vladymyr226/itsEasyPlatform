@@ -1,11 +1,7 @@
 'use client'
-
-import courseImage from '../../src/assets/courseImage.png'
-import skillsImage from '../../src/assets/skillsImage.png'
 import { useEffect, useRef, useState } from 'react'
 import '../../../app/globals.css'
-import { Box, Grid, Button, Typography, CircularProgress } from '@mui/material'
-import LinearProgress from '@mui/material/LinearProgress'
+import { Box, Button, CircularProgress } from '@mui/material'
 
 import IconButton from '@mui/material/IconButton'
 import PreviewIcon from '@mui/icons-material/Preview'
@@ -18,29 +14,20 @@ import TextField from '@mui/material/TextField'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { DateField } from '@mui/x-date-pickers/DateField'
 import { InputLabel } from '@mui/material'
 
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import dayjs from 'dayjs'
 import axios, { all } from 'axios'
 import Rating from '@mui/material/Rating'
 import { useRouter } from 'next/navigation'
-import { useRouter as useRouterNext } from 'next/router'
 import MyEditor from '@/components/SlateEditor/Editor'
 import SlateView from '@/components/SlateEditor/View'
-import { Slate, Editable, withReact } from 'slate-react'
-import { title } from 'process'
-import Video from '@/components/video/Video'
 
 import Swal from 'sweetalert2'
 import React from 'react'
 import YouTube, { YouTubeProps } from 'react-youtube'
 import Autocomplete from '@mui/material/Autocomplete'
-import withReactContent from 'sweetalert2-react-content'
 import { YouTubeProp, TabPanelProps, Lesson, Module, Tag, Skill } from '@/utils/interfaces'
 import * as AWS from 'aws-sdk'
 import { isEqual } from 'lodash-es'
@@ -54,7 +41,6 @@ import LessonCreateDefault from '@/components/LessonCreate/LessonCreateDefault'
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
-    // access to player in all event handlers via event.target
     event.target.pauseVideo()
   }
 
@@ -62,7 +48,6 @@ function ExampleYouTube(props: YouTubeProp) {
     height: '390',
     width: '100%',
     playerVars: {
-      // https://developers.google.com/youtube/player_parameters
       autoplay: 1,
     },
   }
@@ -74,26 +59,6 @@ const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const urlSkill = `${process.env.NEXT_BACK_HOST_API}/cabinet/skill`
-
-const textFieldColors = {
-  // '& label.Mui-focused': {
-  //   color: '#ffec3e',
-  // },
-  // '& .MuiOutlinedInput-root': {
-  //   '& fieldset': { borderColor: '#ffec3e' },
-  //   '&:hover fieldset': {
-  //     borderColor: '#ffec3e',
-  //   },
-  //   '&.Mui-focused fieldset': {
-  //     borderColor: '#ffec3e',
-  //   },
-  // },
-  // color: '#fff',
-  // input: {
-  //   color: '#fff',
-  //   borderColor: '#fff',
-  // },
-}
 
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props
@@ -110,9 +75,10 @@ function CustomTabPanel(props: TabPanelProps) {
     </div>
   )
 }
+
 const CourseCreate = () => {
   const router = useRouter()
-  // States
+
   const [createLessonIndx, setCreateLessonIndx] = useState(-1)
   const [id, setId] = useState()
   const [idLessonEdit, setIdLessonEdit] = useState<string | null>(null)
@@ -124,7 +90,6 @@ const CourseCreate = () => {
   const [modules, setModules] = useState<Array<Module>>([])
   const [allModules, setAllModules] = useState<Array<Lesson>>([])
   const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
-  const [reDropBlock, setReDropBlock] = useState(false)
   const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
   const [skillsSelect, setSkillsSelect] = useState<Array<Skill>>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
@@ -166,7 +131,7 @@ const CourseCreate = () => {
   const [isLoaded, setIsLoaded] = useState(false)
   const [mediaValue, setMediaValue] = useState<{ type: string; content: File }>()
   const [error, setError] = useState<any>()
-  // Handlers
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setIdLessonEdit(null)
     setLessonForm({
@@ -364,7 +329,6 @@ const CourseCreate = () => {
     }
   }
 
-  // sweet alert functions
   function showPushAction(url: string) {
     if (id ? editTrigger : isEdited()) {
       Swal.fire({
@@ -471,7 +435,7 @@ const CourseCreate = () => {
       }
     })
   }
-  // fetching functions
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
@@ -623,7 +587,6 @@ const CourseCreate = () => {
     }
   }, [])
 
-  // AWS module
   if (
     !process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ||
     !process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ||
@@ -663,15 +626,6 @@ const CourseCreate = () => {
     })
   }
 
-  // comparing functions
-  function compareIsLessonEdited(lessonId: string, moduleI: number) {
-    const lessonToCompare = modules[moduleI].lessons.filter((less) => less.id == lessonId)
-    return (
-      lessonToCompare[0].title === lessonForm.title &&
-      lessonToCompare[0].link === lessonForm.link &&
-      compareRichTexts(richValueLesson, lessonToCompare[0].description)
-    )
-  }
   function compareRichTexts(first: Array<any>, second: Array<any>) {
     let result = first.length == second.length
     if (result) {
@@ -715,6 +669,7 @@ const CourseCreate = () => {
 
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
+
   function handleSort(lessonsGet: any, i: number) {
     const lessonClone = [...lessonsGet]
     let draggedIdx = -1
@@ -904,7 +859,6 @@ const CourseCreate = () => {
                           setError({})
                         }}
                         value={form.title}
-                        sx={{ ...textFieldColors }}
                       />
                       <Box sx={{ color: '#000000' }}>
                         <MyEditor value={richValue} setValue={setRichValue} />
@@ -928,7 +882,7 @@ const CourseCreate = () => {
                           setError({})
                         }}
                         value={form.duration || ''}
-                        sx={{ ...textFieldColors, marginTop: 3 }}
+                        sx={{ marginTop: 3 }}
                       />
                       <TextField
                         autoComplete='off'
@@ -949,7 +903,6 @@ const CourseCreate = () => {
                           setError({})
                         }}
                         value={form.price || ''}
-                        sx={{ ...textFieldColors }}
                       />
                       <TextField
                         autoComplete='off'
@@ -967,7 +920,6 @@ const CourseCreate = () => {
                           setEditTrigger(true)
                         }}
                         value={form.priceDiscount || ''}
-                        sx={{ ...textFieldColors }}
                       />
                       <Box sx={{ marginTop: 2 }}>
                         <InputLabel>Language</InputLabel>
@@ -1028,7 +980,6 @@ const CourseCreate = () => {
                             setError({})
                           }}
                           value={form.lector}
-                          sx={{ ...textFieldColors }}
                         />
                       )}
                       {type == 'with-lector' && (
@@ -1048,7 +999,6 @@ const CourseCreate = () => {
                           }}
                           value={form.date || new Date().toISOString().split('T')[0]}
                           sx={{
-                            ...textFieldColors,
                             marginTop: 3,
                           }}
                         />
@@ -1218,7 +1168,6 @@ const CourseCreate = () => {
                           })
                         }}
                         value={form.questionLimit ? form.questionLimit : null}
-                        sx={{ ...textFieldColors }}
                       />
                       {typeof mediaValue?.content == 'string' && (
                         <>
@@ -1381,7 +1330,6 @@ const CourseCreate = () => {
                                         )
                                       }}
                                       value={element.title}
-                                      sx={{ ...textFieldColors }}
                                     />
 
                                     <IconButton

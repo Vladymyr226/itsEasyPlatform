@@ -3,8 +3,6 @@ import arrow from '../../assets/arrow.svg'
 
 import s from './LanguageSwitcher.module.css'
 import { useEffect, useRef, useState } from 'react'
-import DropModalLanguage from '../DropModal/DropModalLanguage'
-import RequestModal from '../RequestModal/RequestModal'
 import { Box } from '@mui/material'
 import { useRouter as detailedRouter } from 'next/router'
 const LanguageSwitcher = () => {

@@ -1,7 +1,4 @@
-// Import necessary libraries and components
 import s from './PopularCourses.module.css'
-import popularCourseImage from '../../assets/popularCourse.png'
-import clock from '../../assets/greyClock.svg'
 import notebook from '../../assets/greyNotebook.svg'
 import stat from '../../assets/statistics.svg'
 import courseShadow from '../../../src/assets/shadows/courseHoverShadow.png'
@@ -13,14 +10,12 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-import { A11y, Navigation, Pagination } from 'swiper/modules'
-import { Box } from '@mui/material'
+import { Navigation, Pagination } from 'swiper/modules'
 import { getLocale } from '@/utils/getLocale'
 
 const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolean }) => {
   const router = useRouter()
-  const swiperRef = useRef<any>(null) // Create a ref for the Swiper
-
+  const swiperRef = useRef<any>(null)
   return (
     <>
       {/* Custom Navigation Buttons */}

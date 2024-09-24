@@ -1,61 +1,27 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import s from './HomePage.module.css'
 import CourseCard from '@/components/CourseCard/CourseCard'
 import FaqSection from '@/components/FaqSection/FaqSection'
-import PopularArticles from '@/components/PopularArticles/PopularArticles'
 import PromoSlider from '@/components/PromoSlider/PromoSlider'
 import plus from '../src/assets/plus.svg'
-import loadMoreButton from '../src/assets/loadMoreButton.png'
 import Layout from '@/components/Layout/Layout'
 import '../app/globals.css'
 import Link from 'next/link'
-const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
-import Autocomplete from '@mui/material/Autocomplete'
-import { Box, Button, TextField, IconButton, CircularProgress } from '@mui/material'
+import { Box, TextField, IconButton, CircularProgress } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import { Tag } from '@/utils/interfaces'
+import { Course, Tag } from '@/utils/interfaces'
 import courseShadow from '../src/assets/shadows/courseHoverShadow.png'
-import { styled } from '@mui/material/styles'
-
-import Popper from '@mui/material/Popper'
-import Paper from '@mui/material/Paper'
-import { useRouter } from 'next/router'
 import { getLocale } from '@/utils/getLocale'
 import PopularCourses from '@/components/PopularCourses/PopularCourses'
-import ConfettiButton from '@/components/ConfettiButton/ConfettiButton'
 
-interface CourseData {
-  title: string
-  language: string
-  level: string
-  date: string
-  type: string
-  description: any
-  rating: number
-  duration: number
-  lector: string
-  modules: any
-  price: number
-  mediaValue: mediaDataValue
-}
-interface mediaDataValue {
-  type: string
-  content: string
-}
-interface Course {
-  id: string
-  data: CourseData
-  is_active: boolean
-  created_at: string
-  views: number
-}
+const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const urlFavourite = `${process.env.NEXT_BACK_HOST_API}/auth/favorite`
+
 export default function HomePage() {
   const t = getLocale()
-  const router = useRouter()
 
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Array<Course>>()
@@ -139,7 +105,7 @@ export default function HomePage() {
     setDataDisplay(filteredRes)
   }
   const [isShownHints, setIsShownHints] = useState(false)
-  const testUrl = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback/id`
+
   return (
     <Layout>
       <div className={s.homePage}>
@@ -394,8 +360,6 @@ export default function HomePage() {
             </div>
           </>
         )}
-
-        {/* <PopularArticles /> */}
       </div>
     </Layout>
   )

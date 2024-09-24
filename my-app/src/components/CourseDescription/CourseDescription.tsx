@@ -4,9 +4,6 @@ import Button from '../Button/Button'
 import CourseControlls from '../CourseControlls/CourseControlls'
 import SlateView from '../../components/SlateEditor/View'
 import CourseImage from '../CourseImage/CourseImage'
-import ru from '../../assets/ru.svg'
-import en from '../../assets/en.svg'
-import ua from '../../assets/ua.svg'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getLocale } from '@/utils/getLocale'
@@ -39,10 +36,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
   return (
     <div className={s.courseDescription} style={{ padding: '20px' }}>
       <div className={s.descHeader}>
-        <h2 className={s.descTitle}>
-          {props.title}
-          {/* <span className={s.accentuated}>Backend</span> разработчик */}
-        </h2>
+        <h2 className={s.descTitle}>{props.title}</h2>
         <CourseControlls />
       </div>
       <ul className={s.descInfo}>

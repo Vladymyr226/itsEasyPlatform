@@ -31,8 +31,6 @@ const textFieldColors = {
 }
 const url = `${process.env.NEXT_BACK_HOST_API}/auth/login?`
 const urlReset = `${process.env.NEXT_BACK_HOST_API}/auth/request-reset-password?`
-const urlReset2 = `${process.env.NEXT_BACK_HOST_API}/auth/reset-password?`
-
 const Login = () => {
   const router = useRouter()
   const [email, setEmail] = useState('')

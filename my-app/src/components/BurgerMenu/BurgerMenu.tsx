@@ -2,15 +2,15 @@ import Logo from '../Logo/Logo'
 import s from './BurgerMenu.module.css'
 import { useEffect, useRef, useState } from 'react'
 import cross from '../../assets/burgerCross.svg'
-import arrow from '../../assets/arrow.svg'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Box } from '@mui/material'
 import { useRouter as detailedRouter } from 'next/router'
 import { getLocale } from '@/utils/getLocale'
+
 const urlHost = `${
   process.env.NEXT_PUBLIC_DEV !== 'dev' ? 'https://cb-shchus.vercel.app/' : 'http://localhost:3000/'
 }`
+
 const BurgerMenu = () => {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -35,9 +35,6 @@ const BurgerMenu = () => {
     setIsOpen(isOpen)
   }, [isOpen])
 
-  const [isLanguageShown, setIsLanguageShown] = useState(false)
-  const routerLocale = detailedRouter()
-  const divRef = useRef<HTMLDivElement>(null)
   const t = getLocale()
   return (
     <>

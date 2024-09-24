@@ -1,37 +1,20 @@
 'use client'
-import skillsImage from '../../../src/assets/skillsImage.png'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import Comments from '@/components/Comments/Comments'
-import CourseControlls from '@/components/CourseControlls/CourseControlls'
 import CourseLessonMaterials from '@/components/CourseMaterials/CourseLessonMaterials'
-import CourseSidebar from '@/components/CourseSidebar/CourseSidebar'
-import PlayButton from '@/components/PlayButton/PlayButton'
-import { PauseButton } from '@/components/PlayButton/PlayButton'
-
-import PopularCourses from '@/components/PopularCourses/PopularCourses'
 import Rating from '@mui/material/Rating'
-import SkillsList from '@/components/SkillsList/SkillsList'
-import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
 import { Box, Button, TextField, IconButton } from '@mui/material'
 import YouTube, { YouTubeProps } from 'react-youtube'
 
-import { YouTubeProp } from '@/utils/interfaces'
+import { LessonData, YouTubeProp } from '@/utils/interfaces'
 import { useRouter } from 'next/navigation'
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  CircularProgress,
-  Checkbox,
-} from '@mui/material'
+import { CircularProgress, Checkbox } from '@mui/material'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { getLocale } from '@/utils/getLocale'
@@ -41,88 +24,25 @@ import s from './lesson.module.css'
 import Radio from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import FormControl from '@mui/material/FormControl'
-import FormLabel from '@mui/material/FormLabel'
 import ConfettiButton from '@/components/ConfettiButton/ConfettiButton'
 import courseShadow from '../../src/assets/shadows/courseHoverShadow.png'
 import { styled } from '@mui/material/styles'
 
-interface CourseData {
-  title: string
-  language: string
-  level: string
-  date: string
-  type: string
-  description: any
-  rating: number
-  duration: number
-  lector: string
-  modules: any
-  price: number
-  mediaValue: any
-}
-interface Course {
-  id: string
-  data: CourseData
-  is_active: boolean
-}
-interface Module {
-  title: string
-  lessons: Array<Lesson>
-}
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 const urlFeedback = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback`
 const urlChat = `${process.env.NEXT_BACK_HOST_API}/cabinet/chat`
 
-interface LessonData {
+interface Module {
   title: string
-  link?: string
-  description?: any
-  image?: any
-  questions?: any
-  fields?: any
+  lessons: Array<Lesson>
 }
 interface Lesson {
   id: string
   data: LessonData
   type: string
 }
-
-// ;<Checkbox
-//   defaultChecked={answerForm[indx][optionIndx]}
-//   disabled={checkAnswers}
-//   onChange={(e) => {
-//     let tmpArr: any = answerForm
-//     tmpArr[indx][optionIndx] = e.target.checked
-//     setAnswerForm(tmpArr)
-//   }}
-//   inputProps={{ 'aria-label': 'controlled' }}
-//   style={{}}
-//   sx={{
-//     backgroundColor: '#c7c6c6',
-//     background:
-//       checkAnswers && answerForm && (answerForm[indx][optionIndx] || option.correct)
-//         ? answerForm[indx][optionIndx] == option.correct
-//           ? '#008000'
-//           : '#FF0000'
-//         : null,
-//     padding: 0.5,
-//     marginTop: 0.5,
-//     color: '#be89f5',
-//     '&:hover': {
-//       backgroundColor: '#171622',
-//       borderRadius: 0,
-//       padding: 0,
-//       margin: 0.5,
-//       marginTop: 1,
-//     },
-//     '&.Mui-checked': {
-//       color: '#c7c6c6',
-//     },
-//   }}
-// />
 
 const BpIcon = styled('span')(({ theme }) => ({
   borderRadius: 3,
@@ -186,7 +106,6 @@ const BpFalseIcon = styled(BpIcon)({
   },
 })
 
-// Inspired by blueprintjs
 function BpCheckbox(props: any) {
   return (
     <Checkbox
@@ -213,7 +132,6 @@ function BpCheckbox(props: any) {
   )
 }
 
-// Custom styled components for radio buttons
 const BpIconRadio = styled('span')(({ theme }) => ({
   borderRadius: '50%', // Make it round for radio
   marginTop: 3,
@@ -306,7 +224,6 @@ const BpCheckedIconRadioFalse = styled(BpIcon)({
   },
 })
 
-// Custom Radio component
 function BpRadioButton(props: any) {
   return (
     <Box
@@ -588,7 +505,7 @@ const LessonDetails = () => {
   const handleGPT = async () => {
     const url = 'https://api.openai.com/v1/chat/completions'
     const apiKey =
-      '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' // Replace with your actual API key
+      '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'
 
     try {
       const response = await axios.post(
@@ -615,8 +532,6 @@ const LessonDetails = () => {
           },
         }
       )
-
-      // Обновляем состояние dataGpt с полученными данными из ответа
 
       const responseChat = await axios.put(
         urlChat + '?lessonId=' + id + '&userId=' + userData.id + '&chatId=' + chatDataId,
@@ -707,15 +622,6 @@ const LessonDetails = () => {
                 </h1>
               )}
               <Box>
-                {/* {data.type == 'default' && (
-                <Box sx={{ overflowY: 'auto', scrollbarWidth: 'none' }}>
-                  <Box
-                    sx={{ width: '100%', height: 'max-content', color: '#c7c6c6', padding: '15px' }}
-                  >
-                    <SlateView value={data && data.data.description} />
-                  </Box>
-                </Box>
-              )} */}
                 {data.type == 'default' && (
                   <Box>
                     {data.data.fields &&
@@ -746,16 +652,6 @@ const LessonDetails = () => {
                               </Box>
                             )}
                             {field.type == 'code' && (
-                              // <Box
-                              //   sx={{
-                              //     width: '100%',
-                              //     height: '900px',
-                              //     color: '#c7c6c6',
-                              //     padding: '15px',
-                              //   }}
-                              // >
-
-                              // </Box>
                               <Box
                                 sx={{
                                   width: '100%',
@@ -839,7 +735,6 @@ const LessonDetails = () => {
                                       sx={{
                                         position: 'relative',
                                         zIndex: 1,
-                                        // answerForm[indx][optionIndx]
                                       }}
                                     >
                                       <BpCheckbox
@@ -934,21 +829,6 @@ const LessonDetails = () => {
                                                   : -1
                                               }
                                             />
-
-                                            //   sx={{
-                                            //     background:
-                                            //       checkAnswers &&
-                                            //       answerForm &&
-                                            //       (answerForm[indx][optionIndx] || option.correct)
-                                            //         ? answerForm[indx][optionIndx] == option.correct
-                                            //           ? '#008000'
-                                            //           : '#FF0000'
-                                            //         : null,
-                                            //     color: '#c7c6c6',
-                                            //     '&.Mui-disabled': { color: '#c7c6c6' },
-                                            //     '&.Mui-checked': { color: '#c7c6c6' },
-                                            //   }}
-                                            // />
                                           }
                                           label={option.title}
                                         />
@@ -1036,6 +916,7 @@ const LessonDetails = () => {
                   </Box>
                 )}
               </Box>
+
               {/* Botom buttons */}
               <Box
                 sx={{
@@ -1402,24 +1283,6 @@ const LessonDetails = () => {
                               sx={{ background: '#2a2439' }}
                               onClick={async (e: any) => {
                                 if (gptField.current.value.trim() != '') {
-                                  // const response = await axios.put(
-                                  //   urlChat +
-                                  //     '?lessonId=' +
-                                  //     id +
-                                  //     '&userId=' +
-                                  //     userData.id +
-                                  //     '&chatId=' +
-                                  //     chatDataId,
-                                  //   {
-                                  //     messages: chatData.data.messages
-                                  //       ? [
-                                  //           ...chatData.data.messages,
-                                  //           { value: message, from: 'user', time: new Date() },
-                                  //         ]
-                                  //       : [{ value: message, from: 'user', time: new Date() }],
-                                  //   }
-                                  // )
-                                  // if (response.status == 200) {
                                   setChatData({
                                     ...chatData,
                                     data: {

@@ -3,15 +3,12 @@
 import { useEffect, useState } from 'react'
 import Layout from '@/components/Layout/Layout'
 import '../../../app/globals.css'
-import { Box, Button, Typography } from '@mui/material'
-import ResetPassword from '@/components/ResetPassword'
+import { Box } from '@mui/material'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 const url = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 const AdminLogin = () => {
-  const [width, setWidth] = useState(0)
-
   const router = useRouter()
   const { id } = router.query
   async function verify() {
@@ -24,11 +21,6 @@ const AdminLogin = () => {
       }, 10000)
     }
   }
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setWidth(window.innerWidth)
-    }
-  }, [])
   useEffect(() => {
     if (typeof id !== 'undefined') {
       verify()

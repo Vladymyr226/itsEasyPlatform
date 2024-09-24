@@ -17,9 +17,6 @@ export function SliderComponent({ children, outside }: SliderProps) {
   const [isLeftButtonHover, setIsLeftButtonHover] = useState(false)
   const [isRightButtonHover, setIsRightButtonHover] = useState(false)
 
-  // const width = window.innerWidth;
-  // width >= 1200 ? false : true;
-
   const settings: Settings = {
     dots: true,
     infinite: true,

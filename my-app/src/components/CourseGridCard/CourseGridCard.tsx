@@ -1,7 +1,5 @@
 import s from './CourseGridCard.module.css'
 
-import popularCourseImage from '../../assets/popularCourse.png'
-import clock from '../../assets/greyClock.svg'
 import notebook from '../../assets/greyNotebook.svg'
 import stat from '../../assets/statistics.svg'
 import Image from 'next/image'
@@ -9,12 +7,10 @@ import courseShadow from '../../../src/assets/shadows/courseHoverShadow.png'
 import Rating from '../Rating/Rating'
 import { useRouter } from 'next/navigation'
 import { getLocale } from '@/utils/getLocale'
-import { TabPanelProps, Module, Tag } from '@/utils/interfaces'
+import { Module } from '@/utils/interfaces'
 import { useEffect, useRef, useState } from 'react'
 import { LinearProgress } from '@mui/material'
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
-const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
-const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 
 const CourseGridCard = ({ course, showProgress }: { course: any; showProgress?: boolean }) => {
   const router = useRouter()

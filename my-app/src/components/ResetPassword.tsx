@@ -1,9 +1,7 @@
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
 import { useState } from 'react'
 import axios from 'axios'
-import { setCookie } from 'cookies-next'
 import Swal from 'sweetalert2'
 import { Box, Button, TextField, IconButton } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
@@ -29,9 +27,7 @@ const textFieldColors = {
     borderColor: '#c7c6c6',
   },
 }
-const url = `${process.env.NEXT_BACK_HOST_API}/auth/login?`
-const urlReset = `${process.env.NEXT_BACK_HOST_API}/auth/request-reset-password?`
-const urlReset2 = `${process.env.NEXT_BACK_HOST_API}/auth/reset-password?`
+const urlReset = `${process.env.NEXT_BACK_HOST_API}/auth/reset-password?`
 
 const ResetPassword = ({ id }: { id: string }) => {
   const router = useRouter()
@@ -68,7 +64,7 @@ const ResetPassword = ({ id }: { id: string }) => {
     }
 
     try {
-      const response = await axios.put(urlReset2 + 'id=' + id + '&password=' + password)
+      const response = await axios.put(urlReset + 'id=' + id + '&password=' + password)
       const resultResponse = response.data
       if (resultResponse) {
         router.push('/admin/login')
@@ -178,23 +174,6 @@ const ResetPassword = ({ id }: { id: string }) => {
         >
           {t.confirm}
         </Button>
-        {/* {!passwordForgot && (
-          <Link href={'./register'}>
-            <Box
-              sx={{
-                color: '#ffec3e',
-                textAlign: 'right',
-                fontSize: '14px',
-                '&:hover': {
-                  color: '#c7c6c6',
-                  cursor: 'pointer',
-                },
-              }}
-            >
-              {t.register_now}
-            </Box>
-          </Link>
-        )} */}
       </Box>
     </Box>
   )

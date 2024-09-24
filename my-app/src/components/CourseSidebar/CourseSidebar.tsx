@@ -1,14 +1,8 @@
 'use client'
 import s from './CourseSidebar.module.css'
-import video from '../../assets/video.svg'
-import certificate from '../../assets/certificate.svg'
 import calendar from '../../assets/calendar.svg'
-import exercises from '../../assets/exercises.svg'
 import notes from '../../assets/notes.svg'
-import time from '../../assets/time.svg'
 import USB from '../../assets/USB.svg'
-import watch from '../../assets/watch.svg'
-import notebook from '../../assets/notebook.svg'
 import Rating from '../Rating/Rating'
 import ViewsCount from '../ViewsCount/ViewsCount'
 import Image from 'next/image'
@@ -125,12 +119,6 @@ const CourseSidebar = ({
     <div className={s.sidebar}>
       <Prices price={price} priceDiscount={priceDiscount} />
       <p className={s.sidebarSubTitle}>{t.this_course_includes}</p>
-      {/* <div className={s.courseContent}>
-        <Image src={video} alt='video' /> 22 часа видео лекций
-      </div> */}
-      {/* <div className={s.courseContent}>
-        <Image src={certificate} alt='certificate' /> Сертификат об окончании курсов
-      </div> */}
       <div className={s.courseContent}>
         <Image src={calendar} alt='calendar' /> {t.course_duration} {duration}
         {declOfNum(duration, [t.day1, t.day2, t.day3])}
@@ -142,35 +130,11 @@ const CourseSidebar = ({
       <div className={s.courseContent}>
         <Image src={USB} alt='USB' /> {modules && modules.length} {t.sections}
       </div>
-      {/* <div className={s.courseContent}>
-        <Image src={exercises} alt='exercises' /> 42 текстовых заданий
-      </div> */}
-      {/* <div className={s.courseContent}>
-        <Image src={notebook} alt='notebook' /> 100 лекций
-      </div> */}
-      {/* <div className={s.courseContent}>
-        <Image src={watch} alt='watch' /> 38 часов консультации ментора
-      </div> */}
-      {/* <div className={s.courseContent}>
-        <Image src={time} alt='time' /> Общая продолжительность 29 ч 48 мин
-      </div> */}
 
       <div className={s.courseStatsWrapper}>
         <Rating rating={rating} isBig={true} />
         <ViewsCount views={views} />
-        {/* <ViewsCount /> */}
       </div>
-
-      {/* <div className={s.divide}></div>
-
-      {width < 1200 && <Prices price={price} priceDiscount={priceDiscount} />}
-
-      <p className={s.footerTitle}>Планируете обучение 5 или более человек?</p>
-      <p className={s.footerText}>
-        Получите доступ к более чем 57 лучших курсов на IT’s easy для своей команды - когда угодно,
-        где угодно.
-      </p>
-      <button className={s.footerButton}>Получить IT’s easy business </button> */}
     </div>
   )
 }

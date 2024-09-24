@@ -1,31 +1,12 @@
 'use client'
 
-import courseImage from '../../src/assets/courseImage.png'
-import skillsImage from '../../src/assets/skillsImage.png'
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import Comments from '@/components/Comments/Comments'
-import CourseControlls from '@/components/CourseControlls/CourseControlls'
-import CourseMaterials from '@/components/CourseMaterials/CourseMaterials'
-import CourseSidebar from '@/components/CourseSidebar/CourseSidebar'
-import PlayButton from '@/components/PlayButton/PlayButton'
-import PopularCourses from '@/components/PopularCourses/PopularCourses'
-import Rating from '@/components/Rating/Rating'
-import SkillsList from '@/components/SkillsList/SkillsList'
-import ViewsCount from '@/components/ViewsCount/ViewsCount'
 import Layout from '@/components/Layout/Layout'
 import '../../../app/globals.css'
-import { Box, Button, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import Login from '@/components/Login'
+
 const AdminLogin = () => {
-  const [width, setWidth] = useState(0)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setWidth(window.innerWidth)
-    }
-  }, [])
-
   return (
     <Layout>
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>

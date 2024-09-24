@@ -1,5 +1,4 @@
 import s from './CourseImage.module.css'
-import courseImage from '../../assets/courseImage.png'
 
 import courseShadow from '../../assets/shadows/courseHoverShadow.png'
 import PlayButton, { PauseButton } from '../PlayButton/PlayButton'
@@ -39,7 +38,6 @@ const CourseImage = ({
                 <img ref={blockRef} className={s.courseImage} src={mediaValue.content} />
               </Box>
 
-              {/* <Image className={s.courseImage} src={mediaValue.content} alt='course' /> */}
               <div className={s.courseStatsWrapper}>
                 <div
                   style={{

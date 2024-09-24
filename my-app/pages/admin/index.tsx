@@ -21,7 +21,6 @@ const tableColumn = {
 }
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
-const urlFeedback = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback`
 
 const TableColumns = () => {
   return (
@@ -97,7 +96,6 @@ const AdminTable = () => {
     }
   }, [])
 
-  // sweetalert
   function showDeleteAlert(id: number) {
     Swal.fire({
       title: 'Do you want to delete the course?',
