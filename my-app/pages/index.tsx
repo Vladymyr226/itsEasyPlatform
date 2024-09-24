@@ -48,7 +48,6 @@ export default function HomePage() {
           'Content-Type': 'application/json',
         },
       })
-      console.log(responseFav)
       const response = await fetch(url + 's?isActive=true', {
         headers: {
           'Content-Type': 'application/json',

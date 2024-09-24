@@ -299,8 +299,8 @@ const LessonDetails = () => {
         },
       })
       const resultUser = await responseUser.json()
-
       setUserData(resultUser)
+
       if (fullUrl.split('id=')[1]) {
         setId(Number(fullUrl.split('id=')[1]))
         getPageData2(Number(fullUrl.split('id=')[1]), resultUser.id)
@@ -453,8 +453,11 @@ const LessonDetails = () => {
 
       setCompleteButtonState('ready')
       setCheckAnswers(false)
-      getPageData()
-      getPageData2(id, userData.id)
+      setData(undefined)
+      setTimeout(() => {
+        getPageData()
+        getPageData2(id, userData.id)
+      }, 1)
     }
   }, [id])
 
@@ -574,7 +577,6 @@ const LessonDetails = () => {
       console.error('Ошибка при отправке запроса:', error)
     }
   }
-
   const gptField = useRef<any>()
   return (
     <Layout>
