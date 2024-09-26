@@ -514,7 +514,7 @@ const LessonDetails = () => {
       const response = await axios.post(
         url,
         {
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4o',
           messages: [
             {
               role: 'system',
