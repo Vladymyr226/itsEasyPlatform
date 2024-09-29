@@ -48,9 +48,41 @@ const LessonCreateQuiz = ({
     const lessonToCompare = modules[moduleI].lessons.filter(
       (less: any) => (less.id ?? -1) == lessonId
     )
+    let check = false
+    if (lessonToCompare[0].questions.length === questionModules.length) {
+      questionModules.map((data: any, i: number) => {
+        let checkOptions = false
+        if (data.title !== lessonToCompare[0].questions[i].title) {
+          check = true
+          return
+        }
+        data.options.map((dataOption: any, j: number) => {
+          if (lessonToCompare[0].questions[i].options[j]) {
+            if (dataOption.correct !== lessonToCompare[0].questions[i].options[j].correct) {
+              checkOptions = true
+              return
+            }
+            if (dataOption.title !== lessonToCompare[0].questions[i].options[j].title) {
+              checkOptions = true
+              return
+            }
+          } else {
+            checkOptions = true
+          }
+        })
+        if (checkOptions) {
+          check = true
+          return
+        }
+      })
+    } else {
+      check = true
+    }
     return (
+      lessonToCompare[0].hours === lessonForm.hours &&
+      lessonToCompare[0].minutes === lessonForm.minutes &&
       lessonToCompare[0].title === lessonForm.title &&
-      lessonToCompare[0].questions.length === questionModules.length
+      !check
     )
   }
 
