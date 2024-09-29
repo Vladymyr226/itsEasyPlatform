@@ -60,6 +60,9 @@ const Prices = ({
           })
 
           const resultResponse = response.data
+
+            // const response = await axios.post('https://its-easy-platform-back-end.vercel.app/api/payment/redirect')
+            // console.log(response);
         }}
       >
         {t.buy_now}
