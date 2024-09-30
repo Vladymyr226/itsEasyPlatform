@@ -6,9 +6,9 @@ import USB from '../../assets/USB.svg'
 import Rating from '../Rating/Rating'
 import ViewsCount from '../ViewsCount/ViewsCount'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import axios from 'axios'
-import { getLocale } from '@/utils/getLocale'
+import {getLocale} from '@/utils/getLocale'
 
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
