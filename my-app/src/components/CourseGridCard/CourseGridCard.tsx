@@ -94,7 +94,17 @@ const CourseGridCard = ({ course, showProgress }: { course: any; showProgress?: 
           </div>
           <div className={s.courseItemFooter}>
             <p className={s.courseTitle}>
-              <span className={s.accentuated} style={{ textWrap: 'wrap' }}>
+              <span
+                className={s.accentuated}
+                style={{
+                  textWrap: 'wrap',
+                  display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: 4,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 {course.data.title}
               </span>
             </p>
