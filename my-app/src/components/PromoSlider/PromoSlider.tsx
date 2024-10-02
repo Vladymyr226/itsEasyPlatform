@@ -1,15 +1,11 @@
 'use client'
 import s from './PromoSlider.module.css'
-
-import loremIpsumPromo from '../../assets/loremipsumPromo.png'
-import ITpromo from '../../assets/ITpromo.png'
-import directionBg from '../../assets/directionBg.png'
-import directionImage from '../../assets/directionImage.png'
 import advantages from '../../assets/advantages.jpeg'
-import laptopImage from '../../assets/laptop.png'
-import promoLines from '../../assets/promoLines.png'
 import backgroundLines from '../../assets/backgroundLines.png'
 import mobileBackgroundLines from '../../assets/mobileBackgroundLines.png'
+import slideFirstImage from '../../assets/slideFirstImage.png'
+import slideFirstText1 from '../../assets/slideFirstText1.svg'
+import slideFirstText2 from '../../assets/slideFirstText2.svg'
 
 import Button from '../Button/Button'
 import { SliderComponent } from '../Slider/Slider'
@@ -30,28 +26,69 @@ const PromoSlider = () => {
       <SliderComponent outside={width < 1280}>
         <div className={s.promoSlide}>
           <div className={s.promoInfo}>
-            <h1 className={s.promoTitle}>
-              <span className={s.accentuated}>IT</span>’s easy - войди в мир ИТ с легкостью!
+            <h1
+              style={{
+                fontSize: `${width >= 1200 ? '78px' : '32px'}`,
+                lineHeight: '93.6px',
+              }}
+            >
+              Learning
+              <Image
+                src={slideFirstText1}
+                alt="slideFirstText1"
+                style={{ display: 'inline', width: '60px', height: '60px' }}
+              />
+              Information Technologies is easier with{'  '}
+              <span>
+                <Image
+                  src={slideFirstText2}
+                  alt="slideFirstText2"
+                  style={{ display: 'inline', width: '60px', height: '60px' }}
+                />
+              </span>{' '}
+              AI Tutor
             </h1>
-            <p className={s.promoDesc}>
-              Качественное образовантие для твоего успешного старта в этой индустрии.
-            </p>
-            <Button text='Тест на определения направления' />
+            <Button text="View Courses" />
           </div>
           <Image
             style={{
-              width: `${width >= 1200 ? '55%' : '90%'}`,
+              width: `${width >= 1200 ? '45%' : '90%'}`,
               pointerEvents: 'none',
             }}
-            src={advantages}
-            alt='programmer'
+            src={slideFirstImage}
+            alt="programmer"
           />
           <Image
             className={s.backgroundLines}
             src={width >= 1280 ? backgroundLines : mobileBackgroundLines}
-            alt='lines'
+            alt="lines"
           />
         </div>
+
+        {/*<div className={s.promoSlide}>*/}
+        {/*  <div className={s.promoInfo}>*/}
+        {/*    <h1 className={s.promoTitle}>*/}
+        {/*      <span className={s.accentuated}>IT</span>’s easy - войди в мир ИТ с легкостью!*/}
+        {/*    </h1>*/}
+        {/*    <p className={s.promoDesc}>*/}
+        {/*      Качественное образовантие для твоего успешного старта в этой индустрии.*/}
+        {/*    </p>*/}
+        {/*    <Button text='Тест на определения направления' />*/}
+        {/*  </div>*/}
+        {/*  <Image*/}
+        {/*    style={{*/}
+        {/*      width: `${width >= 1200 ? '55%' : '90%'}`,*/}
+        {/*      pointerEvents: 'none',*/}
+        {/*    }}*/}
+        {/*    src={advantages}*/}
+        {/*    alt='programmer'*/}
+        {/*  />*/}
+        {/*  <Image*/}
+        {/*    className={s.backgroundLines}*/}
+        {/*    src={width >= 1280 ? backgroundLines : mobileBackgroundLines}*/}
+        {/*    alt='lines'*/}
+        {/*  />*/}
+        {/*</div>*/}
 
         {/*<div className={s.promoSlide}>*/}
         {/*  <div className={s.promoInfo}>*/}
