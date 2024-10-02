@@ -51,18 +51,18 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
       </div>
 
       <Swiper
+        loop={true}
         pagination={{
           dynamicBullets: true,
         }}
         className='mySwiper'
         style={{ width: '100%', paddingBottom: '40px' }}
         modules={[Navigation, Pagination]}
-        // Disable default Swiper navigation and use custom buttons
         navigation={{
           prevEl: `.${s.prevButton}`,
           nextEl: `.${s.nextButton}`,
         }}
-        onSwiper={(swiper) => (swiperRef.current = swiper)} // Reference the Swiper instance
+        onSwiper={(swiper) => (swiperRef.current = swiper)}
         spaceBetween={10}
         breakpoints={{
           480: {
@@ -113,7 +113,17 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
                   </div>
                   <div className={s.courseItemFooter}>
                     <p className={s.courseTitle}>
-                      <span className={s.accentuated} style={{ textWrap: 'wrap' }}>
+                      <span
+                        className={s.accentuated}
+                        style={{
+                          textWrap: 'wrap',
+                          display: '-webkit-box',
+                          WebkitBoxOrient: 'vertical',
+                          WebkitLineClamp: 4,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
                         {course.data.title}
                       </span>
                     </p>
@@ -154,18 +164,18 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
                                 <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
                               </clipPath>
                               <path d='M0,0v30h50v-30z' fill='#012169' />
-                              <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' stroke-width='6' />
+                              <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' strokeWidth='6' />
                               <path
                                 d='M0,0 50,30M50,0 0,30'
-                                clip-path='url(#t)'
+                                clipPath='url(#t)'
                                 stroke='#C8102E'
-                                stroke-width='4'
+                                strokeWidth='4'
                               />
                               <path
                                 d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
                                 fill='#C8102E'
                                 stroke='#c7c6c6'
-                                stroke-width='2'
+                                strokeWidth='2'
                               />
                             </svg>
                           </div>
