@@ -690,7 +690,7 @@ const AllCoursesDetails = () => {
                 dataDisplay.length > 0 ? (
                   <Grid
                     container
-                    sx={{ gap: 20, justifyContent: { xs: 'center', md: 'left' }, paddingTop: 10 }}
+                    sx={{ gap: 20, justifyContent: { xs: 'center', md: 'center' }, paddingTop: 10 }}
                   >
                     {dataDisplay.map((course: Course, index: number) => {
                       return (
