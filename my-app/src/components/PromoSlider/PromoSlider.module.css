@@ -4,7 +4,6 @@
   width: 100%;
   padding-left: 20px;
   border-radius: 28px;
-
   background-color: var(--bg-alt-color);
 }
 
@@ -128,6 +127,7 @@
   .promoSlide {
     justify-content: space-between;
     gap: 90px;
+    align-items: center;
 
     flex-direction: row;
   }
