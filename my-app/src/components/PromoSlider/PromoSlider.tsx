@@ -1,6 +1,5 @@
 'use client'
 import s from './PromoSlider.module.css'
-import advantages from '../../assets/advantages.jpeg'
 import backgroundLines from '../../assets/backgroundLines.png'
 import mobileBackgroundLines from '../../assets/mobileBackgroundLines.png'
 import slideFirstImage from '../../assets/slideFirstImage.png'
