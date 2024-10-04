@@ -92,6 +92,18 @@ const toolbarGroups = [
   ],
   [
     {
+      id: 15,
+      format: 'orderedList',
+      type: 'block',
+    },
+    {
+      id: 16,
+      format: 'unorderedList',
+      type: 'block',
+    },
+  ],
+  [
+    {
       id: 17,
       format: 'alignLeft',
       type: 'block',

@@ -9,7 +9,7 @@ export const en = {
   logout: 'Logout',
   language: 'Language',
   home: 'Home',
-  courses: 'Courses',
+  courses: 'All courses',
   about_us: 'About Us',
   career: 'Career',
   my_courses: 'My Courses',

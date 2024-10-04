@@ -71,7 +71,7 @@ const BurgerMenu = () => {
                 </li>
               </Link>
               <li>{t.about_us}</li>
-              <li>{t.career}</li>
+              {/* <li>{t.career}</li> */}
             </ul>
           </div>
           <div className={s.divide}></div>
