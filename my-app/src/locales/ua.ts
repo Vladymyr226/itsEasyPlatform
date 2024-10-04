@@ -9,7 +9,7 @@ export const ua = {
   logout: 'Вийти',
   language: 'Мова',
   home: 'Головна',
-  courses: 'Курси',
+  courses: 'Всі курси',
   about_us: 'Про нас',
   career: "Кар'єра",
   my_courses: 'Мої курси',

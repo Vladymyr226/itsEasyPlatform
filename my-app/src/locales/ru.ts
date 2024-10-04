@@ -9,7 +9,7 @@ export const ru = {
   logout: 'Выйти',
   language: 'Язык',
   home: 'Главная',
-  courses: 'Курсы',
+  courses: 'Все курсы',
   about_us: 'О нас',
   career: 'Карьера',
   my_courses: 'Мои курсы',
