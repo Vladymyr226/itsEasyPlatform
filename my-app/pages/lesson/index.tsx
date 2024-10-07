@@ -30,6 +30,8 @@ import { styled } from '@mui/material/styles'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
+const urlLessonsById = `${process.env.NEXT_BACK_HOST_API}/cabinet/lessons-by-id`
+
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 const urlFeedback = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedback`
 const urlChat = `${process.env.NEXT_BACK_HOST_API}/cabinet/chat`
@@ -372,26 +374,23 @@ const LessonDetails = () => {
           setModuleLessons(
             resultCourse.data.modules[Number(localStorage.getItem('SelectedModuleIndex'))].lessons
           )
-          const modules = await Promise.all(
-            resultCourse.data.modules.map(async (module: any) => {
-              const lessons = await Promise.all(
-                module.lessons.map(async (lessonId: string) => {
-                  const responseLesson = await fetch(urlLesson + '/' + lessonId, {
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                  })
-                  const resultLesson = await responseLesson.json()
-                  return { id: resultLesson.id, data: resultLesson.data, type: resultLesson.type }
-                })
-              )
+          const allLessonIds = resultCourse.data.modules.flatMap((module: any) => module.lessons);
+          const response = await fetch(urlLessonsById + '?idArr=' + allLessonIds.join(','), {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          const lessonsResponse = await response.json();
 
-              return {
-                title: module.title,
-                lessons: lessons,
-              }
-            })
-          )
+          const lessonsById = lessonsResponse.reduce((acc: any, lesson: any) => {
+            acc[lesson.id] = lesson;
+            return acc;
+          }, {});
+
+          const modules = resultCourse.data.modules.map((module: any) => ({
+            title: module.title,
+            lessons: module.lessons.map((lessonId: string) => lessonsById[lessonId] ?? null),
+          }));
           setModules(modules)
         }
       } else {

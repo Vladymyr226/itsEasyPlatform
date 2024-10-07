@@ -22,6 +22,7 @@ import { Course, LessonData } from '@/utils/interfaces'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
+const urlLessonsById = `${process.env.NEXT_BACK_HOST_API}/cabinet/lessons-by-id`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 interface Module {
@@ -84,50 +85,24 @@ const CourseDetails = () => {
           }
         )
 
-        const modulesTmp = await Promise.all(
-          result.data.modules.map(async (module: any) => {
-            const lessons = await Promise.all(
-              module.lessons.map(async (lessonId: string) => {
-                const responseLesson = await fetch(urlLesson + '/' + lessonId, {
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                })
-                const resultLesson = await responseLesson.json()
-                return { id: resultLesson.id, data: resultLesson.data }
-              })
-            )
-            return {
-              title: module.title,
-              lessons: lessons,
-            }
-          })
-        )
+        const allLessonIds = result.data.modules.flatMap((module: any) => module.lessons);
+        const responseLessons = await fetch(urlLessonsById + '?idArr=' + allLessonIds.join(','), {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const lessonsResponse = await responseLessons.json();
 
-        setModules(modulesTmp)
+        const lessonsById = lessonsResponse.reduce((acc: any, lesson: any) => {
+          acc[lesson.id] = lesson;
+          return acc;
+        }, {});
 
-        let lessonsSum = 0
-        const modules = await Promise.all(
-          result.data.modules.map(async (module: any) => {
-            const lessons = await Promise.all(
-              module.lessons.map(async (lessonId: string) => {
-                lessonsSum += 1
-                const responseLesson = await fetch(urlLesson + '/' + lessonId, {
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                })
-                const resultLesson = await responseLesson.json()
-                return { id: resultLesson.id, data: resultLesson.data }
-              })
-            )
-            return {
-              title: module.title,
-              lessons: lessons,
-            }
-          })
-        )
-        setLessSum(lessonsSum)
+        const modules = result.data.modules.map((module: any) => ({
+          title: module.title,
+          lessons: module.lessons.map((lessonId: string) => lessonsById[lessonId] ?? null),
+        }));
+        setModules(modules)
         localStorage.setItem('SelectedCourse', result.id)
 
         const filter = resultAll.getCourses.filter(
@@ -137,6 +112,7 @@ const CourseDetails = () => {
         )
 
         setPopularCoursesData(filter)
+        setLessSum(allLessonIds.length)
         setData({ ...result, data: { ...result.data, modules: modules } })
       } else {
       }
@@ -158,7 +134,6 @@ const CourseDetails = () => {
   const t = getLocale()
 
   const [modules, setModules] = useState<Array<Module>>()
-
   return (
     <Layout>
       {data ? (
