@@ -12,6 +12,10 @@ import './Editor.css'
 const Element = (props) => {
   return getBlock(props)
 }
+const Leaf = ({ attributes, children, leaf }) => {
+  children = getMarked(leaf, children)
+  return <span {...attributes}>{children}</span>
+}
 
 const SlateView = (props) => {
   const editor = useMemo(
@@ -24,6 +28,7 @@ const SlateView = (props) => {
   }
 
   const renderElement = useCallback((props) => <Element {...props} />, [])
+  const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
 
   const [htmlAction, setHtmlAction] = useState({
     showInput: false,
@@ -42,7 +47,7 @@ const SlateView = (props) => {
     <>
       {typeof props.value != 'undefined' ? (
         <Slate editor={editor} initialValue={props.value}>
-          <Editable readOnly renderElement={renderElement} />
+          <Editable readOnly renderElement={renderElement} renderLeaf={renderLeaf} />
         </Slate>
       ) : (
         <></>
