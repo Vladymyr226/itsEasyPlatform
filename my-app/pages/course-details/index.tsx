@@ -141,7 +141,7 @@ const CourseDetails = () => {
           <div className={s.leftSide}>
             <div className={s.courseTitle}>
               <h2>{data && data.data.title}</h2>
-              <CourseControlls />
+              {data && <CourseControlls courseId={data.id} isFavoriteStart={userData && userData.favourite_courses_id ? userData.favourite_courses_id.indexOf(data.id) != -1:false} userData={userData}/>}
             </div>
 
             <div className={s.courseImageWrapper}>

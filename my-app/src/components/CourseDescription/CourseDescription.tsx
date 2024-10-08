@@ -20,6 +20,8 @@ interface CourseDescriptionProps {
   mediaValue: any
   createdAt: string
   views: number
+  isFavoriteStart: boolean
+  userData: any
 }
 const CourseDescription = (props: CourseDescriptionProps) => {
   const [width, setWidth] = useState(0)
@@ -37,7 +39,7 @@ const CourseDescription = (props: CourseDescriptionProps) => {
     <div className={s.courseDescription} style={{ padding: '20px' }}>
       <div className={s.descHeader}>
         <h2 className={s.descTitle}>{props.title}</h2>
-        <CourseControlls />
+        <CourseControlls courseId={props.id} isFavoriteStart={props.isFavoriteStart} userData={props.userData}/>
       </div>
       <ul className={s.descInfo}>
         <li className={s.infoItem}>

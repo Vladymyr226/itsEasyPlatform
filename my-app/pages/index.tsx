@@ -19,17 +19,21 @@ import PopularCourses from '@/components/PopularCourses/PopularCourses'
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const urlFavourite = `${process.env.NEXT_BACK_HOST_API}/auth/favorite`
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 export default function HomePage() {
   const t = getLocale()
 
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<Array<Course>>()
+  const [userData, setUserData] = useState<any>()
 
   const [dataDisplay, setDataDisplay] = useState<any>()
   const [selectedTag, setSelectedTag] = useState<Array<String>>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
   const [searchField, setSearchField] = useState<string>('')
+  const [favouriteCourses, setFavouriteCourses] = useState<Array<string>>([])
+
   async function getPageData() {
     if (typeof window !== 'undefined') {
       const responseTag = await fetch(urlTag + 's', {
@@ -43,11 +47,16 @@ export default function HomePage() {
           return tag
         })
       )
-      const responseFav = await fetch(urlFavourite + '?userId=8&courseId=4', {
+
+      const userId = localStorage.getItem('UserID')
+      const responseUser = await fetch(urlUser + '/' + userId, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
+      const resultUser = await responseUser.json()
+      setFavouriteCourses(resultUser.favourite_courses_id)
+      setUserData(resultUser)
       const response = await fetch(url + 's?isActive=true', {
         headers: {
           'Content-Type': 'application/json',
@@ -306,6 +315,8 @@ export default function HomePage() {
                     mediaValue={course.data.mediaValue}
                     createdAt={course.created_at}
                     views={course.views}
+                    isFavoriteStart={favouriteCourses ? favouriteCourses.indexOf(course.id) != -1:false}
+                    userData={userData}
                   />
                 </>
               )

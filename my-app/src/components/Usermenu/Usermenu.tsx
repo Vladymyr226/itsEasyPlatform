@@ -57,10 +57,12 @@ const Usermenu = () => {
               <p>{t.my_education}</p>
             </div>
           </Link>
+          <Link href={'/personal-cabinet/saved-courses'}>
           <div className={s.usermenuItem}>
             <Image src={heart} alt='heart' />
             <p>{t.my_favorites}</p>
           </div>
+          </Link>
           <div
             className={s.usermenuItem}
             onClick={(e) => {

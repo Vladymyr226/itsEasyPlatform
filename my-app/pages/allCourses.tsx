@@ -21,10 +21,12 @@ import { getLocale } from '@/utils/getLocale'
 
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 const AllCoursesDetails = () => {
   const [width, setWidth] = useState(0)
   const [data, setData] = useState<any>()
+  const [userData, setUserData] = useState<any>()
   const [dataDisplay, setDataDisplay] = useState<any>()
 
   async function getPageData() {
@@ -47,7 +49,15 @@ const AllCoursesDetails = () => {
           return tag
         })
       )
-
+      const userId = localStorage.getItem('UserID')
+      const responseUser = await fetch(urlUser + '/' + userId, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const resultUser = await responseUser.json()
+      setFavouriteCourses(resultUser.favourite_courses_id)
+      setUserData(resultUser)
       const responseCourse = await fetch(url + 's?isActive=true', {
         headers: {
           'Content-Type': 'application/json',
@@ -83,6 +93,7 @@ const AllCoursesDetails = () => {
   const [type, setType] = useState<any>([])
   const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
+  const [favouriteCourses, setFavouriteCourses] = useState<Array<string>>([])
 
   const handleChangeLanguage = (event: SelectChangeEvent) => {
     const {
@@ -609,6 +620,7 @@ const AllCoursesDetails = () => {
   useEffect(() => {
     handleApply()
   }, [type])
+  
   return (
     <Layout>
       <Box sx={{ display: 'inline' }}>
@@ -670,6 +682,8 @@ const AllCoursesDetails = () => {
                           mediaValue={course.data.mediaValue}
                           createdAt={course.created_at}
                           views={course.views}
+                          isFavoriteStart={favouriteCourses ? favouriteCourses.indexOf(course.id) != -1:false}
+                          userData={userData}
                         />
                       </>
                     )

@@ -18,6 +18,8 @@ interface CourseCardProps {
   mediaValue: any
   createdAt: string
   views: number
+  isFavoriteStart: boolean
+  userData: any
 }
 const CourseCard = (props: CourseCardProps) => {
   const [width, setWidth] = useState(0)
@@ -45,6 +47,8 @@ const CourseCard = (props: CourseCardProps) => {
           mediaValue={props.mediaValue}
           createdAt={props.createdAt}
           views={props.views}
+          isFavoriteStart={props.isFavoriteStart}
+          userData={props.userData}
         />
 
         {width >= 1200 && (
