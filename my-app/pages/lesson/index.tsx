@@ -518,12 +518,18 @@ const LessonDetails = () => {
             {
               role: 'system',
               content:
-                'You are an assistant for a web application that offers IT courses and should provide brief and accurate answers only to questions on IT topics' +
-                  (lessonContext
-                    ? '. Here is the context of the lesson (' + lessonContext + ')'
-                    : '') +
-                  '. The answer should be given in the language in which the question is written. Here is the message: ' +
-                  gptField.current.value ?? '',
+                'You are an assistant for a web application that offers IT courses and should provide brief and accurate answers only to questions on IT topics.' +
+                ' The answer should be given in the language in which the question is written.',
+            },
+            {
+              role: 'assistant',
+              content: lessonContext
+                ? ' Here is the context of the lesson (' + lessonContext + ')'
+                : '',
+            },
+            {
+              role: 'user',
+              content: 'Here is the message: ' + gptField.current.value,
             },
           ],
         },
