@@ -524,14 +524,20 @@ const LessonDetails = () => {
             {
               role: 'assistant',
               content: lessonContext
-                ? ' Here is the context of the lesson (' + lessonContext + ')'
+                ? 'Here is the context of the lesson (' + lessonContext + ')'
                 : '',
             },
+          ].concat(
+            (chatData.data.messages || []).map((msg: any) => ({
+              role: msg.from.replace('chat', 'assistant'),
+              content: msg.value,
+            }))
+          ).concat([
             {
               role: 'user',
               content: 'Here is the message: ' + gptField.current.value,
             },
-          ],
+          ]),
         },
         {
           headers: {
