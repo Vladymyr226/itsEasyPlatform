@@ -134,6 +134,7 @@ const CourseDetails = () => {
   const t = getLocale()
 
   const [modules, setModules] = useState<Array<Module>>()
+  console.log(data)
   return (
     <Layout>
       {data ? (
@@ -334,12 +335,14 @@ const CourseDetails = () => {
               {userData?.purchased_courses_id.filter((courseId: any) => courseId == data?.id)
                 .length > 0 ? (
                 <Box sx={{ marginTop: 2, minWidth: '375px', width: '100%' }}>
-                  {modules && (
+                  {modules && data && userData && (
                     <CourseLessonMaterials
                       setId={-1}
                       modules={modules}
                       selectedLesson={-1}
                       completedLessonTrigger={false}
+                      userDataStart={userData}
+                      courseStart={data}
                     />
                   )}
                 </Box>

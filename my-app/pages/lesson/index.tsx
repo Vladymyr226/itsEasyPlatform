@@ -283,7 +283,7 @@ const LessonDetails = () => {
   const videoRef = useRef(null)
   const [userData, setUserData] = useState<any>()
   const [selectedCourse, setSelectedCourse] = useState<any>()
-
+  const [courseData,  setCourseData]=useState()
   const [chatDataId, setChatDataId] = useState<any>()
   const [chatData, setChatData] = useState<any>()
   const [userId, setUserId] = useState<any>()
@@ -370,6 +370,7 @@ const LessonDetails = () => {
             },
           })
           const resultCourse = await responseCourse.json()
+          setCourseData(resultCourse)
           setQuestionLimit(resultCourse.data.questionLimit)
           setModuleLessons(
             resultCourse.data.modules[Number(localStorage.getItem('SelectedModuleIndex'))].lessons
@@ -1379,6 +1380,8 @@ const LessonDetails = () => {
                 modules={modules}
                 selectedLesson={id ?? -1}
                 completedLessonTrigger={completedLessonTrigger}
+                userDataStart={userData}
+                courseStart={courseData}
               />
             ) : selectedCourse ? (
               <Box
