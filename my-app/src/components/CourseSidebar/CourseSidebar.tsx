@@ -52,6 +52,14 @@ const Prices = ({
               favouriteCoursesId: [...resultUser.favourite_courses_id],
               comletedLessonsId: [...resultUser.comleted_lessons_id],
             })
+
+            const responseUser2 = await fetch(urlUser + '/' + userId, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            const resultUser2 = await responseUser2.json()
+            setUserData(resultUser2)
           }
         } else {
           console.log('purchased')
