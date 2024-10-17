@@ -18,11 +18,15 @@ const CourseLessonMaterials = ({
   selectedLesson,
   setId,
   completedLessonTrigger,
+  userDataStart,
+  courseStart
 }: {
   modules: any
   selectedLesson: number
   setId: any
   completedLessonTrigger: boolean
+  userDataStart: any,
+  courseStart: any
 }) => {
   const [selected, setSelected] = useState<number | null>(0)
 
@@ -33,31 +37,31 @@ const CourseLessonMaterials = ({
 
     setSelected(i)
   }
-  const [userData, setUserData] = useState<any>()
-  const [course, setCourse] = useState<any>()
+  const [userData, setUserData] = useState<any>(userDataStart)
+  const [course, setCourse] = useState<any>(courseStart)
 
   async function getPageData() {
-    if (typeof window !== 'undefined') {
-      if (localStorage.getItem('SelectedCourse')) {
-        const responseCourse = await fetch(url + '/' + localStorage.getItem('SelectedCourse'), {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        const resultCourse = await responseCourse.json()
-        setCourse(resultCourse)
-      }
-      const fullUrl = window.location.href
-      const userId = localStorage.getItem('UserID')
-      const responseUser = await fetch(urlUser + '/' + userId, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const resultUser = await responseUser.json()
+    // if (typeof window !== 'undefined') {
+    //   if (localStorage.getItem('SelectedCourse')) {
+    //     const responseCourse = await fetch(url + '/' + localStorage.getItem('SelectedCourse'), {
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //     })
+    //     const resultCourse = await responseCourse.json()
+    //     setCourse(resultCourse)
+    //   }
+    //   const fullUrl = window.location.href
+    //   const userId = localStorage.getItem('UserID')
+    //   const responseUser = await fetch(urlUser + '/' + userId, {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   })
+    //   const resultUser = await responseUser.json()
 
-      setUserData(resultUser)
-    }
+    //   setUserData(resultUser)
+    // }
   }
   useEffect(() => {
     getPageData()
