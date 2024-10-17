@@ -52,7 +52,6 @@ const Prices = ({
               favouriteCoursesId: [...resultUser.favourite_courses_id],
               comletedLessonsId: [...resultUser.comleted_lessons_id],
             })
-            setReload(!reload)
           }
         } else {
           console.log('purchased')
@@ -65,7 +64,10 @@ const Prices = ({
 
   useEffect(() => {
     getPageData()
+    setReload(!reload)
   }, [])
+
+  useEffect(() => {}, [reload])
   const t = getLocale()
 
   const getPayLink = async () => {
