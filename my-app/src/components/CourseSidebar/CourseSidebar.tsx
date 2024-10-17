@@ -26,7 +26,7 @@ const Prices = ({
   const [userData, setUserData] = useState<any>()
   const userId = localStorage.getItem('UserID')
   const courseId = localStorage.getItem('SelectedCourse')
-  const [reload, setReload] = useState(false)
+
   async function getPageData() {
     try {
       if (typeof window !== 'undefined') {
@@ -52,6 +52,14 @@ const Prices = ({
               favouriteCoursesId: [...resultUser.favourite_courses_id],
               comletedLessonsId: [...resultUser.comleted_lessons_id],
             })
+
+            const responseUser2 = await fetch(urlUser + '/' + userId, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            const resultUser2 = await responseUser2.json()
+            setUserData(resultUser2)
           }
         } else {
           console.log('purchased')
@@ -64,10 +72,9 @@ const Prices = ({
 
   useEffect(() => {
     getPageData()
-    setReload(!reload)
   }, [])
 
-  useEffect(() => {}, [reload])
+  useEffect(() => {}, [userData])
   const t = getLocale()
 
   const getPayLink = async () => {
