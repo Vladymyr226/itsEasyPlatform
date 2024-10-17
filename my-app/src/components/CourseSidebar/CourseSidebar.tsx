@@ -40,7 +40,7 @@ const Prices = ({
         const resultUser = await responseUser.json()
         setUserData(resultUser)
 
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+        await new Promise((resolve) => setTimeout(resolve, 0))
 
         const checkPaymentStatus = await axios.post(
           `https://its-easy-platform-back-end.vercel.app/api/payment/payment-status-by-id?userId=${Number(userId)}&courseId=${Number(courseId)}`,
