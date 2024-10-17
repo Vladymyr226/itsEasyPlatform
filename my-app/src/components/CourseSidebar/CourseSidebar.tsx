@@ -24,7 +24,6 @@ const Prices = ({
   title?: string
 }) => {
   const [userData, setUserData] = useState<any>()
-  const [isUpdated, setIsUpdated] = useState(false)
   const userId = localStorage.getItem('UserID')
   const courseId = localStorage.getItem('SelectedCourse')
 
@@ -57,11 +56,10 @@ const Prices = ({
               comletedLessonsId: [...resultUser.comleted_lessons_id],
             })
 
-            setIsUpdated(!isUpdated)
+            window.location.reload()
           }
         } else {
           console.log('purchased')
-          setIsUpdated(!isUpdated)
         }
       }
     } catch (e) {
@@ -72,13 +70,6 @@ const Prices = ({
   useEffect(() => {
     getPageData()
   }, [])
-
-  useEffect(() => {
-    if (isUpdated) {
-      getPageData() // Викликаємо повторно отримання даних
-      setIsUpdated(false) // Скидаємо стан, щоб уникнути циклічних викликів
-    }
-  }, [isUpdated])
 
   const t = getLocale()
 
