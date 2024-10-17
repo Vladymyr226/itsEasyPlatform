@@ -26,7 +26,7 @@ const Prices = ({
   const [userData, setUserData] = useState<any>()
   const userId = localStorage.getItem('UserID')
   const courseId = localStorage.getItem('SelectedCourse')
-  const [reload, setReload] = useState(false)
+
   async function getPageData() {
     try {
       if (typeof window !== 'undefined') {
@@ -72,10 +72,9 @@ const Prices = ({
 
   useEffect(() => {
     getPageData()
-    setReload(!reload)
   }, [])
 
-  useEffect(() => {}, [reload])
+  useEffect(() => {}, [userData])
   const t = getLocale()
 
   const getPayLink = async () => {
