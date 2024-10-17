@@ -57,10 +57,11 @@ const Prices = ({
               comletedLessonsId: [...resultUser.comleted_lessons_id],
             })
 
-            setIsUpdated(true)
+            setIsUpdated(!isUpdated)
           }
         } else {
           console.log('purchased')
+          setIsUpdated(!isUpdated)
         }
       }
     } catch (e) {
