@@ -24,6 +24,7 @@ const Prices = ({
   title?: string
 }) => {
   const [userData, setUserData] = useState<any>()
+  const [isUpdated, setIsUpdated] = useState(false)
   const userId = localStorage.getItem('UserID')
   const courseId = localStorage.getItem('SelectedCourse')
 
@@ -36,8 +37,11 @@ const Prices = ({
             'Content-Type': 'application/json',
           },
         })
+
         const resultUser = await responseUser.json()
         setUserData(resultUser)
+
+        await new Promise((resolve) => setTimeout(resolve, 5000))
 
         const checkPaymentStatus = await axios.post(
           `https://its-easy-platform-back-end.vercel.app/api/payment/payment-status-by-id?userId=${Number(userId)}&courseId=${Number(courseId)}`,
@@ -52,14 +56,8 @@ const Prices = ({
               favouriteCoursesId: [...resultUser.favourite_courses_id],
               comletedLessonsId: [...resultUser.comleted_lessons_id],
             })
-            console.log(asd)
-            const responseUser2 = await fetch(urlUser + '/' + userId, {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            })
-            const resultUser2 = await responseUser2.json()
-            setUserData(resultUser2)
+
+            setIsUpdated(true)
           }
         } else {
           console.log('purchased')
@@ -74,7 +72,12 @@ const Prices = ({
     getPageData()
   }, [])
 
-  useEffect(() => {}, [userData])
+  useEffect(() => {
+    if (isUpdated) {
+      getPageData() // Викликаємо повторно отримання даних
+      setIsUpdated(false) // Скидаємо стан, щоб уникнути циклічних викликів
+    }
+  }, [isUpdated])
 
   const t = getLocale()
 
