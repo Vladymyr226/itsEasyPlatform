@@ -44,7 +44,7 @@ const Prices = ({
         )
         if (!resultUser?.purchased_courses_id?.includes(Number(courseId))) {
           if (checkPaymentStatus?.data.order_status === 'approved') {
-            await axios.put(urlUser + '?id=' + resultUser.id, {
+            const asd = await axios.put(urlUser + '?id=' + resultUser.id, {
               purchasedCoursesId: [
                 ...resultUser.purchased_courses_id,
                 Number(localStorage.getItem('SelectedCourseIndex')),
@@ -52,7 +52,7 @@ const Prices = ({
               favouriteCoursesId: [...resultUser.favourite_courses_id],
               comletedLessonsId: [...resultUser.comleted_lessons_id],
             })
-
+            console.log(asd)
             const responseUser2 = await fetch(urlUser + '/' + userId, {
               headers: {
                 'Content-Type': 'application/json',
@@ -75,6 +75,7 @@ const Prices = ({
   }, [])
 
   useEffect(() => {}, [userData])
+
   const t = getLocale()
 
   const getPayLink = async () => {
