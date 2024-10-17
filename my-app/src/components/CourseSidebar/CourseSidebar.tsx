@@ -6,9 +6,9 @@ import USB from '../../assets/USB.svg'
 import Rating from '../Rating/Rating'
 import ViewsCount from '../ViewsCount/ViewsCount'
 import Image from 'next/image'
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
-import {getLocale} from '@/utils/getLocale'
+import { getLocale } from '@/utils/getLocale'
 
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
@@ -16,100 +16,86 @@ const Prices = ({
   price,
   priceDiscount,
   groupPrice,
+  title,
 }: {
   price: number
   priceDiscount?: number
   groupPrice?: number
+  title?: string
 }) => {
   const [userData, setUserData] = useState<any>()
+  const userId = localStorage.getItem('UserID')
+  const courseId = localStorage.getItem('SelectedCourse')
+  const [reload, setReload] = useState(false)
   async function getPageData() {
-    if (typeof window !== 'undefined') {
-      const userId = localStorage.getItem('UserID')
-      const responseUser = await fetch(urlUser + '/' + userId, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const resultUser = await responseUser.json()
-      setUserData(resultUser)
+    try {
+      if (typeof window !== 'undefined') {
+        const userId = localStorage.getItem('UserID')
+        const responseUser = await fetch(urlUser + '/' + userId, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        const resultUser = await responseUser.json()
+        setUserData(resultUser)
+
+        const checkPaymentStatus = await axios.post(
+          `https://its-easy-platform-back-end.vercel.app/api/payment/payment-status-by-id?userId=${Number(userId)}&courseId=${Number(courseId)}`,
+        )
+        if (!resultUser?.purchased_courses_id?.includes(Number(courseId))) {
+          if (checkPaymentStatus?.data.order_status === 'approved') {
+            await axios.put(urlUser + '?id=' + resultUser.id, {
+              purchasedCoursesId: [
+                ...resultUser.purchased_courses_id,
+                Number(localStorage.getItem('SelectedCourseIndex')),
+              ],
+              favouriteCoursesId: [...resultUser.favourite_courses_id],
+              comletedLessonsId: [...resultUser.comleted_lessons_id],
+            })
+            setReload(!reload)
+          }
+        } else {
+          console.log('purchased')
+        }
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
+
   useEffect(() => {
     getPageData()
   }, [])
   const t = getLocale()
 
-
-    // const [form, setForm] = useState('');
-
-    // useEffect(() => {
-    //     test();
-    // }, []);
-
-    // useEffect(() => {
-    //     if (form) {
-    //         // Знаходимо input[type="image"]
-    //         const inputImage = document.querySelector('input[type="image"]');
-    //         if (inputImage) {
-    //             // Створюємо новий елемент кнопки
-    //             const button = document.createElement('button');
-    //             button.innerText = 'Сплатити';
-    //             button.type = 'submit';  // Надаємо кнопці тип submit, щоб вона виконувала дію форми
-
-    //             // Додаємо стилі для кнопки
-    //             button.style.height = '60px';
-    //             button.style.borderRadius = '8px';
-    //             button.style.cursor = 'pointer';
-    //             button.style.width = '100%';
-    //             button.style.marginTop = '14px';
-    //             button.style.paddingTop = '11px';
-    //             button.style.paddingBottom = '11px';
-    //             button.style.border = 'none';
-    //             button.style.fontWeight = '700';
-    //             button.style.fontSize = '16px';
-    //             button.style.lineHeight = '20px';
-    //             button.style.textAlign = 'center';
-    //             button.style.background = 'red';
-    //             button.style.color = 'white';
-    //             button.style.borderRadius = '7px';
-
-    //             // Замінюємо input[type="image"] на нашу кнопку
-    //             inputImage.replaceWith(button);
-    //         }
-    //     }
-    // }, [form]);
-
-    // const test = async () => {
-    //     const response = await axios.post('https://its-easy-platform-back-end.vercel.app/api/payment/liqpay');
-    //     setForm(response.data);
-    // };
+  const getPayLink = async () => {
+    try {
+      const response = await axios.post(
+        `https://its-easy-platform-back-end.vercel.app/api/payment/fondy/?userId=${userId}&courseId=${courseId}&description=${title}&price=${priceDiscount && priceDiscount > 0 ? priceDiscount : price}00`,
+      )
+      window.location.href = response.data.body.checkout_url
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
 
   return (
     <>
       <h3 className={s.sidebarTitle}>{t.self_education}</h3>
       <div className={s.priceWrapper}>
-        {priceDiscount && priceDiscount > 0 ? <span className={s.prevPrice}>${price}</span> : <></>}
+        {priceDiscount && priceDiscount > 0 ? (
+          <span className={s.prevPrice}>${price}</span>
+        ) : (
+          <></>
+        )}
         <span className={s.currentPrice}>
           ${priceDiscount && priceDiscount > 0 ? priceDiscount : price}
         </span>
       </div>
       <button
-          // dangerouslySetInnerHTML={{ __html: form }}
         className={s.sidebarFillButton}
         onClick={async (e) => {
-          const response = await axios.put(urlUser + '?id=' + userData.id, {
-            purchasedCoursesId: [
-              ...userData.purchased_courses_id,
-              Number(localStorage.getItem('SelectedCourseIndex')),
-            ],
-            favouriteCoursesId: [...userData.favourite_courses_id],
-            comletedLessonsId: [...userData.comleted_lessons_id],
-          })
-
-          const resultResponse = response.data
-
-            // const response = await axios.post('https://its-easy-platform-back-end.vercel.app/api/payment/redirect')
-            // console.log(response);
+          getPayLink()
         }}
       >
         {t.buy_now}
@@ -139,6 +125,7 @@ const CourseSidebar = ({
   rating,
   duration,
   views,
+  title,
 }: {
   duration: number
   price: number
@@ -148,6 +135,7 @@ const CourseSidebar = ({
   groupPrice?: number
   rating: number
   views: number
+  title?: string
 }) => {
   const [width, setWidth] = useState(0)
   const [lessonsSum, setLessonsSum] = useState(0)
@@ -161,24 +149,26 @@ const CourseSidebar = ({
   function declOfNum(number: number, titles: any) {
     const cases = [2, 0, 1, 1, 1, 2]
     return titles[
-      number % 100 > 4 && number % 100 < 20 ? 2 : cases[number % 10 < 5 ? number % 10 : 5]
+      number % 100 > 4 && number % 100 < 20
+        ? 2
+        : cases[number % 10 < 5 ? number % 10 : 5]
     ]
   }
   const t = getLocale()
   return (
     <div className={s.sidebar}>
-      <Prices price={price} priceDiscount={priceDiscount} />
+      <Prices price={price} priceDiscount={priceDiscount} title={title} />
       <p className={s.sidebarSubTitle}>{t.this_course_includes}</p>
       <div className={s.courseContent}>
-        <Image src={calendar} alt='calendar' /> {t.course_duration} {duration}
+        <Image src={calendar} alt="calendar" /> {t.course_duration} {duration}
         {declOfNum(duration, [t.day1, t.day2, t.day3])}
       </div>
       <div className={s.courseContent}>
-        <Image src={notes} alt='notes' />
+        <Image src={notes} alt="notes" />
         {lessonsNum} {t.lessons}
       </div>
       <div className={s.courseContent}>
-        <Image src={USB} alt='USB' /> {modules && modules.length} {t.sections}
+        <Image src={USB} alt="USB" /> {modules && modules.length} {t.sections}
       </div>
 
       <div className={s.courseStatsWrapper}>
