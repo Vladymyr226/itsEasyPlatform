@@ -29,21 +29,14 @@ const TableColumns = () => {
           ...tableColumn,
         }}
       >
-        User name
+        User
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        User email
-      </Box>
-      <Box
-        sx={{
-          ...tableColumn,
-        }}
-      >
-        Course name
+        Course Name
       </Box>
       <Box
         sx={{
@@ -57,7 +50,21 @@ const TableColumns = () => {
           ...tableColumn,
         }}
       >
-        Order status
+        Order Status
+      </Box>
+      <Box
+        sx={{
+          ...tableColumn,
+        }}
+      >
+        Order Time
+      </Box>
+      <Box
+        sx={{
+          ...tableColumn,
+        }}
+      >
+        Order ID
       </Box>
     </>
   )
@@ -249,19 +256,10 @@ const Index = () => {
                         }}
                       >
                         {element.user_name}
-                      </Box>
-                      <Box
-                        sx={{
-                          borderRight: '2px solid #000',
-                          minWidth: '10rem',
-                          width: '100%',
-                          textAlign: 'center',
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                        }}
-                      >
+                        <br />
                         {element.email}
                       </Box>
+
                       <Box
                         sx={{
                           borderRight: '2px solid #000',
@@ -279,7 +277,7 @@ const Index = () => {
                       </Box>
                       <Box
                         sx={{
-                          minWidth: '10rem',
+                          minWidth: '2rem',
                           width: '100%',
                           textAlign: 'center',
                           paddingTop: 1,
@@ -296,9 +294,33 @@ const Index = () => {
                           textAlign: 'center',
                           paddingTop: 1,
                           paddingBottom: 1,
+                          borderRight: '2px solid #000',
                         }}
                       >
                         {element.order_status}
+                      </Box>
+                      <Box
+                        sx={{
+                          minWidth: '10rem',
+                          width: '100%',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                          borderRight: '2px solid #000',
+                        }}
+                      >
+                        {element.order_time}
+                      </Box>
+                      <Box
+                        sx={{
+                          minWidth: '10rem',
+                          width: '100%',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        {element.order_id}
                       </Box>
                     </Box>
                   </div>
