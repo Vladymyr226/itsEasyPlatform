@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { deleteCookie } from 'cookies-next'
 import '../../../app/globals.css'
 import Logo from '@/components/Logo/Logo'
+import axios from 'axios'
 
 const tableColumn = {
   minWidth: '10rem',
@@ -18,6 +19,7 @@ const tableColumn = {
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/feedbacks`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/users`
+const urlPayments = `${process.env.NEXT_BACK_HOST_API}/payment/payments`
 
 const TableColumns = () => {
   return (
@@ -27,76 +29,49 @@ const TableColumns = () => {
           ...tableColumn,
         }}
       >
-        Raiting
+        User name
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Lesson
+        User email
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Message
+        Course name
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        Created at
+        Costs
       </Box>
       <Box
         sx={{
           ...tableColumn,
         }}
       >
-        User
+        Order status
       </Box>
     </>
   )
 }
-const AdminFeedbackTable = () => {
+const Index = () => {
   const [data, setData] = useState<Array<any>>()
 
   async function getPageData() {
     if (typeof window !== 'undefined') {
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const result = await response.json()
-      const responseLesson = await fetch(urlLesson + 's', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const resultLesson = await responseLesson.json()
-
-      const responseUser = await fetch(urlUser, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const resultUser = await responseUser.json()
-      setData(
-        result.getFeedbacks.map((feedback: any) => {
-          return {
-            ...feedback,
-            lesson_id: resultLesson.getLessons.filter(
-              (less: any) => less.id == feedback.lesson_id,
-            )[0],
-            user_id: resultUser.getUsers.filter(
-              (user: any) => user.id == feedback.user_id,
-            )[0],
-          }
-        }),
+      const data = await axios.get(
+        `https://its-easy-platform-back-end.vercel.app/api/payment/payments`,
       )
+      setData([...data.data.getPayments])
+      console.log(data.data.getPayments)
     }
   }
 
@@ -186,7 +161,6 @@ const AdminFeedbackTable = () => {
                 paddingLeft: 2,
                 paddingRight: 2,
                 color: '#000',
-                borderLeft: '2px solid #000',
                 fontSize: 20,
               }}
             >
@@ -201,6 +175,7 @@ const AdminFeedbackTable = () => {
                 paddingRight: 2,
                 color: '#000',
                 fontSize: 20,
+                borderLeft: '2px solid #000',
               }}
             >
               Payments
@@ -273,7 +248,7 @@ const AdminFeedbackTable = () => {
                           paddingBottom: 1,
                         }}
                       >
-                        {element.rating}
+                        {element.user_name}
                       </Box>
                       <Box
                         sx={{
@@ -285,15 +260,7 @@ const AdminFeedbackTable = () => {
                           paddingBottom: 1,
                         }}
                       >
-                        <Link
-                          href={'/lesson?id=' + element.lesson_id.id}
-                          onClick={() => {
-                            localStorage.removeItem('SelectedCourse')
-                            localStorage.removeItem('SelectedModuleIndex')
-                          }}
-                        >
-                          {element.lesson_id.data.title}
-                        </Link>
+                        {element.email}
                       </Box>
                       <Box
                         sx={{
@@ -308,7 +275,7 @@ const AdminFeedbackTable = () => {
                           scrollbarWidth: 'none',
                         }}
                       >
-                        {element.feedback_name}
+                        {element.course_title}
                       </Box>
                       <Box
                         sx={{
@@ -320,9 +287,7 @@ const AdminFeedbackTable = () => {
                           borderRight: '2px solid #000',
                         }}
                       >
-                        {new Date(element.created_at).toLocaleDateString() +
-                          ' , ' +
-                          new Date(element.created_at).toLocaleTimeString()}
+                        {element.price / 100}$
                       </Box>
                       <Box
                         sx={{
@@ -333,7 +298,7 @@ const AdminFeedbackTable = () => {
                           paddingBottom: 1,
                         }}
                       >
-                        {element.user_id.user_name}
+                        {element.order_status}
                       </Box>
                     </Box>
                   </div>
@@ -364,4 +329,4 @@ const AdminFeedbackTable = () => {
   )
 }
 
-export default AdminFeedbackTable
+export default Index

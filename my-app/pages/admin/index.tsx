@@ -85,8 +85,10 @@ const AdminTable = () => {
 
       setData(
         result.getCourses.sort(function (a: any, b: any) {
-          return (new Date(b.created_at) as any) - (new Date(a.created_at) as any)
-        })
+          return (
+            (new Date(b.created_at) as any) - (new Date(a.created_at) as any)
+          )
+        }),
       )
     }
   }
@@ -125,15 +127,22 @@ const AdminTable = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'between', padding: 4, background: '#000' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'between',
+          padding: 4,
+          background: '#000',
+        }}
+      >
         <Box sx={{ width: '100%' }}>
           <Logo />
         </Box>
 
         <Link href={'/admin/login'}>
           <Button
-            variant='contained'
-            color='error'
+            variant="contained"
+            color="error"
             onClick={() => {
               deleteCookie('jwt')
             }}
@@ -153,7 +162,14 @@ const AdminTable = () => {
           flexDirection: { xs: 'column', md: 'row' },
         }}
       >
-        <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box
+          sx={{
+            marginRight: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
           <Link href={'/admin'}>
             <Box
               sx={{
@@ -194,6 +210,19 @@ const AdminTable = () => {
               Feedback
             </Box>
           </Link>
+          <Link href={'/admin/payments'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+                fontSize: 20,
+              }}
+            >
+              Payments
+            </Box>
+          </Link>
         </Box>
         <Box
           sx={{
@@ -207,7 +236,7 @@ const AdminTable = () => {
           <Box sx={{ display: 'flex', justifyContent: 'end', marginBottom: 2 }}>
             <Link href={'./admin/create'}>
               <Button
-                variant='contained'
+                variant="contained"
                 sx={{
                   padding: 1,
                   borderRadius: '10px',
@@ -349,16 +378,16 @@ const AdminTable = () => {
                         }}
                       >
                         <Link href={'./admin/create?_id=' + element.id}>
-                          <IconButton key={'editButton_'} aria-label='edit'>
-                            <EditIcon key={'editIcon_'} color='primary' />
+                          <IconButton key={'editButton_'} aria-label="edit">
+                            <EditIcon key={'editIcon_'} color="primary" />
                           </IconButton>
                         </Link>
                         <IconButton
                           key={'deleteButton_'}
-                          aria-label='delete'
+                          aria-label="delete"
                           onClick={(e) => showDeleteAlert(element.id)}
                         >
-                          <DeleteIcon key={'deleteIcon_'} color='primary' />
+                          <DeleteIcon key={'deleteIcon_'} color="primary" />
                         </IconButton>
                       </Box>
                     </Box>

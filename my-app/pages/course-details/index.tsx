@@ -79,36 +79,49 @@ const CourseDetails = () => {
           router.push('./')
         }
         const responseViewed = await axios.put(
-          url + '?id=' + fullUrl.split('id=')[1] + '&views=' + Number(Number(result.views) + 1),
+          url +
+            '?id=' +
+            fullUrl.split('id=')[1] +
+            '&views=' +
+            Number(Number(result.views) + 1),
           {
             ...result.data,
-          }
+          },
         )
 
-        const allLessonIds = result.data.modules.flatMap((module: any) => module.lessons);
-        const responseLessons = await fetch(urlLessonsById + '?idArr=' + allLessonIds.join(','), {
-          headers: {
-            'Content-Type': 'application/json',
+        const allLessonIds = result.data.modules.flatMap(
+          (module: any) => module.lessons,
+        )
+        const responseLessons = await fetch(
+          urlLessonsById + '?idArr=' + allLessonIds.join(','),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
           },
-        });
-        const lessonsResponse = await responseLessons.json();
+        )
+        const lessonsResponse = await responseLessons.json()
 
         const lessonsById = lessonsResponse.reduce((acc: any, lesson: any) => {
-          acc[lesson.id] = lesson;
-          return acc;
-        }, {});
+          acc[lesson.id] = lesson
+          return acc
+        }, {})
 
         const modules = result.data.modules.map((module: any) => ({
           title: module.title,
-          lessons: module.lessons.map((lessonId: string) => lessonsById[lessonId] ?? null),
-        }));
+          lessons: module.lessons.map(
+            (lessonId: string) => lessonsById[lessonId] ?? null,
+          ),
+        }))
         setModules(modules)
         localStorage.setItem('SelectedCourse', result.id)
 
         const filter = resultAll.getCourses.filter(
           (dataFilter: any, i: number) =>
-            arraysHaveCommonElements(dataFilter.data.category, result.data.category) &&
-            result.id != dataFilter.id
+            arraysHaveCommonElements(
+              dataFilter.data.category,
+              result.data.category,
+            ) && result.id != dataFilter.id,
         )
 
         setPopularCoursesData(filter)
@@ -141,7 +154,17 @@ const CourseDetails = () => {
           <div className={s.leftSide}>
             <div className={s.courseTitle}>
               <h2>{data && data.data.title}</h2>
-              {data && <CourseControlls courseId={data.id} isFavoriteStart={userData && userData.favourite_courses_id ? userData.favourite_courses_id.indexOf(data.id) != -1:false} userData={userData}/>}
+              {data && (
+                <CourseControlls
+                  courseId={data.id}
+                  isFavoriteStart={
+                    userData && userData.favourite_courses_id
+                      ? userData.favourite_courses_id.indexOf(data.id) != -1
+                      : false
+                  }
+                  userData={userData}
+                />
+              )}
             </div>
 
             <div className={s.courseImageWrapper}>
@@ -150,13 +173,17 @@ const CourseDetails = () => {
                   {data?.data.mediaValue.type == 'image' ? (
                     <>
                       <Box
-                        sx={{ background: '#000000', display: 'flex', justifyContent: 'center' }}
+                        sx={{
+                          background: '#000000',
+                          display: 'flex',
+                          justifyContent: 'center',
+                        }}
                       >
                         <img
                           className={s.courseImage}
                           src={data?.data.mediaValue.content}
                           style={{ maxHeight: '650px' }}
-                          alt='course'
+                          alt="course"
                         />
                       </Box>
                     </>
@@ -167,8 +194,15 @@ const CourseDetails = () => {
                         src={data?.data.mediaValue.content}
                         style={{ width: '100%' }}
                       />
-                      {!play && <PlayButton onClickPlay={setPlay} videoRef={videoRef} />}
-                      {play && <PauseButton onClickPlay={setPlay} videoRef={videoRef} />}
+                      {!play && (
+                        <PlayButton onClickPlay={setPlay} videoRef={videoRef} />
+                      )}
+                      {play && (
+                        <PauseButton
+                          onClickPlay={setPlay}
+                          videoRef={videoRef}
+                        />
+                      )}
                     </>
                   )}
                 </>
@@ -188,49 +222,74 @@ const CourseDetails = () => {
                       {data.data.language == 'RU' && (
                         <div style={{ height: '20px', width: '20px' }}>
                           <svg
-                            xmlns='http://www.w3.org/2000/svg'
-                            viewBox='0 0 9 6'
-                            width='35'
-                            height='20'
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 9 6"
+                            width="35"
+                            height="20"
                           >
-                            <rect fill='#c7c6c6' width='9' height='3' />
-                            <rect fill='#d52b1e' y='3' width='9' height='3' />
-                            <rect fill='#0039a6' y='2' width='9' height='2' />
+                            <rect fill="#c7c6c6" width="9" height="3" />
+                            <rect fill="#d52b1e" y="3" width="9" height="3" />
+                            <rect fill="#0039a6" y="2" width="9" height="2" />
                           </svg>
                         </div>
                       )}
                       {data.data.language == 'UA' && (
-                        <div style={{ height: '20px', width: '20px', position: 'relative' }}>
-                          <svg xmlns='http://www.w3.org/2000/svg' width='35' height='20'>
-                            <rect width='1200' height='10' fill='#0057B7' />
-                            <rect width='1200' height='10' y='10' fill='#FFD700' />
+                        <div
+                          style={{
+                            height: '20px',
+                            width: '20px',
+                            position: 'relative',
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="35"
+                            height="20"
+                          >
+                            <rect width="1200" height="10" fill="#0057B7" />
+                            <rect
+                              width="1200"
+                              height="10"
+                              y="10"
+                              fill="#FFD700"
+                            />
                           </svg>
                         </div>
                       )}
                       {data.data.language == 'EN' && (
-                        <div style={{ height: '20px', width: '20px', position: 'relative' }}>
+                        <div
+                          style={{
+                            height: '20px',
+                            width: '20px',
+                            position: 'relative',
+                          }}
+                        >
                           <svg
-                            xmlns='http://www.w3.org/2000/svg'
-                            viewBox='0 0 50 30'
-                            width='35'
-                            height='20'
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 50 30"
+                            width="35"
+                            height="20"
                           >
-                            <clipPath id='t'>
-                              <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
+                            <clipPath id="t">
+                              <path d="M25,15h25v15zv15h-25zh-25v-15zv-15h25z" />
                             </clipPath>
-                            <path d='M0,0v30h50v-30z' fill='#012169' />
-                            <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' stroke-width='6' />
+                            <path d="M0,0v30h50v-30z" fill="#012169" />
                             <path
-                              d='M0,0 50,30M50,0 0,30'
-                              clip-path='url(#t)'
-                              stroke='#C8102E'
-                              stroke-width='4'
+                              d="M0,0 50,30M50,0 0,30"
+                              stroke="#c7c6c6"
+                              stroke-width="6"
                             />
                             <path
-                              d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
-                              fill='#C8102E'
-                              stroke='#c7c6c6'
-                              stroke-width='2'
+                              d="M0,0 50,30M50,0 0,30"
+                              clip-path="url(#t)"
+                              stroke="#C8102E"
+                              stroke-width="4"
+                            />
+                            <path
+                              d="M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z"
+                              fill="#C8102E"
+                              stroke="#c7c6c6"
+                              stroke-width="2"
                             />
                           </svg>
                         </div>
@@ -253,7 +312,8 @@ const CourseDetails = () => {
                 <li className={s.infoItem}>
                   <p className={s.infoItemTitle}>{t.created_date}</p>
                   <p className={s.infoItemContent}>
-                    {data && new Date(data.created_at).toISOString().split('T')[0]}
+                    {data &&
+                      new Date(data.created_at).toISOString().split('T')[0]}
                   </p>
                 </li>
               )}
@@ -280,6 +340,7 @@ const CourseDetails = () => {
                 modules={data?.data.modules}
                 rating={data?.data.rating ?? 0}
                 views={data?.views ?? 0}
+                title={data?.data.title ?? 'Course payment'}
               />
             )}
             <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>
@@ -331,8 +392,9 @@ const CourseDetails = () => {
 
           {width >= 1200 && (
             <div className={s.rightSide}>
-              {userData?.purchased_courses_id.filter((courseId: any) => courseId == data?.id)
-                .length > 0 ? (
+              {userData?.purchased_courses_id.filter(
+                (courseId: any) => courseId == data?.id,
+              ).length > 0 ? (
                 <Box sx={{ marginTop: 2, minWidth: '375px', width: '100%' }}>
                   {modules && (
                     <CourseLessonMaterials
@@ -352,13 +414,21 @@ const CourseDetails = () => {
                   modules={data?.data.modules}
                   rating={data?.data.rating ?? 0}
                   views={data?.views ?? 0}
+                  title={data?.data.title ?? 'Course payment'}
                 />
               )}
             </div>
           )}
         </div>
       ) : (
-        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 40, marginBottom: 70 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 40,
+            marginBottom: 70,
+          }}
+        >
           <CircularProgress sx={{ color: '#ffec3e' }} />
         </Box>
       )}

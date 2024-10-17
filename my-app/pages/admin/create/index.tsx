@@ -28,7 +28,14 @@ import Swal from 'sweetalert2'
 import React from 'react'
 import YouTube, { YouTubeProps } from 'react-youtube'
 import Autocomplete from '@mui/material/Autocomplete'
-import { YouTubeProp, TabPanelProps, Lesson, Module, Tag, Skill } from '@/utils/interfaces'
+import {
+  YouTubeProp,
+  TabPanelProps,
+  Lesson,
+  Module,
+  Tag,
+  Skill,
+} from '@/utils/interfaces'
 import * as AWS from 'aws-sdk'
 import { isEqual } from 'lodash-es'
 import { deleteCookie } from 'cookies-next'
@@ -65,7 +72,7 @@ function CustomTabPanel(props: TabPanelProps) {
 
   return (
     <div
-      role='tabpanel'
+      role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
@@ -129,7 +136,10 @@ const CourseCreate = () => {
   const [preview, setPreview] = useState('-1')
   const [editTrigger, setEditTrigger] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [mediaValue, setMediaValue] = useState<{ type: string; content: File }>()
+  const [mediaValue, setMediaValue] = useState<{
+    type: string
+    content: File
+  }>()
   const [error, setError] = useState<any>()
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -172,7 +182,9 @@ const CourseCreate = () => {
   const handleChangeLessonType = (event: SelectChangeEvent) => {
     setLessonType(event.target.value as string)
   }
-  const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePreviewMediaChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     if (event.target.files) {
       setEditTrigger(true)
       setError({})
@@ -209,7 +221,9 @@ const CourseCreate = () => {
       lector: form.lector == '',
       price: form.price == null || form.price == 0 || form.price < 0,
       priceDiscount:
-        form.priceDiscount == null || form.priceDiscount == 0 || form.priceDiscount < 0,
+        form.priceDiscount == null ||
+        form.priceDiscount == 0 ||
+        form.priceDiscount < 0,
       language: language == '',
       level: level == '',
       type: type == '',
@@ -259,8 +273,8 @@ const CourseCreate = () => {
           typeof mediaValue?.content === 'string'
             ? mediaValue?.content
             : mediaValue?.content
-            ? await uploadFileToS3(mediaValue.content)
-            : null,
+              ? await uploadFileToS3(mediaValue.content)
+              : null,
       },
       description: richValue,
       language: language,
@@ -283,8 +297,12 @@ const CourseCreate = () => {
     try {
       if (id) {
         const response = await axios.put(
-          url + '?id=' + id + '&isActive=' + (status == 'active' ? true : false),
-          json
+          url +
+            '?id=' +
+            id +
+            '&isActive=' +
+            (status == 'active' ? true : false),
+          json,
         )
         const resultResponse = response.data
         if (resultResponse) {
@@ -300,7 +318,7 @@ const CourseCreate = () => {
       } else {
         const response = await axios.post(
           url + '?isActive=' + (status == 'active' ? true : false),
-          json
+          json,
         )
         const resultResponse = response.data
 
@@ -361,7 +379,9 @@ const CourseCreate = () => {
       `,
       focusConfirm: false,
       preConfirm: () => {
-        const textInput = (Swal.getPopup()?.querySelector('#textInput') as HTMLInputElement).value
+        const textInput = (
+          Swal.getPopup()?.querySelector('#textInput') as HTMLInputElement
+        ).value
 
         if (!textInput || textInput.trim() == '') {
           Swal.showValidationMessage(`Please enter text`)
@@ -372,7 +392,7 @@ const CourseCreate = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         const response = await axios.post(
-          urlSkill + '?title=' + result.value.textInput + '&iconUrl=' + ''
+          urlSkill + '?title=' + result.value.textInput + '&iconUrl=' + '',
         )
         const resultResponse = response.data
         if (resultResponse) {
@@ -400,8 +420,12 @@ const CourseCreate = () => {
       `,
       focusConfirm: false,
       preConfirm: () => {
-        const textInput = (Swal.getPopup()?.querySelector('#textInput') as HTMLInputElement).value
-        const fileInput = (Swal.getPopup()?.querySelector('#fileInput') as HTMLInputElement).files
+        const textInput = (
+          Swal.getPopup()?.querySelector('#textInput') as HTMLInputElement
+        ).value
+        const fileInput = (
+          Swal.getPopup()?.querySelector('#fileInput') as HTMLInputElement
+        ).files
 
         if (!textInput || textInput.trim() == '') {
           Swal.showValidationMessage(`Please enter text`)
@@ -412,10 +436,16 @@ const CourseCreate = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         const selectedFileURL =
-          result.value.fileInput.length > 0 ? await uploadFileToS3(result.value.fileInput[0]) : ''
+          result.value.fileInput.length > 0
+            ? await uploadFileToS3(result.value.fileInput[0])
+            : ''
 
         const response = await axios.post(
-          urlTag + '?title=' + result.value.textInput + '&iconUrl=' + selectedFileURL
+          urlTag +
+            '?title=' +
+            result.value.textInput +
+            '&iconUrl=' +
+            selectedFileURL,
         )
         const resultResponse = response.data
         if (resultResponse) {
@@ -449,7 +479,7 @@ const CourseCreate = () => {
       setAllCategorySelect(
         resultTag.getTags.map((tag: any) => {
           return tag
-        })
+        }),
       )
 
       const responseSkill = await fetch(urlSkill + 's', {
@@ -461,7 +491,7 @@ const CourseCreate = () => {
       setAllSkillSelect(
         resultSkill.getSkills.map((skill: any) => {
           return skill
-        })
+        }),
       )
 
       if (fullUrl.split('_id=')[1]) {
@@ -478,7 +508,7 @@ const CourseCreate = () => {
         })
         const resultLesson = await responseLesson.json()
         const resultData = result.getCourses.filter(
-          (course: any) => course.id == fullUrl.split('_id=')[1]
+          (course: any) => course.id == fullUrl.split('_id=')[1],
         )
         let allLessons = resultLesson.getLessons.map((lesson: any) => {
           return {
@@ -499,7 +529,7 @@ const CourseCreate = () => {
             if (resultData[0].data.category.indexOf(tag.id) != -1) {
               return tag
             }
-          })
+          }),
         )
         setFetchedData(resultData[0].data.description)
         setFetchedMediaData(resultData[0].data.mediaValue)
@@ -516,17 +546,17 @@ const CourseCreate = () => {
               title: module.title,
               lessons: module.lessons.map((lessonId: string) => {
                 const found = allLessons.filter(
-                  (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId
+                  (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId,
                 )
                 return found[0]
               }),
             }
-          })
+          }),
         )
         resultData[0].data.modules.map((module: any) => {
           module.lessons.map((lessonId: string) => {
             allLessons = allLessons.filter(
-              (moduleElemFilter: Lesson) => moduleElemFilter.id != lessonId
+              (moduleElemFilter: Lesson) => moduleElemFilter.id != lessonId,
             )
           })
         })
@@ -566,7 +596,7 @@ const CourseCreate = () => {
               type: lesson.type,
               ...lesson.data,
             }
-          })
+          }),
         )
       }
       setIsLoaded(true)
@@ -581,9 +611,13 @@ const CourseCreate = () => {
       e.preventDefault()
       return (e.returnValue = '')
     }
-    window.addEventListener('beforeunload', handleOnBeforeUnload, { capture: true })
+    window.addEventListener('beforeunload', handleOnBeforeUnload, {
+      capture: true,
+    })
     return () => {
-      window.removeEventListener('beforeunload', handleOnBeforeUnload, { capture: true })
+      window.removeEventListener('beforeunload', handleOnBeforeUnload, {
+        capture: true,
+      })
     }
   }, [])
 
@@ -593,7 +627,7 @@ const CourseCreate = () => {
     !process.env.NEXT_PUBLIC_AWS_BUCKET_NAME
   ) {
     throw new Error(
-      'Отсутствуют переменные окружения NEXT_PUBLIC_AWS_ACCESS_KEY_ID или NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY или NEXT_PUBLIC_AWS_BUCKET_NAME'
+      'Отсутствуют переменные окружения NEXT_PUBLIC_AWS_ACCESS_KEY_ID или NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY или NEXT_PUBLIC_AWS_BUCKET_NAME',
     )
   }
 
@@ -684,7 +718,7 @@ const CourseCreate = () => {
         ? draggedOverLesson.current + 1
         : draggedOverLesson.current,
       0,
-      temp
+      temp,
     )
     setEditTrigger(true)
     setModules(
@@ -698,26 +732,33 @@ const CourseCreate = () => {
                 i ==
                   (draggedOverLesson.current > draggedIdx
                     ? draggedOverLesson.current + 1
-                    : draggedOverLesson.current)
+                    : draggedOverLesson.current),
             ),
           }
         }
         return module
-      })
+      }),
     )
   }
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'between', padding: 4, background: '#000' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'between',
+          padding: 4,
+          background: '#000',
+        }}
+      >
         <Box sx={{ width: '100%' }}>
           <Logo />
         </Box>
 
         <Link href={'/admin/login'}>
           <Button
-            variant='contained'
-            color='error'
+            variant="contained"
+            color="error"
             onClick={() => {
               deleteCookie('jwt')
             }}
@@ -737,7 +778,14 @@ const CourseCreate = () => {
           flexDirection: { xs: 'column', md: 'row' },
         }}
       >
-        <Box sx={{ marginRight: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box
+          sx={{
+            marginRight: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
           <Box
             sx={{
               fontWeight: 'bold',
@@ -785,6 +833,21 @@ const CourseCreate = () => {
           >
             Feedback
           </Box>
+          <Box
+            sx={{
+              fontWeight: 'bold',
+              paddingLeft: 2,
+              paddingRight: 2,
+              color: '#000',
+              fontSize: 20,
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {
+              showPushAction('/admin/payments')
+            }}
+          >
+            Payments
+          </Box>
         </Box>
 
         <Box sx={{ width: '100%', marginTop: 4 }}>
@@ -800,12 +863,18 @@ const CourseCreate = () => {
                   borderTop: '4px solid #000',
                 }}
               >
-                <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    width: '100%',
+                  }}
+                >
                   <Tabs
                     value={value}
                     onChange={handleChange}
-                    aria-label='basic tabs example'
-                    variant='scrollable'
+                    aria-label="basic tabs example"
+                    variant="scrollable"
                     TabIndicatorProps={{
                       style: {
                         backgroundColor: '#000',
@@ -814,7 +883,7 @@ const CourseCreate = () => {
                   >
                     <Tab
                       value={0}
-                      label='General'
+                      label="General"
                       sx={{
                         minWidth: '50%',
                         width: '100%',
@@ -828,7 +897,7 @@ const CourseCreate = () => {
                     />
                     <Tab
                       value={1}
-                      label='Structure'
+                      label="Structure"
                       sx={{
                         minWidth: '50%',
                         width: '100%',
@@ -843,14 +912,14 @@ const CourseCreate = () => {
                   <CustomTabPanel value={value} index={0}>
                     <Box sx={{ color: '#fff' }}>
                       <TextField
-                        autoComplete='off'
-                        margin='normal'
+                        autoComplete="off"
+                        margin="normal"
                         required
                         fullWidth
-                        id='title'
-                        type='text'
-                        label='Title'
-                        name='title'
+                        id="title"
+                        type="text"
+                        label="Title"
+                        name="title"
                         error={(error && error.title) ?? false}
                         autoFocus
                         onChange={(e) => {
@@ -864,15 +933,15 @@ const CourseCreate = () => {
                         <MyEditor value={richValue} setValue={setRichValue} />
                       </Box>
                       <TextField
-                        autoComplete='off'
-                        margin='normal'
+                        autoComplete="off"
+                        margin="normal"
                         required
                         fullWidth
                         error={(error && error.duration) ?? false}
-                        id='duration'
-                        type='number'
-                        label='Duration'
-                        name='duration'
+                        id="duration"
+                        type="number"
+                        label="Duration"
+                        name="duration"
                         InputProps={{
                           inputProps: { min: 1 },
                         }}
@@ -885,15 +954,15 @@ const CourseCreate = () => {
                         sx={{ marginTop: 3 }}
                       />
                       <TextField
-                        autoComplete='off'
-                        margin='normal'
+                        autoComplete="off"
+                        margin="normal"
                         required
                         fullWidth
                         error={(error && error.price) ?? false}
-                        id='price'
-                        type='number'
-                        label='Price'
-                        name='price'
+                        id="price"
+                        type="number"
+                        label="Price"
+                        name="price"
                         InputProps={{
                           inputProps: { min: 1 },
                         }}
@@ -905,18 +974,21 @@ const CourseCreate = () => {
                         value={form.price || ''}
                       />
                       <TextField
-                        autoComplete='off'
-                        margin='normal'
+                        autoComplete="off"
+                        margin="normal"
                         fullWidth
-                        id='priceDiscount'
-                        type='number'
-                        label='Price with discount'
-                        name='priceDiscount'
+                        id="priceDiscount"
+                        type="number"
+                        label="Price with discount"
+                        name="priceDiscount"
                         InputProps={{
                           inputProps: { min: 1 },
                         }}
                         onChange={(e) => {
-                          setForm({ ...form, priceDiscount: Number(e.target.value) })
+                          setForm({
+                            ...form,
+                            priceDiscount: Number(e.target.value),
+                          })
                           setEditTrigger(true)
                         }}
                         value={form.priceDiscount || ''}
@@ -926,7 +998,7 @@ const CourseCreate = () => {
                         <Select
                           error={(error && error.language) ?? false}
                           fullWidth
-                          id='languageSelect'
+                          id="languageSelect"
                           value={language}
                           onChange={handleChangeLanguage}
                         >
@@ -940,7 +1012,7 @@ const CourseCreate = () => {
                         <Select
                           error={(error && error.level) ?? false}
                           fullWidth
-                          id='levelSelect'
+                          id="levelSelect"
                           value={level}
                           onChange={handleChangeLevel}
                         >
@@ -955,25 +1027,27 @@ const CourseCreate = () => {
                         <Select
                           error={(error && error.type) ?? false}
                           fullWidth
-                          id='typeSelect'
+                          id="typeSelect"
                           value={type}
                           onChange={handleChangeType}
                         >
-                          <MenuItem value={'self-education'}>Self education</MenuItem>
+                          <MenuItem value={'self-education'}>
+                            Self education
+                          </MenuItem>
                           <MenuItem value={'with-lector'}>With lector</MenuItem>
                         </Select>
                       </Box>
                       {type == 'with-lector' && (
                         <TextField
-                          autoComplete='off'
-                          margin='normal'
+                          autoComplete="off"
+                          margin="normal"
                           required
                           fullWidth
                           error={(error && error.lector) ?? false}
-                          id='lector'
-                          type='text'
-                          label='Lector'
-                          name='lector'
+                          id="lector"
+                          type="text"
+                          label="Lector"
+                          name="lector"
                           onChange={(e) => {
                             setForm({ ...form, lector: e.target.value })
                             setEditTrigger(true)
@@ -984,20 +1058,22 @@ const CourseCreate = () => {
                       )}
                       {type == 'with-lector' && (
                         <TextField
-                          autoComplete='off'
-                          margin='normal'
+                          autoComplete="off"
+                          margin="normal"
                           required
                           fullWidth
-                          id='date'
-                          type='date'
-                          label='Date'
-                          name='date'
+                          id="date"
+                          type="date"
+                          label="Date"
+                          name="date"
                           onChange={(e) => {
                             setForm({ ...form, date: e.target.value })
                             setEditTrigger(true)
                             setError({})
                           }}
-                          value={form.date || new Date().toISOString().split('T')[0]}
+                          value={
+                            form.date || new Date().toISOString().split('T')[0]
+                          }
                           sx={{
                             marginTop: 3,
                           }}
@@ -1008,7 +1084,7 @@ const CourseCreate = () => {
                         <Select
                           error={(error && error.status) ?? false}
                           fullWidth
-                          id='statusSelect'
+                          id="statusSelect"
                           value={status}
                           onChange={handleChangeStatus}
                         >
@@ -1017,9 +1093,17 @@ const CourseCreate = () => {
                         </Select>
                       </Box>
                       <Box sx={{ display: 'flex', marginTop: 1 }}>
-                        <Box sx={{ marginTop: 1, fontWeight: 'bold', color: '#000' }}>Rating</Box>
+                        <Box
+                          sx={{
+                            marginTop: 1,
+                            fontWeight: 'bold',
+                            color: '#000',
+                          }}
+                        >
+                          Rating
+                        </Box>
                         <Rating
-                          name='rating'
+                          name="rating"
                           precision={0.1}
                           onChange={(event, newValue) => {
                             setRating(newValue ?? 5.0)
@@ -1037,7 +1121,7 @@ const CourseCreate = () => {
                       <Autocomplete
                         disablePortal
                         multiple
-                        id='combo-box-demo'
+                        id="combo-box-demo"
                         value={categorySelect}
                         onChange={(event, value: any) => {
                           setCategorySelect(value)
@@ -1047,11 +1131,20 @@ const CourseCreate = () => {
                         getOptionLabel={(option: any) => option.name_of_tag}
                         options={allCategorySelect}
                         fullWidth
-                        renderInput={(params) => <TextField {...params} label='Category' />}
-                        renderOption={(props: object, option: any, state: object) => (
+                        renderInput={(params) => (
+                          <TextField {...params} label="Category" />
+                        )}
+                        renderOption={(
+                          props: object,
+                          option: any,
+                          state: object,
+                        ) => (
                           <div
                             {...props}
-                            style={{ display: 'flex', justifyContent: 'space-between' }}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
                           >
                             {option.icon_url && (
                               <img
@@ -1060,26 +1153,36 @@ const CourseCreate = () => {
                                 style={{ width: 20, height: 20 }}
                               ></img>
                             )}
-                            <div style={{ textAlign: 'left', width: '100%', paddingLeft: '10px' }}>
+                            <div
+                              style={{
+                                textAlign: 'left',
+                                width: '100%',
+                                paddingLeft: '10px',
+                              }}
+                            >
                               {option.name_of_tag}
                             </div>
                             <IconButton
                               key={'deleteButton_' + option.id}
-                              aria-label='delete'
+                              aria-label="delete"
                               onClick={async (e) => {
                                 const deletingOption = option
-                                const response = await axios.delete(urlTag + '?id=' + option.id)
+                                const response = await axios.delete(
+                                  urlTag + '?id=' + option.id,
+                                )
                                 const resultResponse = response.data
                                 if (resultResponse) {
                                   setAllCategorySelect(
                                     allCategorySelect.filter(
-                                      (category) => category.id !== deletingOption.id
-                                    )
+                                      (category) =>
+                                        category.id !== deletingOption.id,
+                                    ),
                                   )
                                   setCategorySelect(
                                     categorySelect.filter(
-                                      (category) => category.id !== deletingOption.id
-                                    )
+                                      (category) =>
+                                        category.id !== deletingOption.id,
+                                    ),
                                   )
                                   Swal.fire({
                                     title: 'Deleted!',
@@ -1091,7 +1194,7 @@ const CourseCreate = () => {
                                 }
                               }}
                             >
-                              <DeleteIcon key={'deleteIcon_'} color='primary' />
+                              <DeleteIcon key={'deleteIcon_'} color="primary" />
                             </IconButton>
                           </div>
                         )}
@@ -1101,7 +1204,7 @@ const CourseCreate = () => {
                       <Autocomplete
                         disablePortal
                         multiple
-                        id='skills'
+                        id="skills"
                         value={skillsSelect}
                         onChange={(event, value: any) => {
                           setSkillsSelect(value)
@@ -1111,26 +1214,41 @@ const CourseCreate = () => {
                         getOptionLabel={(option: any) => option.name_skill}
                         options={allSkillSelect}
                         fullWidth
-                        renderInput={(params) => <TextField {...params} label='Skill' />}
-                        renderOption={(props: object, option: any, state: object) => (
+                        renderInput={(params) => (
+                          <TextField {...params} label="Skill" />
+                        )}
+                        renderOption={(
+                          props: object,
+                          option: any,
+                          state: object,
+                        ) => (
                           <div
                             {...props}
-                            style={{ display: 'flex', justifyContent: 'space-between' }}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
                           >
                             <div>{option.name_skill}</div>
                             <IconButton
                               key={'deleteButtonSkill_' + option.id}
-                              aria-label='delete'
+                              aria-label="delete"
                               onClick={async (e) => {
                                 const deletingOption = option
-                                const response = await axios.delete(urlSkill + '?id=' + option.id)
+                                const response = await axios.delete(
+                                  urlSkill + '?id=' + option.id,
+                                )
                                 const resultResponse = response.data
                                 if (resultResponse) {
                                   setAllSkillSelect(
-                                    allSkillSelect.filter((skill) => skill.id !== deletingOption.id)
+                                    allSkillSelect.filter(
+                                      (skill) => skill.id !== deletingOption.id,
+                                    ),
                                   )
                                   setSkillsSelect(
-                                    skillsSelect.filter((skill) => skill.id !== deletingOption.id)
+                                    skillsSelect.filter(
+                                      (skill) => skill.id !== deletingOption.id,
+                                    ),
                                   )
                                   Swal.fire({
                                     title: 'Deleted!',
@@ -1142,7 +1260,10 @@ const CourseCreate = () => {
                                 }
                               }}
                             >
-                              <DeleteIcon key={'deleteIconSkill_'} color='primary' />
+                              <DeleteIcon
+                                key={'deleteIconSkill_'}
+                                color="primary"
+                              />
                             </IconButton>
                           </div>
                         )}
@@ -1151,12 +1272,12 @@ const CourseCreate = () => {
                       <TextField
                         fullWidth
                         required
-                        autoComplete='off'
-                        margin='normal'
-                        id='QuestionLimit'
-                        type='number'
-                        label='Question Limit'
-                        name='questionLimit'
+                        autoComplete="off"
+                        margin="normal"
+                        id="QuestionLimit"
+                        type="number"
+                        label="Question Limit"
+                        name="questionLimit"
                         InputProps={{
                           inputProps: { min: -1 },
                         }}
@@ -1177,15 +1298,19 @@ const CourseCreate = () => {
                             </>
                           ) : (
                             <>
-                              <video controls src={mediaValue?.content} style={{ width: '100%' }} />
+                              <video
+                                controls
+                                src={mediaValue?.content}
+                                style={{ width: '100%' }}
+                              />
                             </>
                           )}
                         </>
                       )}
                       <Box sx={{ display: 'flex' }}>
                         <Button
-                          variant='contained'
-                          component='label'
+                          variant="contained"
+                          component="label"
                           onClick={() => {
                             setEditTrigger(true)
                             setError({})
@@ -1196,10 +1321,15 @@ const CourseCreate = () => {
                           Remove
                         </Button>
 
-                        <Button fullWidth variant='contained' component='label' sx={{ mt: 1 }}>
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          component="label"
+                          sx={{ mt: 1 }}
+                        >
                           <input
-                            type='file'
-                            accept='video/mp4, image/png, image/jpeg'
+                            type="file"
+                            accept="video/mp4, image/png, image/jpeg"
                             onChange={handlePreviewMediaChange}
                           />
                         </Button>
@@ -1207,7 +1337,7 @@ const CourseCreate = () => {
                       <Box sx={{ display: 'flex' }}>
                         {isEdited() && (
                           <Button
-                            variant='contained'
+                            variant="contained"
                             sx={{
                               marginTop: 2,
                               fontWeight: 'bold',
@@ -1237,7 +1367,10 @@ const CourseCreate = () => {
                                   selectedModulesArr.push(less)
                                 })
                               })
-                              setAllModules([...allModules, ...selectedModulesArr])
+                              setAllModules([
+                                ...allModules,
+                                ...selectedModulesArr,
+                              ])
                               setModules([])
 
                               setRichValue([
@@ -1268,7 +1401,7 @@ const CourseCreate = () => {
                           </Button>
                         )}
                         <Button
-                          variant='contained'
+                          variant="contained"
                           fullWidth
                           sx={{
                             marginTop: 2,
@@ -1288,7 +1421,13 @@ const CourseCreate = () => {
                   </CustomTabPanel>
                   <CustomTabPanel value={value} index={1}>
                     <Box sx={{ width: '100%' }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 6,
+                        }}
+                      >
                         {modules.map((element, i) => {
                           return (
                             <Box
@@ -1296,7 +1435,10 @@ const CourseCreate = () => {
                               sx={{ boxShadow: 2, border: '1px solid' }}
                             >
                               <Accordion defaultExpanded={true} sx={{}}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{}}>
+                                <AccordionSummary
+                                  expandIcon={<ExpandMoreIcon />}
+                                  sx={{}}
+                                >
                                   <div
                                     style={{
                                       display: 'flex',
@@ -1306,13 +1448,15 @@ const CourseCreate = () => {
                                     }}
                                   >
                                     <TextField
-                                      autoComplete='off'
-                                      margin='normal'
+                                      autoComplete="off"
+                                      margin="normal"
                                       fullWidth
                                       required
-                                      error={countModuleNameMeet(element.title) > 1}
+                                      error={
+                                        countModuleNameMeet(element.title) > 1
+                                      }
                                       id={'module' + i}
-                                      type='text'
+                                      type="text"
                                       label={'Module ' + (i + 1) + ' name'}
                                       name={'module' + i}
                                       autoFocus
@@ -1322,18 +1466,21 @@ const CourseCreate = () => {
                                         setModules(
                                           modules.map((module, moduleIndex) => {
                                             if (i == moduleIndex) {
-                                              return { ...module, title: e.target.value }
+                                              return {
+                                                ...module,
+                                                title: e.target.value,
+                                              }
                                             } else {
                                               return module
                                             }
-                                          })
+                                          }),
                                         )
                                       }}
                                       value={element.title}
                                     />
 
                                     <IconButton
-                                      color='error'
+                                      color="error"
                                       sx={{
                                         marginTop: 3,
                                         width: '40px',
@@ -1344,12 +1491,17 @@ const CourseCreate = () => {
                                         setEditTrigger(true)
                                         setError({})
                                         setModules(
-                                          modules.filter((moduleElem, index) => {
-                                            if (i !== index) {
-                                              return moduleElem
-                                            }
-                                            setAllModules([...allModules, ...moduleElem.lessons])
-                                          })
+                                          modules.filter(
+                                            (moduleElem, index) => {
+                                              if (i !== index) {
+                                                return moduleElem
+                                              }
+                                              setAllModules([
+                                                ...allModules,
+                                                ...moduleElem.lessons,
+                                              ])
+                                            },
+                                          ),
                                         )
                                       }}
                                     >
@@ -1387,26 +1539,42 @@ const CourseCreate = () => {
                                                 '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
                                             }}
                                             draggable
-                                            onDragStart={() => (dragLesson.current = lesson.id)}
-                                            onDragEnter={() => (draggedOverLesson.current = index)}
-                                            onDragEnd={(e) => handleSort(element.lessons, i)}
-                                            onDragOver={(e) => e.preventDefault()}
+                                            onDragStart={() =>
+                                              (dragLesson.current = lesson.id)
+                                            }
+                                            onDragEnter={() =>
+                                              (draggedOverLesson.current =
+                                                index)
+                                            }
+                                            onDragEnd={(e) =>
+                                              handleSort(element.lessons, i)
+                                            }
+                                            onDragOver={(e) =>
+                                              e.preventDefault()
+                                            }
                                           >
-                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                            <Box
+                                              sx={{ display: 'flex', gap: 1 }}
+                                            >
                                               <DragIndicatorIcon />
                                               <Box sx={{ fontWeight: 'bold' }}>
                                                 {lesson.title ?? ''}
                                               </Box>
                                             </Box>
 
-                                            <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                                            <Box
+                                              sx={{
+                                                display: 'flex',
+                                                justifyContent: 'end',
+                                              }}
+                                            >
                                               {lesson.type == 'defaultOld' && (
                                                 <IconButton
                                                   onClick={(e) => {
                                                     setPreview(
                                                       lesson.id == preview
                                                         ? '-1'
-                                                        : lesson.id ?? '-1'
+                                                        : (lesson.id ?? '-1'),
                                                     )
                                                   }}
                                                 >
@@ -1419,11 +1587,13 @@ const CourseCreate = () => {
                                                     idLessonEdit == lesson.id
                                                       ? null
                                                       : lesson.id
-                                                      ? lesson.id
-                                                      : null
+                                                        ? lesson.id
+                                                        : null,
                                                   )
                                                   setLessonForm(lesson)
-                                                  setRichValueLesson(lesson.description)
+                                                  setRichValueLesson(
+                                                    lesson.description,
+                                                  )
                                                   setCreateLessonIndx(i)
                                                   setLessonType(lesson.type)
                                                   setValue(2)
@@ -1435,113 +1605,151 @@ const CourseCreate = () => {
                                                 onClick={async (e) => {
                                                   setEditTrigger(true)
                                                   setError({})
-                                                  setStoredModules([...storedModules, lesson])
+                                                  setStoredModules([
+                                                    ...storedModules,
+                                                    lesson,
+                                                  ])
                                                   setModules(
-                                                    modules.map((elem, index) => {
-                                                      if (i === index) {
-                                                        return {
-                                                          title: elem.title,
-                                                          lessons: elem.lessons.filter(
-                                                            (lessonFilter, lessonIndex) => {
-                                                              if (lessonFilter.id !== lesson.id) {
-                                                                return lessonFilter
-                                                              }
-                                                              setStoredModules([
-                                                                ...storedModules,
-                                                                lessonFilter,
-                                                              ])
-                                                            }
-                                                          ),
+                                                    modules.map(
+                                                      (elem, index) => {
+                                                        if (i === index) {
+                                                          return {
+                                                            title: elem.title,
+                                                            lessons:
+                                                              elem.lessons.filter(
+                                                                (
+                                                                  lessonFilter,
+                                                                  lessonIndex,
+                                                                ) => {
+                                                                  if (
+                                                                    lessonFilter.id !==
+                                                                    lesson.id
+                                                                  ) {
+                                                                    return lessonFilter
+                                                                  }
+                                                                  setStoredModules(
+                                                                    [
+                                                                      ...storedModules,
+                                                                      lessonFilter,
+                                                                    ],
+                                                                  )
+                                                                },
+                                                              ),
+                                                          }
                                                         }
-                                                      }
-                                                      return elem
-                                                    })
+                                                        return elem
+                                                      },
+                                                    ),
                                                   )
                                                 }}
                                               >
-                                                <DeleteIcon color='error' />
+                                                <DeleteIcon color="error" />
                                               </IconButton>
                                             </Box>
-                                            {preview == lesson.id && idLessonEdit != lesson.id && (
-                                              <>
-                                                <Box
-                                                  sx={{
-                                                    paddingLeft: '16px',
-                                                    maxHeight: '10rem',
-                                                    overflow: 'auto',
-                                                    scrollbarWidth: 'none',
-                                                  }}
-                                                >
-                                                  <SlateView value={lesson.description} />
-                                                </Box>
-                                                <Box
-                                                  sx={{
-                                                    overflow: 'auto',
-                                                    scrollbarWidth: 'none',
-                                                    marginTop: 2,
-                                                  }}
-                                                >
-                                                  <ExampleYouTube
-                                                    url={lesson.link.split('?v=')[1]}
-                                                  />
-                                                </Box>
-                                              </>
-                                            )}
+                                            {preview == lesson.id &&
+                                              idLessonEdit != lesson.id && (
+                                                <>
+                                                  <Box
+                                                    sx={{
+                                                      paddingLeft: '16px',
+                                                      maxHeight: '10rem',
+                                                      overflow: 'auto',
+                                                      scrollbarWidth: 'none',
+                                                    }}
+                                                  >
+                                                    <SlateView
+                                                      value={lesson.description}
+                                                    />
+                                                  </Box>
+                                                  <Box
+                                                    sx={{
+                                                      overflow: 'auto',
+                                                      scrollbarWidth: 'none',
+                                                      marginTop: 2,
+                                                    }}
+                                                  >
+                                                    <ExampleYouTube
+                                                      url={
+                                                        lesson.link.split(
+                                                          '?v=',
+                                                        )[1]
+                                                      }
+                                                    />
+                                                  </Box>
+                                                </>
+                                              )}
                                           </div>
                                         )
                                       })}
                                     </Box>
                                   </Box>
                                   <Box
-                                    sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}
+                                    sx={{
+                                      display: 'flex',
+                                      justifyContent: 'end',
+                                      marginTop: 4,
+                                    }}
                                   >
-                                    <Box sx={{ maxWidth: '100%', width: '100%' }}>
+                                    <Box
+                                      sx={{ maxWidth: '100%', width: '100%' }}
+                                    >
                                       <Autocomplete
                                         disablePortal
-                                        id='combo-box-demo'
-                                        getOptionLabel={(option: any) => option.title}
+                                        id="combo-box-demo"
+                                        getOptionLabel={(option: any) =>
+                                          option.title
+                                        }
                                         options={storedModules}
                                         value={{ title: '' }}
                                         fullWidth
                                         renderInput={(params) => (
-                                          <TextField {...params} label='Stored lessons' />
+                                          <TextField
+                                            {...params}
+                                            label="Stored lessons"
+                                          />
                                         )}
                                         onChange={(event, value: any) => {
                                           setEditTrigger(true)
                                           setError({})
                                           if (value) {
                                             setModules(
-                                              modules.map((modulesElem, index) => {
-                                                if (
-                                                  index == i &&
-                                                  modulesElem.lessons.filter(
-                                                    (reDropElem) => reDropElem.id === value.id
-                                                  ).length === 0
-                                                ) {
-                                                  setStoredModules(
-                                                    storedModules.filter(
-                                                      (storedModule) => storedModule.id != value.id
+                                              modules.map(
+                                                (modulesElem, index) => {
+                                                  if (
+                                                    index == i &&
+                                                    modulesElem.lessons.filter(
+                                                      (reDropElem) =>
+                                                        reDropElem.id ===
+                                                        value.id,
+                                                    ).length === 0
+                                                  ) {
+                                                    setStoredModules(
+                                                      storedModules.filter(
+                                                        (storedModule) =>
+                                                          storedModule.id !=
+                                                          value.id,
+                                                      ),
                                                     )
-                                                  )
-                                                  return {
-                                                    title: modulesElem.title,
-                                                    lessons: [
-                                                      ...modulesElem.lessons,
-                                                      {
-                                                        ...value,
-                                                      },
-                                                    ],
+                                                    return {
+                                                      title: modulesElem.title,
+                                                      lessons: [
+                                                        ...modulesElem.lessons,
+                                                        {
+                                                          ...value,
+                                                        },
+                                                      ],
+                                                    }
                                                   }
-                                                }
-                                                return modulesElem
-                                              })
+                                                  return modulesElem
+                                                },
+                                              ),
                                             )
                                           }
                                         }}
                                         renderOption={(
                                           props: object,
                                           option: any,
-                                          state: object
+                                          state: object,
                                         ) => (
                                           <div
                                             // {...props}
@@ -1550,15 +1758,19 @@ const CourseCreate = () => {
                                               justifyContent: 'space-between',
                                             }}
                                           >
-                                            <div {...props} style={{ width: '100%' }}>
+                                            <div
+                                              {...props}
+                                              style={{ width: '100%' }}
+                                            >
                                               {option.title}
                                             </div>
                                             <IconButton
                                               key={'deleteButton_' + option.id}
-                                              aria-label='delete'
+                                              aria-label="delete"
                                               onClick={async (e) => {
                                                 Swal.fire({
-                                                  title: 'Do you want to delete the lesson?',
+                                                  title:
+                                                    'Do you want to delete the lesson?',
                                                   background: '#171622',
                                                   color: '#ffec3e',
                                                   confirmButtonColor: '#ff2052',
@@ -1567,15 +1779,21 @@ const CourseCreate = () => {
                                                 }).then(async (result) => {
                                                   if (result.isConfirmed) {
                                                     removeLessonIds(option.id)
-                                                    const response = await axios.delete(
-                                                      urlLesson + '?id=' + option.id
-                                                    )
-                                                    const resultResponse = response.data
+                                                    const response =
+                                                      await axios.delete(
+                                                        urlLesson +
+                                                          '?id=' +
+                                                          option.id,
+                                                      )
+                                                    const resultResponse =
+                                                      response.data
                                                     if (resultResponse) {
                                                       setStoredModules(
                                                         storedModules.filter(
-                                                          (lesson) => lesson.id != option.id
-                                                        )
+                                                          (lesson) =>
+                                                            lesson.id !=
+                                                            option.id,
+                                                        ),
                                                       )
                                                     }
                                                   }
@@ -1583,7 +1801,10 @@ const CourseCreate = () => {
                                               }}
                                               sx={{}}
                                             >
-                                              <DeleteIcon key={'deleteIcon_'} color='primary' />
+                                              <DeleteIcon
+                                                key={'deleteIcon_'}
+                                                color="primary"
+                                              />
                                             </IconButton>
                                           </div>
                                         )}
@@ -1591,12 +1812,18 @@ const CourseCreate = () => {
                                     </Box>
                                   </Box>
                                   <Box
-                                    sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}
+                                    sx={{
+                                      display: 'flex',
+                                      justifyContent: 'end',
+                                      marginTop: 4,
+                                    }}
                                   >
                                     <Button
-                                      variant='contained'
+                                      variant="contained"
                                       onClick={() => {
-                                        setCreateLessonIndx(createLessonIndx === i ? -1 : i)
+                                        setCreateLessonIndx(
+                                          createLessonIndx === i ? -1 : i,
+                                        )
                                         setLessonForm({
                                           title: '',
                                           image: null,
@@ -1622,7 +1849,7 @@ const CourseCreate = () => {
                         })}
                       </Box>
                       <Button
-                        variant='contained'
+                        variant="contained"
                         onClick={(e) => {
                           setModules([...modules, { title: '', lessons: [] }])
                         }}
@@ -1647,7 +1874,7 @@ const CourseCreate = () => {
                           <InputLabel>Lesson type</InputLabel>
                           <Select
                             fullWidth
-                            id='lessonTypeSelect'
+                            id="lessonTypeSelect"
                             value={lessonType}
                             onChange={handleChangeLessonType}
                           >
@@ -1707,7 +1934,7 @@ const CourseCreate = () => {
                 </Box>
               </Box>
               <Button
-                variant='contained'
+                variant="contained"
                 fullWidth
                 sx={{
                   marginTop: 2,
@@ -1721,7 +1948,12 @@ const CourseCreate = () => {
           ) : (
             <>
               <Box
-                sx={{ display: 'flex', justifyContent: 'center', marginTop: 20, marginBottom: 70 }}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  marginTop: 20,
+                  marginBottom: 70,
+                }}
               >
                 <CircularProgress sx={{ color: '#000' }} />
               </Box>

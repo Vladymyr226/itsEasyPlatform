@@ -66,15 +66,22 @@ const AdminTable = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#fff', paddingBottom: 8 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'between', padding: 4, background: '#000' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'between',
+          padding: 4,
+          background: '#000',
+        }}
+      >
         <Box sx={{ width: '100%' }}>
           <Logo />
         </Box>
 
         <Link href={'/admin/login'}>
           <Button
-            variant='contained'
-            color='error'
+            variant="contained"
+            color="error"
             onClick={() => {
               deleteCookie('jwt')
             }}
@@ -95,7 +102,13 @@ const AdminTable = () => {
         }}
       >
         <Box
-          sx={{ marginRight: 4, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}
+          sx={{
+            marginRight: 4,
+            marginBottom: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
           <Link href={'/admin'}>
             <Box
@@ -136,6 +149,19 @@ const AdminTable = () => {
               }}
             >
               Feedback
+            </Box>
+          </Link>
+          <Link href={'/admin/payments'}>
+            <Box
+              sx={{
+                fontWeight: 'bold',
+                paddingLeft: 2,
+                paddingRight: 2,
+                color: '#000',
+                fontSize: 20,
+              }}
+            >
+              Payments
             </Box>
           </Link>
         </Box>
