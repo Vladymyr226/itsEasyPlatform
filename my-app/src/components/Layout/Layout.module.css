@@ -1,241 +1,243 @@
 .content {
-  display: flex;
-  flex: 1 0 auto;
-  flex-direction: column;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 45px;
-  margin-bottom: 33px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 45px;
+    margin-bottom: 33px;
 }
 
 .headerRightSide {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
 .footer {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 49px;
-  align-items: center;
-  margin-top: 83px;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 49px;
+    align-items: center;
+    margin-top: 83px;
 }
 
 .upperFooter {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 50px;
-  width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    width: 100%;
 }
 
 .footerInfo {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 35px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 35px;
 }
 
 .footerInfoCard {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  width: 100%;
-  color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    color: var(--text-color);
 }
 
 .footerInfoTitle {
-  color: var(--main-color);
-  padding-bottom: 12px;
-  border-bottom: 0.5px solid var(--main-color);
-  width: 100%;
+    color: var(--main-color);
+    padding-bottom: 12px;
+    border-bottom: 0.5px solid var(--main-color);
+    width: 100%;
 }
 
 .footerInfoList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .listWrapper {
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 }
 
 .footerContacts {
-  display: flex;
-  flex-direction: column;
-  gap: 35px;
-  text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    text-align: center;
 
-  color: var(--text-color);
+    color: var(--text-color);
 }
 
 .footerPhone {
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 35px;
-  margin-bottom: 14px;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 35px;
+    margin-bottom: 14px;
 }
 
 .footerEmail {
-  font-size: 16px;
-  line-height: 140%;
+    font-size: 16px;
+    line-height: 140%;
 }
 
 .footerSocialList {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  gap: 12px;
+    gap: 12px;
 }
 
 .footrSocialItem {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  width: 42px;
-  height: 42px;
+    width: 42px;
+    height: 42px;
 
-  border-radius: 50%;
-  background-color: var(--bg-alt-color);
-  cursor: pointer;
+    border-radius: 50%;
+    background-color: var(--bg-alt-color);
+    cursor: pointer;
 }
 
 .bottomFooter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 
-  color: rgba(255, 255, 255, 0.5);
-  border-top: 0.5px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.5);
+    border-top: 0.5px solid rgba(255, 255, 255, 0.2);
 
-  padding-bottom: 20px;
-  padding-top: 22px;
+    padding-bottom: 20px;
+    padding-top: 22px;
 
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 140%;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 140%;
 }
 
 @media screen and (min-width: 1200px) {
-  .header {
-    margin-top: 33px;
-    margin-bottom: 55px;
-  }
+    .header {
+        margin-top: 33px;
+        margin-bottom: 55px;
+    }
 
-  .headerRightSide {
-    gap: 55px;
-  }
+    .headerRightSide {
+        gap: 55px;
+    }
 
-  .headerNavigation {
-    display: flex;
-    align-items: center;
-    gap: 45px;
-  }
+    .headerNavigation {
+        display: flex;
+        align-items: center;
+        gap: 45px;
+    }
 
-  .headerNavigationLink {
-    color: var(--text-color);
-    font-weight: 700;
-    font-size: 19px;
-    line-height: 24px;
-    min-width: 90px;
-    cursor: pointer;
-  }
+    .headerNavigationLink {
+        color: var(--text-color);
+        font-weight: 700;
+        font-size: 19px;
+        line-height: 24px;
+        min-width: 90px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
 
-  .headerNavigationLink:hover {
-    color: var(--main-color);
-  }
+    .headerNavigationLink:hover {
+        color: var(--main-color);
+    }
 
-  .headerActiveNavigationLink {
-    color: var(--main-color);
-    font-weight: 700;
-    min-width: 90px;
-    font-size: 19px;
-    line-height: 24px;
-    cursor: pointer;
-  }
+    .headerActiveNavigationLink {
+        color: var(--main-color);
+        font-weight: 700;
+        min-width: 120px;
+        font-size: 19px;
+        line-height: 24px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
 
-  .headerControlls {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-  }
+    .headerControlls {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
 
-  .footer {
-    margin-top: 130px;
-    align-items: inherit;
-  }
+    .footer {
+        margin-top: 130px;
+        align-items: inherit;
+    }
 
-  .upperFooter {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 96px;
-  }
+    .upperFooter {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 96px;
+    }
 
-  .footerInfo {
-    flex-direction: row;
-    gap: 0;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
+    .footerInfo {
+        flex-direction: row;
+        gap: 0;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
 
-  .footerInfoCard {
-    width: auto;
-  }
+    .footerInfoCard {
+        width: auto;
+    }
 
-  .footerInfoTitle {
-    border-bottom: 1px solid var(--main-color);
-  }
+    .footerInfoTitle {
+        border-bottom: 1px solid var(--main-color);
+    }
 
-  .footerInfoItem:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
+    .footerInfoItem:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
 
-  .listWrapper {
-    justify-content: inherit;
-    gap: 55px;
-  }
+    .listWrapper {
+        justify-content: inherit;
+        gap: 55px;
+    }
 
-  .footerContacts {
-    height: 207px;
-    gap: 0;
-    justify-content: space-between;
+    .footerContacts {
+        height: 207px;
+        gap: 0;
+        justify-content: space-between;
 
-    text-align: right;
-  }
+        text-align: right;
+    }
 
-  .footerEmail:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
+    .footerEmail:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
 
-  .footerPhone {
-    margin-bottom: 20px;
-  }
+    .footerPhone {
+        margin-bottom: 20px;
+    }
 
-  .footerSocialList {
-    justify-content: flex-end;
-  }
+    .footerSocialList {
+        justify-content: flex-end;
+    }
 
-  .footrSocialItem {
-    width: 32px;
-    height: 32px;
-  }
+    .footrSocialItem {
+        width: 32px;
+        height: 32px;
+    }
 
-  .bottomFooter {
-    font-size: 16px;
-  }
+    .bottomFooter {
+        font-size: 16px;
+    }
 }

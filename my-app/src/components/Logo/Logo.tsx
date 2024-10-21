@@ -6,8 +6,12 @@ import Image from 'next/image'
 
 const Logo = () => {
   return (
-    <Link href='/' className={s.logo}>
-      <Image src={logoImage} alt='logo' />
+    <Link href="/" className={s.logo}>
+      <Image
+        className={s.imgLogo}
+        src={logoImage}
+        alt="logo"
+      />
     </Link>
   )
 }
