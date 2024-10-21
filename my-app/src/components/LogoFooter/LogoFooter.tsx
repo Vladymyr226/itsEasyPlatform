@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import logoImage from '../../assets/logo.svg'
 
-import s from './Logo.module.css'
+import s from './LogoFooter.module.css'
 import Image from 'next/image'
 
-const Logo = () => {
+const LogoFooter = () => {
   return (
     <Link href="/" className={s.logo}>
       <Image
+        className={s.imgLogoFooter}
         src={logoImage}
         alt="logo"
       />
@@ -15,4 +16,4 @@ const Logo = () => {
   )
 }
 
-export default Logo
+export default LogoFooter

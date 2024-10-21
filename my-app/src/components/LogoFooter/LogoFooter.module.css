@@ -6,6 +6,10 @@
     max-width: 90px;
 }
 
+.imgLogoFooter {
+    width: 90px;
+}
+
 @media screen and (min-width: 1200px) {
     .logo {
         max-width: none;

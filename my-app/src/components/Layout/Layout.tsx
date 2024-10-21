@@ -14,6 +14,7 @@ import Image from 'next/image'
 import Container from '../Container/Container'
 import Link from 'next/link'
 import { getLocale } from '@/utils/getLocale'
+import LogoFooter from '@/components/LogoFooter/LogoFooter'
 
 type LayoutProps = {
   children: ReactNode
@@ -94,7 +95,7 @@ const Layout = ({ children }: LayoutProps) => {
 
       <footer className={s.footer}>
         <div className={s.upperFooter}>
-          <Logo />
+          <LogoFooter />
 
           <div
             className={s.footerInfo}
