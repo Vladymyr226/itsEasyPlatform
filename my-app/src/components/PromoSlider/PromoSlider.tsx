@@ -247,20 +247,27 @@ import rectangleForCarousel from '../../assets/rectangleForCarousel.png'
 import carouselImage2 from '../../assets/carouselImage2.png'
 import starForCarouselBottom from '../../assets/starForCarouselBottom.png'
 import starForCarousel2Top from '../../assets/starForCarousel2Top.png'
+import iconCarousel4s from '../../assets/iconCarousel4s.png'
 
 import Button from '../Button/Button'
 import { SliderComponent } from '../Slider/Slider'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 const PromoSlider = () => {
   const [width, setWidth] = useState(0)
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
     }
   }, [])
+
+  const handleClick = () => {
+    router.push('/allCourses');
+  }
 
   return (
     <div className={s.promoSlider}>
@@ -272,7 +279,7 @@ const PromoSlider = () => {
               gaining new knowledge is now a streamlined, personalized,
               and engaging experience for everyone.
             </h1>
-            <Button text="View Courses" />
+            <Button text="View Courses" handleClick={handleClick}/>
           </div>
 
           <div className={s.promoImageBlockFirst}>
@@ -295,7 +302,7 @@ const PromoSlider = () => {
               simplifies the process, providing personalized guidance
               every step of the way
             </h1>
-            <Button text="View Courses" />
+            <Button text="View Courses" handleClick={handleClick} />
           </div>
 
           <Image
@@ -348,7 +355,7 @@ const PromoSlider = () => {
             >
               With pre-configured development environment, ready to use right out of the box!
             </p>
-            <Button text="View Courses" />
+            <Button text="View Courses" handleClick={handleClick} />
           </div>
 
           <div className={s.promoImageBlockFirst}>
@@ -371,7 +378,7 @@ const PromoSlider = () => {
               Thanks to AI Tutor, you can seamlessly gain knowledge and
               skills faster and more efficiently than ever before
             </h1>
-            <Button text="View Courses" />
+            <Button text="View Courses" handleClick={handleClick} />
           </div>
 
           <Image
@@ -385,9 +392,20 @@ const PromoSlider = () => {
             alt="icon"
           />
 
-          <div className={s.promoImageBlockFirst}>
+          <Image
+            className={s.promoCarouselIcon4S}
+            src={iconCarousel4s}
+            alt="icon"
+          />
+          <Image
+            className={s.rectangleForCarousel4S}
+            src={rectangleForCarousel}
+            alt="icon"
+          />
+
+          <div className={s.promoImageBlockFirst4}>
             <Image
-              className={s.promoImage}
+              className={s.promoImage4}
               src={carouselImage4}
               alt="programmer"
             />

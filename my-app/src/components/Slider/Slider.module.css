@@ -1,13 +1,11 @@
 .arrowButton {
   cursor: pointer;
-
   background-color: transparent;
   border: none;
 }
 
 .arrowReverseButton {
   cursor: pointer;
-
   background-color: transparent;
   border: none;
   transform: rotate(180deg);
