@@ -702,19 +702,30 @@ const AllCoursesDetails = () => {
             <>
               {dataDisplay ? (
                 dataDisplay.length > 0 ? (
+                  // <Grid
+                  //   container
+                  //   sx={{ gap: 20, justifyContent: { xs: 'center', md: 'center' }, paddingTop: 10 }}
+                  // >
+                  //   {dataDisplay.map((course: Course, index: number) => {
+                  //     return (
+                  //       <>
+                  //         <Grid item sx={{}}>
+                  //           <CourseGridCard course={course} />
+                  //         </Grid>
+                  //       </>
+                  //     )
+                  //   })}
+                  // </Grid>
                   <Grid
                     container
-                    sx={{ gap: 20, justifyContent: { xs: 'center', md: 'center' }, paddingTop: 10 }}
+                    spacing={3}
+                    sx={{ justifyContent: { xs: 'center', md: 'center' }, paddingTop: 10 }}
                   >
-                    {dataDisplay.map((course: Course, index: number) => {
-                      return (
-                        <>
-                          <Grid item sx={{}}>
-                            <CourseGridCard course={course} />
-                          </Grid>
-                        </>
-                      )
-                    })}
+                    {dataDisplay.map((course: Course, index: number) => (
+                      <Grid item xs={12} sm={6} md={3} key={index}>
+                        <CourseGridCard course={course} />
+                      </Grid>
+                    ))}
                   </Grid>
                 ) : (
                   <h1 style={{ color: '#c7c6c6', textAlign: 'center', marginTop: '100px' }}>
