@@ -1,26 +1,94 @@
+/*.arrowButton {*/
+/*  cursor: pointer;*/
+/*  background-color: transparent;*/
+/*  border: none;*/
+/*}*/
+
+/*.arrowReverseButton {*/
+/*  cursor: pointer;*/
+/*  background-color: transparent;*/
+/*  border: none;*/
+/*  transform: rotate(180deg);*/
+/*}*/
+
+/*.buttonsWrapper {*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*}*/
+
+/*.dotsList {*/
+/*  display: flex;*/
+/*  gap: 5px;*/
+/*}*/
+
+/*.dotsList li {*/
+/*  height: 4px;*/
+/*}*/
+
+.imageWrapper {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    transition: opacity 1.5s ease-in-out;
+    opacity: 1;
+}
+
+.iconHidden {
+    opacity: 0;
+}
+
 .arrowButton {
-  cursor: pointer;
-  background-color: transparent;
-  border: none;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .arrowReverseButton {
-  cursor: pointer;
-  background-color: transparent;
-  border: none;
-  transform: rotate(180deg);
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    transform: rotate(180deg);
 }
 
 .buttonsWrapper {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .dotsList {
-  display: flex;
-  gap: 5px;
+    display: flex;
+    gap: 5px;
 }
 
 .dotsList li {
-  height: 4px;
+    height: 4px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
