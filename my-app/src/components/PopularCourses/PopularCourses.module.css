@@ -1,197 +1,196 @@
 .popularCoursesList {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 25px;
-  margin-top: 35px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 35px;
 }
 
 .shadow {
-  display: block;
-  opacity: 0;
-  left: 50%;
-  top: 53%;
-  transform: translate(-50%, -50%);
-  width: 120%;
-  height: 120%;
-  z-index: -1;
-  position: absolute;
-  max-width: none;
-  pointer-events: none;
-  user-select: none;
-  transition: opacity 0.3s ease;
+    display: block;
+    opacity: 0;
+    left: 50%;
+    top: 53%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    z-index: -1;
+    position: absolute;
+    max-width: none;
+    pointer-events: none;
+    user-select: none;
+    transition: opacity 0.3s ease;
 }
 
 .courseImageWrapper {
-  position: relative;
-  cursor: pointer;
+    position: relative;
+    cursor: pointer;
 }
 
 .courseImageWrapper:hover .shadow {
-  opacity: 1;
+    opacity: 1;
 }
 
 .priceWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 17px;
-  padding-top: 10px;
-  margin-left: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 17px;
+    padding-top: 10px;
+    margin-left: 40px;
 }
 
 .prevPrice {
-  font-weight: 400;
-  padding-top: 10px;
-  font-size: 21px;
-  line-height: 25px;
-  text-decoration-line: line-through;
-  color: var(--text-color);
+    font-weight: 400;
+    padding-top: 10px;
+    font-size: 21px;
+    line-height: 25px;
+    text-decoration-line: line-through;
+    color: var(--text-color);
 }
 
 .currentPrice {
-  font-weight: 700;
-  padding-top: 10px;
-  font-size: 32px;
-  line-height: 52px;
-  color: var(--secondary-color);
+    font-weight: 700;
+    padding-top: 10px;
+    font-size: 32px;
+    line-height: 52px;
+    color: var(--secondary-color);
 }
 
 .courseItem {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 330px;
-  max-width: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 330px;
+    max-width: none;
 }
 
 .courseItemHeader {
-  height: 190px;
-  width: 100%;
-  border-top-right-radius: 14px;
-  border-top-left-radius: 14px;
-  background-color: var(--secondary-color);
-  pointer-events: none;
+    height: 190px;
+    width: 100%;
+    border-top-right-radius: 14px;
+    border-top-left-radius: 14px;
+    background-color: var(--secondary-color);
+    pointer-events: none;
 }
 
 .courseItemFooter {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding-left: 20px;
-  padding-bottom: 20px;
-  padding-top: 28px;
-  padding-right: 20px;
-  border-bottom-right-radius: 14px;
-  border-bottom-left-radius: 14px;
-  background: linear-gradient(287.08deg, rgba(197, 142, 254, 0.07) 0%, rgba(25, 23, 47, 0) 43.83%),
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    padding-top: 28px;
+    padding-right: 20px;
+    border-bottom-right-radius: 14px;
+    border-bottom-left-radius: 14px;
+    background: linear-gradient(287.08deg, rgba(197, 142, 254, 0.07) 0%, rgba(25, 23, 47, 0) 43.83%),
     linear-gradient(107.7deg, rgba(197, 142, 254, 0.07) 0%, rgba(25, 23, 47, 0) 32.84%), #171622;
 }
 
 .courseTitle {
-  height: 99px;
-  font-weight: 700;
-  font-size: 21px;
-  line-height: 26px;
-  color: var(--text-color);
+    height: 99px;
+    font-weight: 700;
+    font-size: 21px;
+    line-height: 26px;
+    color: var(--text-color);
 }
 
 .courseInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 120%;
-  margin-top: 14px;
-  text-transform: uppercase;
-  color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    margin-top: 14px;
+    text-transform: uppercase;
+    color: var(--text-color);
 }
 
 .courseButton {
-  padding: 5px 10px;
-  cursor: pointer;
-  border: none;
-  width: 135px;
-  max-height: 40px;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  margin-top: 25px;
-  background: var(--main-color);
-  border-radius: 7px;
-  color: var(--text-alt-color);
+    padding: 5px 10px;
+    cursor: pointer;
+    border: none;
+    width: 135px;
+    max-height: 40px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+    margin-top: 25px;
+    background: var(--main-color);
+    border-radius: 7px;
+    color: var(--text-alt-color);
 }
 
 .courseDetails {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
 }
 
 .courseDetails li {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 17px;
-  color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .accentuated {
-  color: var(--main-color);
+    color: var(--main-color);
 }
 
 /* Custom Navigation Button Styles */
 .navigationButtons {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 20px; /* Adjust the spacing around buttons as needed */
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 0; /* Adjust the spacing around buttons as needed */
 }
 
 .prevButton {
-  position: absolute;
-  top: 50%;
-  z-index: 10;
-  left: 0px;
-  width: 45px;
-  height: 45px;
-  transform: translateY(-50%);
-  margin-top: 0px;
-  background-color: var(--hover-color);
+    position: absolute;
+    top: 50%;
+    z-index: 10;
+    left: -2px;
+    transform: translateY(-50%);
+    margin-top: 0;
+    background-color: var(--hover-color);
 }
+
 .nextButton {
-  margin-top: 0px;
-  position: absolute;
-  top: 50%;
-  z-index: 10;
-  right: 0px;
-  width: 45px;
-  height: 45px;
-  transform: translateY(-50%);
-  background-color: var(--hover-color);
+    margin-top: 0;
+    position: absolute;
+    top: 50%;
+    z-index: 10;
+    right: -2px;
+    transform: translateY(-50%) rotate(180deg);
+    background-color: var(--hover-color);
 }
 
 /* Media Query Adjustments */
 @media screen and (min-width: 1200px) {
-  .nextButton {
-    right: -55px;
-  }
-  .prevButton {
-    left: -55px;
-  }
-  .popularCoursesList {
-    flex-direction: row;
-    justify-content: space-between;
-    margin-top: 50px;
-  }
+    .nextButton {
+        right: -60px;
+    }
 
-  .courseItem {
-    max-width: none;
-  }
+    .prevButton {
+        left: -60px;
+    }
+
+    .popularCoursesList {
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: 50px;
+    }
+
+    .courseItem {
+        max-width: none;
+    }
 }

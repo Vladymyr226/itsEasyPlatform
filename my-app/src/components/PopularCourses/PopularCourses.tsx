@@ -12,41 +12,64 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import { Navigation, Pagination } from 'swiper/modules'
 import { getLocale } from '@/utils/getLocale'
+import arrowLeft from '../../assets/prevSlideButton.svg'
+import arrowLeftHover from '../../assets/prevSlideButtonHover.svg'
 
 const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolean }) => {
   const router = useRouter()
   const swiperRef = useRef<any>(null)
+
+  const [isLeftButtonHover, setIsLeftButtonHover] = useState(false)
+  const [isRightButtonHover, setIsRightButtonHover] = useState(false)
+
   return (
     <>
       {/* Custom Navigation Buttons */}
       <div className={s.navigationButtons}>
-        <button className={s.prevButton} onClick={() => swiperRef.current?.slidePrev()}>
-          <svg
-            width='37.5px'
-            height='60px'
-            viewBox='256 56.768 563.568 903.232'
-            version='1.1'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <path
-              d='M768 903.232l-50.432 56.768L256 512l461.568-448 50.432 56.768L364.928 512z'
-              fill='#007aff'
-            />
-          </svg>
+        <button className={s.prevButton}
+                onClick={() => swiperRef.current?.slidePrev()}
+                onMouseEnter={() => setIsLeftButtonHover(true)}
+                onMouseLeave={() => setIsLeftButtonHover(false)}
+        >
+          {/*<svg*/}
+          {/*  width='37.5px'*/}
+          {/*  height='60px'*/}
+          {/*  viewBox='256 56.768 563.568 903.232'*/}
+          {/*  version='1.1'*/}
+          {/*  xmlns='http://www.w3.org/2000/svg'*/}
+          {/*>*/}
+          {/*  <path*/}
+          {/*    d='M768 903.232l-50.432 56.768L256 512l461.568-448 50.432 56.768L364.928 512z'*/}
+          {/*    fill='#007aff'*/}
+          {/*  />*/}
+          {/*</svg>*/}
+
+          <Image
+            src={isLeftButtonHover ? arrowLeftHover : arrowLeft}
+            alt="prev" />
         </button>
-        <button className={s.nextButton} onClick={() => swiperRef.current?.slideNext()}>
-          <svg
-            width='34px'
-            height='60px'
-            viewBox='256 64 512 896'
-            version='1.1'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <path
-              d='M256 120.768L306.432 64 768 512l-461.568 448L256 903.232 659.072 512z'
-              fill='#007aff'
-            />
-          </svg>
+
+        <button className={s.nextButton}
+                onClick={() => swiperRef.current?.slideNext()}
+                onMouseEnter={() => setIsRightButtonHover(true)}
+                onMouseLeave={() => setIsRightButtonHover(false)}
+        >
+          {/*<svg*/}
+          {/*  width="34px"*/}
+          {/*  height="60px"*/}
+          {/*  viewBox="256 64 512 896"*/}
+          {/*  version="1.1"*/}
+          {/*  xmlns="http://www.w3.org/2000/svg"*/}
+          {/*>*/}
+          {/*  <path*/}
+          {/*    d='M256 120.768L306.432 64 768 512l-461.568 448L256 903.232 659.072 512z'*/}
+          {/*    fill='#007aff'*/}
+          {/*  />*/}
+          {/*</svg>*/}
+
+          <Image
+            src={isRightButtonHover ? arrowLeftHover : arrowLeft}
+            alt="next" />
         </button>
       </div>
 
@@ -55,8 +78,8 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
         pagination={{
           dynamicBullets: true,
         }}
-        className='mySwiper'
-        style={{ width: '100%', paddingBottom: '40px' }}
+        className="mySwiper"
+        style={{ width: '100%', paddingBottom: '30px' }}
         modules={[Navigation, Pagination]}
         navigation={{
           prevEl: `.${s.prevButton}`,
@@ -98,7 +121,7 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
                       <img
                         className={s.courseItemHeader}
                         src={course.data.mediaValue.content}
-                        alt='programmer'
+                        alt="programmer"
                         style={{
                           objectFit: 'cover',
                         }}
@@ -133,49 +156,49 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
                         {course.data.language == 'RU' && (
                           <div style={{ height: '20px', width: '10px' }}>
                             <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              viewBox='0 0 9 6'
-                              width='20'
-                              height='10'
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 9 6"
+                              width="20"
+                              height="10"
                             >
-                              <rect fill='#c7c6c6' width='9' height='3' />
-                              <rect fill='#d52b1e' y='3' width='9' height='3' />
-                              <rect fill='#0039a6' y='2' width='9' height='2' />
+                              <rect fill="#c7c6c6" width="9" height="3" />
+                              <rect fill="#d52b1e" y="3" width="9" height="3" />
+                              <rect fill="#0039a6" y="2" width="9" height="2" />
                             </svg>
                           </div>
                         )}
                         {course.data.language == 'UA' && (
                           <div style={{ height: '20px', width: '20px', position: 'relative' }}>
-                            <svg xmlns='http://www.w3.org/2000/svg' width='20' height='10'>
-                              <rect width='1200' height='5' fill='#0057B7' />
-                              <rect width='1200' height='5' y='5' fill='#FFD700' />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="10">
+                              <rect width="1200" height="5" fill="#0057B7" />
+                              <rect width="1200" height="5" y="5" fill="#FFD700" />
                             </svg>
                           </div>
                         )}
                         {course.data.language == 'EN' && (
                           <div style={{ height: '20px', width: '20px', position: 'relative' }}>
                             <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              viewBox='0 0 50 30'
-                              width='20'
-                              height='10'
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 50 30"
+                              width="20"
+                              height="10"
                             >
-                              <clipPath id='t'>
-                                <path d='M25,15h25v15zv15h-25zh-25v-15zv-15h25z' />
+                              <clipPath id="t">
+                                <path d="M25,15h25v15zv15h-25zh-25v-15zv-15h25z" />
                               </clipPath>
-                              <path d='M0,0v30h50v-30z' fill='#012169' />
-                              <path d='M0,0 50,30M50,0 0,30' stroke='#c7c6c6' strokeWidth='6' />
+                              <path d="M0,0v30h50v-30z" fill="#012169" />
+                              <path d="M0,0 50,30M50,0 0,30" stroke="#c7c6c6" strokeWidth="6" />
                               <path
-                                d='M0,0 50,30M50,0 0,30'
-                                clipPath='url(#t)'
-                                stroke='#C8102E'
-                                strokeWidth='4'
+                                d="M0,0 50,30M50,0 0,30"
+                                clipPath="url(#t)"
+                                stroke="#C8102E"
+                                strokeWidth="4"
                               />
                               <path
-                                d='M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z'
-                                fill='#C8102E'
-                                stroke='#c7c6c6'
-                                strokeWidth='2'
+                                d="M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z"
+                                fill="#C8102E"
+                                stroke="#c7c6c6"
+                                strokeWidth="2"
                               />
                             </svg>
                           </div>
@@ -198,10 +221,10 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
                     <Rating isBig={true} isSmall={true} rating={course.data.rating} />
                     <ul className={s.courseDetails}>
                       <li>
-                        <Image src={notebook} alt='notebook' /> {tmpSum} {t.lectures}
+                        <Image src={notebook} alt="notebook" /> {tmpSum} {t.lectures}
                       </li>
                       <li>
-                        <Image src={stat} alt='stat' /> {course.data.level}
+                        <Image src={stat} alt="stat" /> {course.data.level}
                       </li>
                     </ul>
                     <div style={{ display: 'flex' }}>
@@ -230,7 +253,7 @@ const PopularCourses = ({ data, smallScreen }: { data: any; smallScreen?: boolea
                     </div>
                   </div>
                 </div>
-                <Image className={s.shadow} src={courseShadow} alt='shadow' />
+                <Image className={s.shadow} src={courseShadow} alt="shadow" />
               </div>
             </SwiperSlide>
           )

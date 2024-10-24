@@ -45,7 +45,7 @@ export default function HomePage() {
       setAllCategorySelect(
         resultTag.getTags.map((tag: any) => {
           return tag
-        })
+        }),
       )
 
       const userId = localStorage.getItem('UserID')
@@ -63,13 +63,14 @@ export default function HomePage() {
         },
       })
       const result = await response.json()
-      const dataRes = result.getCourses.sort(function (a: any, b: any) {
+      const dataRes = result.getCourses.sort(function(a: any, b: any) {
         return b.data.rating - a.data.rating
       })
       setData(dataRes)
       setDataDisplay(dataRes)
     }
   }
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWidth(window.innerWidth)
@@ -82,6 +83,7 @@ export default function HomePage() {
   useEffect(() => {
     handleApply()
   }, [searchField])
+
   function arraysHaveCommonElements(array1: any, array2: any) {
     return array1.some((element: any) => array2.includes(element))
   }
@@ -95,18 +97,18 @@ export default function HomePage() {
             dataFilter.data.category,
             selectedTag.map((tag: any) => {
               return tag
-            })
-          )
+            }),
+          ),
         )
       }
       if (searchField.length >= 2) {
         filteredRes = filteredRes.filter((dataFilter: any) =>
-          dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase())
+          dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase()),
         )
       }
     }
     if (filteredRes) {
-      filteredRes = filteredRes.sort(function (a: any, b: any) {
+      filteredRes = filteredRes.sort(function(a: any, b: any) {
         return b.data.rating - a.data.rating
       })
     }
@@ -129,7 +131,7 @@ export default function HomePage() {
           >
             <TextField
               autoComplete={'off'}
-              id='standard-name'
+              id="standard-name"
               fullWidth
               placeholder={t.find_course}
               value={searchField}
@@ -149,7 +151,7 @@ export default function HomePage() {
                       handleApply()
                     }}
                   >
-                    <SearchIcon sx={{ color: '#45454e' }} fontSize='medium' />
+                    <SearchIcon sx={{ color: '#45454e' }} fontSize="medium" />
                   </IconButton>
                 ),
               }}
@@ -186,7 +188,7 @@ export default function HomePage() {
                 }}
               >
                 {dataDisplay.filter((dataFilter: any) =>
-                  dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase())
+                  dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase()),
                 ).length === 0 && (
                   <Box
                     sx={{
@@ -202,7 +204,7 @@ export default function HomePage() {
                 )}
                 {dataDisplay
                   .filter((dataFilter: any) =>
-                    dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase())
+                    dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase()),
                   )
                   .map((result: any) => {
                     return (
@@ -275,7 +277,7 @@ export default function HomePage() {
                     <Image
                       className={s.shadow}
                       src={courseShadow}
-                      alt='shadow'
+                      alt="shadow"
                       style={selectedTag.indexOf(tag.id) == -1 ? {} : { opacity: 1 }}
                     />
                     <img
@@ -315,7 +317,7 @@ export default function HomePage() {
                     mediaValue={course.data.mediaValue}
                     createdAt={course.created_at}
                     views={course.views}
-                    isFavoriteStart={favouriteCourses ? favouriteCourses.indexOf(course.id) != -1:false}
+                    isFavoriteStart={favouriteCourses ? favouriteCourses.indexOf(course.id) != -1 : false}
                     userData={userData}
                   />
                 </>
@@ -336,14 +338,14 @@ export default function HomePage() {
           <Link href={'/allCourses'}>
             <button className={s.loadMoreButton}>
               {t.see_more}
-              <Image src={plus} alt='plus' />
+              <Image src={plus} alt="plus" />
             </button>
           </Link>
         ) : (
           <Link href={'/allCourses'}>
             <button className={s.loadMoreButton}>
               {t.see_more}
-              <Image src={plus} alt='plus' />
+              <Image src={plus} alt="plus" />
             </button>
           </Link>
         )}
