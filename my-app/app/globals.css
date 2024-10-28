@@ -137,8 +137,8 @@ body {
   height: 100%;
 }
 
-ul:not([data-slate-node]),
-ol:not([data-slate-node]) {
+:not([data-slate-node]) > ul:not([data-slate-node]),
+:not([data-slate-node]) > ol:not([data-slate-node]) {
   padding: 0;
   list-style: none;
 }

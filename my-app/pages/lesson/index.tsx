@@ -27,6 +27,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import ConfettiButton from '@/components/ConfettiButton/ConfettiButton'
 import courseShadow from '../../src/assets/shadows/courseHoverShadow.png'
 import { styled } from '@mui/material/styles'
+import ReactMarkdown from 'react-markdown'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
@@ -1235,7 +1236,7 @@ const LessonDetails = () => {
                                       borderRadius: 2,
                                     }}
                                   >
-                                    {message.value}
+                                    <div data-slate-node><ReactMarkdown>{message.value}</ReactMarkdown></div>
                                   </Box>
                                 </Box>
                               )
