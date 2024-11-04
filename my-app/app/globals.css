@@ -118,6 +118,7 @@ input:-webkit-autofill:active {
   --bg-color: #0f0e16;
   --bg-alt-color: #171622;
   --main-color: #ffec3e;
+  --main-color-faded: #ffec3e32;
   --secondary-color: #c58efe;
   --text-color: #ffffff;
   --text-alt-color: #0f0e16;

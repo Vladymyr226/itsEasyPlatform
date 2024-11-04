@@ -71,8 +71,9 @@ const Layout = ({ children }: LayoutProps) => {
                       {t.courses}
                     </div>
                   </Link>
-                  <div className={s.headerNavigationLink}>{t.about_us}</div>
-                  {/* <div className={s.headerNavigationLink}>{t.career}</div> */}
+                  <Link href="aboutUs">
+                    <div className={s.headerNavigationLink}>{t.about_us}</div>
+                  </Link>
                 </div>
 
                 <div className={s.headerControlls}>

@@ -70,8 +70,14 @@ const BurgerMenu = () => {
                   {t.courses}
                 </li>
               </Link>
-              <li>{t.about_us}</li>
-              {/* <li>{t.career}</li> */}
+              <Link href={'/aboutUs'}>
+                <li
+                  className={targetSite == 'aboutUs' ? s.active : ''}
+                  style={{ color: targetSite != 'aboutUs' ? '#c7c6c6' : '' }}
+                >
+                  {t.about_us}
+                </li>
+              </Link>
             </ul>
           </div>
           <div className={s.divide}></div>
