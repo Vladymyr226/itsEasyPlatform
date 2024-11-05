@@ -116,7 +116,7 @@ function BpCheckbox(props: any) {
         '&:hover': { bgcolor: 'transparent' },
       }}
       disableRipple
-      color='default'
+      color="default"
       checkedIcon={
         props.correct == -1 ? (
           <BpCheckedIcon />
@@ -127,7 +127,13 @@ function BpCheckbox(props: any) {
         )
       }
       icon={
-        props.correct == -1 ? <BpIcon /> : props.correct == 1 ? <BpTrueIcon /> : <BpFalseIcon />
+        props.correct == -1 ? (
+          <BpIcon />
+        ) : props.correct == 1 ? (
+          <BpTrueIcon />
+        ) : (
+          <BpFalseIcon />
+        )
       }
       inputProps={{ 'aria-label': 'Checkbox demo' }}
       {...props}
@@ -242,7 +248,7 @@ function BpRadioButton(props: any) {
           '&:hover': { bgcolor: 'transparent' },
         }}
         disableRipple
-        color='default'
+        color="default"
         checkedIcon={
           props.correct == -1 ? (
             <BpCheckedIconRadio />
@@ -267,8 +273,10 @@ function BpRadioButton(props: any) {
       <Image
         className={s.shadow}
         src={courseShadow}
-        alt='shadow'
-        style={props.correct == -1 ? (props.dispayChecked ? { opacity: 1 } : {}) : {}}
+        alt="shadow"
+        style={
+          props.correct == -1 ? (props.dispayChecked ? { opacity: 1 } : {}) : {}
+        }
       />
     </Box>
   )
@@ -284,7 +292,7 @@ const LessonDetails = () => {
   const videoRef = useRef(null)
   const [userData, setUserData] = useState<any>()
   const [selectedCourse, setSelectedCourse] = useState<any>()
-  const [courseData,  setCourseData]=useState()
+  const [courseData, setCourseData] = useState()
   const [chatDataId, setChatDataId] = useState<any>()
   const [chatData, setChatData] = useState<any>()
   const [userId, setUserId] = useState<any>()
@@ -307,11 +315,14 @@ const LessonDetails = () => {
       if (fullUrl.split('id=')[1]) {
         setId(Number(fullUrl.split('id=')[1]))
         getPageData2(Number(fullUrl.split('id=')[1]), resultUser.id)
-        const response = await fetch(urlLesson + '/' + fullUrl.split('id=')[1], {
-          headers: {
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          urlLesson + '/' + fullUrl.split('id=')[1],
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
           },
-        })
+        )
         const result = await response.json()
         if (result.type === 'quiz') {
           setAnswerForm(
@@ -319,7 +330,7 @@ const LessonDetails = () => {
               return question.options.map((option: any) => {
                 return false
               })
-            })
+            }),
           )
           if (
             resultUser?.comleted_lessons_id &&
@@ -329,7 +340,9 @@ const LessonDetails = () => {
           }
         }
         if (result.type == 'default') {
-          const slateFields = result.data.fields.filter((field: any) => field.type == 'slate')
+          const slateFields = result.data.fields.filter(
+            (field: any) => field.type == 'slate',
+          )
           const value = slateFields
             .map((field: any) => {
               return field.value
@@ -346,7 +359,9 @@ const LessonDetails = () => {
           setLessonContext(value)
         }
         if (result.type == 'practice') {
-          const slateFields = result.data.fields.filter((field: any) => field.type == 'slate')
+          const slateFields = result.data.fields.filter(
+            (field: any) => field.type == 'slate',
+          )
           const value = slateFields
             .map((field: any) => {
               return field.value
@@ -364,35 +379,53 @@ const LessonDetails = () => {
         }
 
         setData(result)
-        if (localStorage.getItem('SelectedCourse') && localStorage.getItem('SelectedModuleIndex')) {
-          const responseCourse = await fetch(url + '/' + localStorage.getItem('SelectedCourse'), {
-            headers: {
-              'Content-Type': 'application/json',
+        if (
+          localStorage.getItem('SelectedCourse') &&
+          localStorage.getItem('SelectedModuleIndex')
+        ) {
+          const responseCourse = await fetch(
+            url + '/' + localStorage.getItem('SelectedCourse'),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
             },
-          })
+          )
           const resultCourse = await responseCourse.json()
           setCourseData(resultCourse)
           setQuestionLimit(resultCourse.data.questionLimit)
           setModuleLessons(
-            resultCourse.data.modules[Number(localStorage.getItem('SelectedModuleIndex'))].lessons
+            resultCourse.data.modules[
+              Number(localStorage.getItem('SelectedModuleIndex'))
+            ].lessons,
           )
-          const allLessonIds = resultCourse.data.modules.flatMap((module: any) => module.lessons);
-          const response = await fetch(urlLessonsById + '?idArr=' + allLessonIds.join(','), {
-            headers: {
-              'Content-Type': 'application/json',
+          const allLessonIds = resultCourse.data.modules.flatMap(
+            (module: any) => module.lessons,
+          )
+          const response = await fetch(
+            urlLessonsById + '?idArr=' + allLessonIds.join(','),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
             },
-          });
-          const lessonsResponse = await response.json();
+          )
+          const lessonsResponse = await response.json()
 
-          const lessonsById = lessonsResponse.reduce((acc: any, lesson: any) => {
-            acc[lesson.id] = lesson;
-            return acc;
-          }, {});
+          const lessonsById = lessonsResponse.reduce(
+            (acc: any, lesson: any) => {
+              acc[lesson.id] = lesson
+              return acc
+            },
+            {},
+          )
 
           const modules = resultCourse.data.modules.map((module: any) => ({
             title: module.title,
-            lessons: module.lessons.map((lessonId: string) => lessonsById[lessonId] ?? null),
-          }));
+            lessons: module.lessons.map(
+              (lessonId: string) => lessonsById[lessonId] ?? null,
+            ),
+          }))
           setModules(modules)
         }
       } else {
@@ -409,7 +442,7 @@ const LessonDetails = () => {
       })
       const result = await response.json()
       const chats = result.getChats.filter(
-        (chat: any) => chat.lesson_id == id2 && chat.user_id == userID2
+        (chat: any) => chat.lesson_id == id2 && chat.user_id == userID2,
       )
       if (chats.length > 0) {
         setChatData(chats[0])
@@ -423,9 +456,12 @@ const LessonDetails = () => {
           }
         }, 1000)
       } else {
-        const responsePost = await axios.post(urlChat + '?lessonId=' + id2 + '&userId=' + userID2, {
-          messages: [],
-        })
+        const responsePost = await axios.post(
+          urlChat + '?lessonId=' + id2 + '&userId=' + userID2,
+          {
+            messages: [],
+          },
+        )
         const resultResponse2 = responsePost.data
         if (resultResponse2) {
           setChatData({
@@ -529,40 +565,64 @@ const LessonDetails = () => {
                 ? 'Here is the context of the lesson (' + lessonContext + ')'
                 : '',
             },
-          ].concat(
-            (chatData.data.messages || []).map((msg: any) => ({
-              role: msg.from.replace('chat', 'assistant'),
-              content: msg.value,
-            }))
-          ).concat([
-            {
-              role: 'user',
-              content: 'Here is the message: ' + gptField.current.value,
-            },
-          ]),
+          ]
+            .concat(
+              (chatData.data.messages || []).map((msg: any) => ({
+                role: msg.from.replace('chat', 'assistant'),
+                content: msg.value,
+              })),
+            )
+            .concat([
+              {
+                role: 'user',
+                content: 'Here is the message: ' + gptField.current.value,
+              },
+            ]),
         },
         {
           headers: {
             Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
 
       const responseChat = await axios.put(
-        urlChat + '?lessonId=' + id + '&userId=' + userData.id + '&chatId=' + chatDataId,
+        urlChat +
+          '?lessonId=' +
+          id +
+          '&userId=' +
+          userData.id +
+          '&chatId=' +
+          chatDataId,
         {
           messages: chatData.data.messages
             ? [
                 ...chatData.data.messages,
-                { value: gptField.current.value ?? '', from: 'user', time: new Date() },
-                { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
+                {
+                  value: gptField.current.value ?? '',
+                  from: 'user',
+                  time: new Date(),
+                },
+                {
+                  value: response.data.choices[0].message.content,
+                  from: 'chat',
+                  time: new Date(),
+                },
               ]
             : [
-                { value: gptField.current.value ?? '', from: 'user', time: new Date() },
-                { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
+                {
+                  value: gptField.current.value ?? '',
+                  from: 'user',
+                  time: new Date(),
+                },
+                {
+                  value: response.data.choices[0].message.content,
+                  from: 'chat',
+                  time: new Date(),
+                },
               ],
-        }
+        },
       )
       if (response.status == 200) {
         setChatData({
@@ -570,8 +630,16 @@ const LessonDetails = () => {
           data: {
             messages: [
               ...chatData.data.messages,
-              { value: gptField.current.value ?? '', from: 'user', time: new Date() },
-              { value: response.data.choices[0].message.content, from: 'chat', time: new Date() },
+              {
+                value: gptField.current.value ?? '',
+                from: 'user',
+                time: new Date(),
+              },
+              {
+                value: response.data.choices[0].message.content,
+                from: 'chat',
+                time: new Date(),
+              },
             ],
           },
         })
@@ -632,7 +700,13 @@ const LessonDetails = () => {
                 </Box>
               )}
               {data.type != 'quiz' && (
-                <h1 style={{ textAlign: 'left', color: '#ffec3e', marginBottom: '20px' }}>
+                <h1
+                  style={{
+                    textAlign: 'left',
+                    color: '#ffec3e',
+                    marginBottom: '20px',
+                  }}
+                >
                   <b>{data && data.data.title}</b>
                 </h1>
               )}
@@ -675,7 +749,11 @@ const LessonDetails = () => {
                                 }}
                               >
                                 <iframe
-                                  src={field ? field.value : 'https://codesandbox.io/'}
+                                  src={
+                                    field
+                                      ? field.value
+                                      : 'https://codesandbox.io/'
+                                  }
                                   style={{
                                     width: '100%',
                                     height: '900px',
@@ -683,10 +761,10 @@ const LessonDetails = () => {
                                     borderRadius: '4px',
                                     overflow: 'hidden',
                                   }}
-                                  title='React'
+                                  title="React"
                                   allowFullScreen
-                                  allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
-                                  sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
+                                  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+                                  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
                                 ></iframe>
                               </Box>
                             )}
@@ -711,7 +789,9 @@ const LessonDetails = () => {
                                   padding: '15px',
                                 }}
                               >
-                                <ExampleYouTube url={field.value.split('?v=')[1]} />
+                                <ExampleYouTube
+                                  url={field.value.split('?v=')[1]}
+                                />
                               </Box>
                             )}
                           </Box>
@@ -734,66 +814,93 @@ const LessonDetails = () => {
                     {data.data.questions.map((question: any, indx: number) => {
                       return (
                         <Box key={'Question_' + indx}>
-                          <h2 style={{ textAlign: 'left', color: '#c7c6c6', marginBottom: '20px' }}>
+                          <h2
+                            style={{
+                              textAlign: 'left',
+                              color: '#c7c6c6',
+                              marginBottom: '20px',
+                            }}
+                          >
                             <b>{indx + 1 + '. ' + question.title}</b>
                           </h2>
-                          {question.options.filter((option: any) => option.correct).length > 1 ? (
-                            question.options.map((option: any, optionIndx: number) => {
-                              return (
-                                <Box
-                                  key={'QuestionOption_' + indx}
-                                  sx={{ display: 'flex', color: '#c7c6c6', marginTop: 1 }}
-                                >
-                                  {!clearCheckBoxes && (
-                                    <Box
-                                      className={s.optionWrapper}
-                                      sx={{
-                                        position: 'relative',
-                                        zIndex: 1,
+                          {question.options.filter(
+                            (option: any) => option.correct,
+                          ).length > 1 ? (
+                            question.options.map(
+                              (option: any, optionIndx: number) => {
+                                return (
+                                  <Box
+                                    key={'QuestionOption_' + indx}
+                                    sx={{
+                                      display: 'flex',
+                                      color: '#c7c6c6',
+                                      marginTop: 1,
+                                    }}
+                                  >
+                                    {!clearCheckBoxes && (
+                                      <Box
+                                        className={s.optionWrapper}
+                                        sx={{
+                                          position: 'relative',
+                                          zIndex: 1,
+                                        }}
+                                      >
+                                        <BpCheckbox
+                                          defaultChecked={
+                                            answerForm[indx][optionIndx]
+                                          }
+                                          disabled={checkAnswers}
+                                          onChange={(e: any) => {
+                                            let tmpArr: any = answerForm
+                                            tmpArr[indx][optionIndx] =
+                                              e.target.checked
+                                            setAnswerForm(tmpArr)
+                                            setRefreshTrigger(!refreshTrigger)
+                                          }}
+                                          inputProps={{
+                                            'aria-label': 'controlled',
+                                          }}
+                                          correct={
+                                            checkAnswers &&
+                                            answerForm &&
+                                            (answerForm[indx][optionIndx] ||
+                                              option.correct)
+                                              ? answerForm[indx][optionIndx] ==
+                                                option.correct
+                                                ? 1
+                                                : 0
+                                              : -1
+                                          }
+                                        />
+                                        <Image
+                                          className={s.shadow}
+                                          src={courseShadow}
+                                          alt="shadow"
+                                          style={
+                                            checkAnswers &&
+                                            answerForm &&
+                                            (answerForm[indx][optionIndx] ||
+                                              option.correct)
+                                              ? {}
+                                              : answerForm[indx][optionIndx]
+                                                ? { opacity: 1 }
+                                                : {}
+                                          }
+                                        />
+                                      </Box>
+                                    )}
+                                    <b
+                                      style={{
+                                        marginTop: '10px',
+                                        marginLeft: '10px',
                                       }}
                                     >
-                                      <BpCheckbox
-                                        defaultChecked={answerForm[indx][optionIndx]}
-                                        disabled={checkAnswers}
-                                        onChange={(e: any) => {
-                                          let tmpArr: any = answerForm
-                                          tmpArr[indx][optionIndx] = e.target.checked
-                                          setAnswerForm(tmpArr)
-                                          setRefreshTrigger(!refreshTrigger)
-                                        }}
-                                        inputProps={{ 'aria-label': 'controlled' }}
-                                        correct={
-                                          checkAnswers &&
-                                          answerForm &&
-                                          (answerForm[indx][optionIndx] || option.correct)
-                                            ? answerForm[indx][optionIndx] == option.correct
-                                              ? 1
-                                              : 0
-                                            : -1
-                                        }
-                                      />
-                                      <Image
-                                        className={s.shadow}
-                                        src={courseShadow}
-                                        alt='shadow'
-                                        style={
-                                          checkAnswers &&
-                                          answerForm &&
-                                          (answerForm[indx][optionIndx] || option.correct)
-                                            ? {}
-                                            : answerForm[indx][optionIndx]
-                                            ? { opacity: 1 }
-                                            : {}
-                                        }
-                                      />
-                                    </Box>
-                                  )}
-                                  <b style={{ marginTop: '10px', marginLeft: '10px' }}>
-                                    {option.title}
-                                  </b>
-                                </Box>
-                              )
-                            })
+                                      {option.title}
+                                    </b>
+                                  </Box>
+                                )
+                              },
+                            )
                           ) : (
                             <Box
                               key={'QuestionOption_' + indx}
@@ -806,50 +913,70 @@ const LessonDetails = () => {
                             >
                               {!clearCheckBoxes && (
                                 <RadioGroup
-                                  aria-labelledby='demo-radio-buttons-group-label'
-                                  name='radio-buttons-group'
+                                  aria-labelledby="demo-radio-buttons-group-label"
+                                  name="radio-buttons-group"
                                 >
-                                  {question.options.map((option: any, optionIndx: number) => {
-                                    return (
-                                      <>
-                                        <FormControlLabel
-                                          key={'QuestionOption_' + indx + '_' + option.title}
-                                          value={option.title}
-                                          sx={{
-                                            color: '#c7c6c6',
-                                            '& .MuiFormControlLabel-label.Mui-disabled': {
-                                              color: '#c7c6c6 !important',
-                                            },
-                                          }}
-                                          control={
-                                            <BpRadioButton
-                                              onClick={(e: any) => {
-                                                let tmpArr: any = answerForm
-                                                tmpArr[indx] = tmpArr[indx].map(() => {
-                                                  return false
-                                                })
+                                  {question.options.map(
+                                    (option: any, optionIndx: number) => {
+                                      return (
+                                        <>
+                                          <FormControlLabel
+                                            key={
+                                              'QuestionOption_' +
+                                              indx +
+                                              '_' +
+                                              option.title
+                                            }
+                                            value={option.title}
+                                            sx={{
+                                              color: '#c7c6c6',
+                                              '& .MuiFormControlLabel-label.Mui-disabled':
+                                                {
+                                                  color: '#c7c6c6 !important',
+                                                },
+                                            }}
+                                            control={
+                                              <BpRadioButton
+                                                onClick={(e: any) => {
+                                                  let tmpArr: any = answerForm
+                                                  tmpArr[indx] = tmpArr[
+                                                    indx
+                                                  ].map(() => {
+                                                    return false
+                                                  })
 
-                                                tmpArr[indx][optionIndx] = true
-                                                setAnswerForm(tmpArr)
-                                                setRefreshTrigger(!refreshTrigger)
-                                              }}
-                                              dispayChecked={answerForm[indx][optionIndx]}
-                                              correct={
-                                                checkAnswers &&
-                                                answerForm &&
-                                                (answerForm[indx][optionIndx] || option.correct)
-                                                  ? answerForm[indx][optionIndx] == option.correct
-                                                    ? 1
-                                                    : 0
-                                                  : -1
-                                              }
-                                            />
-                                          }
-                                          label={option.title}
-                                        />
-                                      </>
-                                    )
-                                  })}
+                                                  tmpArr[indx][optionIndx] =
+                                                    true
+                                                  setAnswerForm(tmpArr)
+                                                  setRefreshTrigger(
+                                                    !refreshTrigger,
+                                                  )
+                                                }}
+                                                dispayChecked={
+                                                  answerForm[indx][optionIndx]
+                                                }
+                                                correct={
+                                                  checkAnswers &&
+                                                  answerForm &&
+                                                  (answerForm[indx][
+                                                    optionIndx
+                                                  ] ||
+                                                    option.correct)
+                                                    ? answerForm[indx][
+                                                        optionIndx
+                                                      ] == option.correct
+                                                      ? 1
+                                                      : 0
+                                                    : -1
+                                                }
+                                              />
+                                            }
+                                            label={option.title}
+                                          />
+                                        </>
+                                      )
+                                    },
+                                  )}
                                 </RadioGroup>
                               )}
                             </Box>
@@ -898,7 +1025,11 @@ const LessonDetails = () => {
                                 }}
                               >
                                 <iframe
-                                  src={field ? field.value : 'https://codesandbox.io/'}
+                                  src={
+                                    field
+                                      ? field.value
+                                      : 'https://codesandbox.io/'
+                                  }
                                   style={{
                                     width: '100%',
                                     height: '90vh',
@@ -906,10 +1037,10 @@ const LessonDetails = () => {
                                     borderRadius: '4px',
                                     overflow: 'hidden',
                                   }}
-                                  title='React'
+                                  title="React"
                                   allowFullScreen
-                                  allow='accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking'
-                                  sandbox='allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts'
+                                  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+                                  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
                                 ></iframe>
                               </Box>
                             )}
@@ -944,28 +1075,41 @@ const LessonDetails = () => {
               >
                 {(getLessonIndx() > 0 ||
                   Number(
-                    typeof window !== 'undefined' ? localStorage.getItem('SelectedModuleIndex') : 0
+                    typeof window !== 'undefined'
+                      ? localStorage.getItem('SelectedModuleIndex')
+                      : 0,
                   ) > 0) && (
                   <Button
-                    variant='text'
+                    variant="text"
                     onClick={(e) => {
+                      setResetAnswersBtn(false)
                       const getLessIndx = getLessonIndx()
                       if (getLessIndx > 0) {
                         if (moduleLessons) {
-                          router.replace('/lesson?id=' + moduleLessons[getLessonIndx() - 1])
+                          router.replace(
+                            '/lesson?id=' + moduleLessons[getLessonIndx() - 1],
+                          )
                           setId(Number(moduleLessons[getLessonIndx() - 1]))
                         }
                       } else {
-                        if (Number(localStorage.getItem('SelectedModuleIndex')) > 0) {
-                          const currentIndex = Number(localStorage.getItem('SelectedModuleIndex'))
-                          localStorage.setItem('SelectedModuleIndex', '' + (currentIndex - 1))
+                        if (
+                          Number(localStorage.getItem('SelectedModuleIndex')) >
+                          0
+                        ) {
+                          const currentIndex = Number(
+                            localStorage.getItem('SelectedModuleIndex'),
+                          )
+                          localStorage.setItem(
+                            'SelectedModuleIndex',
+                            '' + (currentIndex - 1),
+                          )
                           setCompletedLessonTrigger(!completedLessonTrigger)
                           const lessIndex = Number(
                             modules
                               ? modules[currentIndex - 1].lessons[
                                   modules[currentIndex - 1].lessons.length - 1
                                 ].id
-                              : 0
+                              : 0,
                           )
                           router.replace('/lesson?id=' + lessIndex)
                           setId(lessIndex)
@@ -978,10 +1122,18 @@ const LessonDetails = () => {
                     {t.previous}
                   </Button>
                 )}
-                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <Box
+                  sx={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                  }}
+                >
                   {userData &&
                     userData?.purchased_courses_id &&
-                    userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 &&
+                    userData?.purchased_courses_id.indexOf(
+                      Number(selectedCourse),
+                    ) != -1 &&
                     userData?.comleted_lessons_id &&
                     userData?.comleted_lessons_id.indexOf(id) != -1 &&
                     data.type == 'quiz' && (
@@ -994,7 +1146,9 @@ const LessonDetails = () => {
                     )}
                   {userData &&
                     userData?.purchased_courses_id &&
-                    userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 &&
+                    userData?.purchased_courses_id.indexOf(
+                      Number(selectedCourse),
+                    ) != -1 &&
                     userData?.comleted_lessons_id &&
                     userData?.comleted_lessons_id.indexOf(id) == -1 && (
                       <>
@@ -1003,58 +1157,98 @@ const LessonDetails = () => {
                             <ConfettiButton
                               completeButtonState={completeButtonState}
                               onClickFunction={async () => {
-                                if (data.type == 'default' || data.type == 'practice') {
-                                  const response = await axios.put(urlUser + '?id=' + userData.id, {
-                                    purchasedCoursesId: [...userData.purchased_courses_id],
-                                    favouriteCoursesId: [...userData.favourite_courses_id],
-                                    comletedLessonsId: [...userData.comleted_lessons_id, id],
-                                  })
+                                if (
+                                  data.type == 'default' ||
+                                  data.type == 'practice'
+                                ) {
+                                  const response = await axios.put(
+                                    urlUser + '?id=' + userData.id,
+                                    {
+                                      purchasedCoursesId: [
+                                        ...userData.purchased_courses_id,
+                                      ],
+                                      favouriteCoursesId: [
+                                        ...userData.favourite_courses_id,
+                                      ],
+                                      comletedLessonsId: [
+                                        ...userData.comleted_lessons_id,
+                                        id,
+                                      ],
+                                    },
+                                  )
                                   const resultResponse = response.data
                                   const userId = localStorage.getItem('UserID')
-                                  const responseUser = await fetch(urlUser + '/' + userId, {
-                                    headers: {
-                                      'Content-Type': 'application/json',
+                                  const responseUser = await fetch(
+                                    urlUser + '/' + userId,
+                                    {
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                      },
                                     },
-                                  })
+                                  )
                                   const resultUser = await responseUser.json()
                                   setCompleteButtonState('complete')
                                   setTimeout(() => {
-                                    setCompletedLessonTrigger(!completedLessonTrigger)
+                                    setCompletedLessonTrigger(
+                                      !completedLessonTrigger,
+                                    )
                                     setUserData(resultUser)
                                     if (
                                       resultResponse &&
                                       moduleLessons &&
                                       getLessonIndx() >= 0 &&
-                                      getLessonIndx() < moduleLessons?.length - 1
+                                      getLessonIndx() <
+                                        moduleLessons?.length - 1
                                     ) {
                                       setUserData({
                                         ...userData,
-                                        comleted_lessons_id: [...userData.comleted_lessons_id, id],
+                                        comleted_lessons_id: [
+                                          ...userData.comleted_lessons_id,
+                                          id,
+                                        ],
                                       })
                                       if (moduleLessons) {
                                         router.replace(
-                                          '/lesson?id=' + moduleLessons[getLessonIndx() + 1]
+                                          '/lesson?id=' +
+                                            moduleLessons[getLessonIndx() + 1],
                                         )
-                                        setId(Number(moduleLessons[getLessonIndx() + 1]))
+                                        setId(
+                                          Number(
+                                            moduleLessons[getLessonIndx() + 1],
+                                          ),
+                                        )
                                       }
                                     } else {
                                       if (
                                         resultResponse &&
-                                        Number(localStorage.getItem('SelectedModuleIndex')) <
+                                        Number(
+                                          localStorage.getItem(
+                                            'SelectedModuleIndex',
+                                          ),
+                                        ) <
                                           (modules?.length ?? 0) - 1
                                       ) {
                                         const currentIndex = Number(
-                                          localStorage.getItem('SelectedModuleIndex')
+                                          localStorage.getItem(
+                                            'SelectedModuleIndex',
+                                          ),
                                         )
                                         localStorage.setItem(
                                           'SelectedModuleIndex',
-                                          '' + (currentIndex + 1)
+                                          '' + (currentIndex + 1),
                                         )
-                                        setCompletedLessonTrigger(!completedLessonTrigger)
+                                        setCompletedLessonTrigger(
+                                          !completedLessonTrigger,
+                                        )
                                         const lessIndex = Number(
-                                          modules ? modules[currentIndex + 1].lessons[0].id : 0
+                                          modules
+                                            ? modules[currentIndex + 1]
+                                                .lessons[0].id
+                                            : 0,
                                         )
-                                        router.replace('/lesson?id=' + lessIndex)
+                                        router.replace(
+                                          '/lesson?id=' + lessIndex,
+                                        )
                                         setId(lessIndex)
                                       }
                                     }
@@ -1063,34 +1257,54 @@ const LessonDetails = () => {
                                 }
                                 if (data.type == 'quiz') {
                                   let result = true
-                                  data.data.questions.map((question: any, indx: number) => {
-                                    question.options.map((option: any, optionIndx: number) => {
-                                      if (option.correct != answerForm[indx][optionIndx]) {
-                                        result = false
-                                      }
-                                    })
-                                  })
+                                  data.data.questions.map(
+                                    (question: any, indx: number) => {
+                                      question.options.map(
+                                        (option: any, optionIndx: number) => {
+                                          if (
+                                            option.correct !=
+                                            answerForm[indx][optionIndx]
+                                          ) {
+                                            result = false
+                                          }
+                                        },
+                                      )
+                                    },
+                                  )
                                   if (result) {
                                     const response = await axios.put(
                                       urlUser + '?id=' + userData.id,
                                       {
-                                        purchasedCoursesId: [...userData.purchased_courses_id],
-                                        favouriteCoursesId: [...userData.favourite_courses_id],
-                                        comletedLessonsId: [...userData.comleted_lessons_id, id],
-                                      }
+                                        purchasedCoursesId: [
+                                          ...userData.purchased_courses_id,
+                                        ],
+                                        favouriteCoursesId: [
+                                          ...userData.favourite_courses_id,
+                                        ],
+                                        comletedLessonsId: [
+                                          ...userData.comleted_lessons_id,
+                                          id,
+                                        ],
+                                      },
                                     )
                                     const resultResponse = response.data
-                                    const userId = localStorage.getItem('UserID')
-                                    const responseUser = await fetch(urlUser + '/' + userId, {
-                                      headers: {
-                                        'Content-Type': 'application/json',
+                                    const userId =
+                                      localStorage.getItem('UserID')
+                                    const responseUser = await fetch(
+                                      urlUser + '/' + userId,
+                                      {
+                                        headers: {
+                                          'Content-Type': 'application/json',
+                                        },
                                       },
-                                    })
+                                    )
                                     const resultUser = await responseUser.json()
                                     setCompleteButtonState('complete')
 
                                     setTimeout(() => {
-                                      setCompletedLessonTrigger(!completedLessonTrigger)
+                                      setCompletedLessonTrigger(
+                                        !completedLessonTrigger,
+                                      )
                                       setUserData(resultUser)
 
                                       setCheckAnswers(true)
@@ -1117,15 +1331,19 @@ const LessonDetails = () => {
                         )}
                         {resetAnswersBtn && (
                           <Button
-                            variant='contained'
-                            sx={{ maxWidth: '200px', width: '50%', marginLeft: 2 }}
+                            variant="contained"
+                            sx={{
+                              maxWidth: '200px',
+                              width: '50%',
+                              marginLeft: 2,
+                            }}
                             onClick={(e) => {
                               setAnswerForm(
                                 answerForm.map((ansForm: any) => {
                                   return ansForm.map((opt: any) => {
                                     return false
                                   })
-                                })
+                                }),
                               )
                               setClearCheckBoxes(true)
                               setTimeout(() => setClearCheckBoxes(false), 1)
@@ -1145,19 +1363,24 @@ const LessonDetails = () => {
                   getLessonIndx() >= 0 &&
                   getLessonIndx() < moduleLessons?.length - 1) ||
                   Number(
-                    typeof window !== 'undefined' ? localStorage.getItem('SelectedModuleIndex') : 0
+                    typeof window !== 'undefined'
+                      ? localStorage.getItem('SelectedModuleIndex')
+                      : 0,
                   ) <
                     (modules?.length ?? 0) - 1) && (
                   <Button
-                    variant='text'
+                    variant="text"
                     onClick={(e) => {
+                      setResetAnswersBtn(false)
                       if (
                         moduleLessons &&
                         getLessonIndx() >= 0 &&
                         getLessonIndx() < moduleLessons?.length - 1
                       ) {
                         if (moduleLessons) {
-                          router.replace('/lesson?id=' + moduleLessons[getLessonIndx() + 1])
+                          router.replace(
+                            '/lesson?id=' + moduleLessons[getLessonIndx() + 1],
+                          )
 
                           setId(Number(moduleLessons[getLessonIndx() + 1]))
                         }
@@ -1166,11 +1389,18 @@ const LessonDetails = () => {
                           Number(localStorage.getItem('SelectedModuleIndex')) <
                           (modules?.length ?? 0) - 1
                         ) {
-                          const currentIndex = Number(localStorage.getItem('SelectedModuleIndex'))
-                          localStorage.setItem('SelectedModuleIndex', '' + (currentIndex + 1))
+                          const currentIndex = Number(
+                            localStorage.getItem('SelectedModuleIndex'),
+                          )
+                          localStorage.setItem(
+                            'SelectedModuleIndex',
+                            '' + (currentIndex + 1),
+                          )
                           setCompletedLessonTrigger(!completedLessonTrigger)
                           const lessIndex = Number(
-                            modules ? modules[currentIndex + 1].lessons[0].id : 0
+                            modules
+                              ? modules[currentIndex + 1].lessons[0].id
+                              : 0,
                           )
                           router.replace('/lesson?id=' + lessIndex)
                           setId(lessIndex)
@@ -1189,7 +1419,9 @@ const LessonDetails = () => {
                 userData &&
                 userId &&
                 userData?.purchased_courses_id &&
-                userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+                userData?.purchased_courses_id.indexOf(
+                  Number(selectedCourse),
+                ) != -1 && (
                   <Box
                     sx={{
                       marginTop: 2,
@@ -1216,33 +1448,45 @@ const LessonDetails = () => {
                           }}
                         >
                           {chatData.data.messages &&
-                            chatData.data.messages.map((message: any, i: number) => {
-                              return (
-                                <Box
-                                  key={'message_' + i}
-                                  sx={{
-                                    display: 'flex',
-                                    justifyContent: message.from == 'user' ? 'end' : 'start',
-                                  }}
-                                >
+                            chatData.data.messages.map(
+                              (message: any, i: number) => {
+                                return (
                                   <Box
+                                    key={'message_' + i}
                                     sx={{
-                                      maxWidth: '70%',
-                                      background: '#2a2439',
-                                      marginTop: 0.5,
-                                      marginBottom: 0.5,
-                                      whiteSpace: 'pre-wrap',
-                                      padding: 1.5,
-                                      borderRadius: 2,
+                                      display: 'flex',
+                                      justifyContent:
+                                        message.from == 'user'
+                                          ? 'end'
+                                          : 'start',
                                     }}
                                   >
-                                    <div data-slate-node><ReactMarkdown>{message.value}</ReactMarkdown></div>
+                                    <Box
+                                      sx={{
+                                        maxWidth: '70%',
+                                        background: '#2a2439',
+                                        marginTop: 0.5,
+                                        marginBottom: 0.5,
+                                        whiteSpace: 'pre-wrap',
+                                        padding: 1.5,
+                                        borderRadius: 2,
+                                      }}
+                                    >
+                                      <div data-slate-node>
+                                        <ReactMarkdown>
+                                          {message.value}
+                                        </ReactMarkdown>
+                                      </div>
+                                    </Box>
                                   </Box>
-                                </Box>
-                              )
-                            })}
+                                )
+                              },
+                            )}
                           {dataGpt && (
-                            <div className={s.bouncing_loader} style={{ marginTop: '20px' }}>
+                            <div
+                              className={s.bouncing_loader}
+                              style={{ marginTop: '20px' }}
+                            >
                               <div></div>
                               <div></div>
                               <div></div>
@@ -1253,7 +1497,7 @@ const LessonDetails = () => {
                           <TextField
                             inputRef={gptField}
                             autoComplete={'off'}
-                            id='standard-name'
+                            id="standard-name"
                             fullWidth
                             placeholder={t.gptPlaceholder}
                             multiline
@@ -1291,7 +1535,7 @@ const LessonDetails = () => {
                               disabled={
                                 questionLimit && questionLimit != 0
                                   ? chatData.data.messages.filter(
-                                      (message: any) => message.from == 'chat'
+                                      (message: any) => message.from == 'chat',
                                     ).length >= questionLimit
                                   : false
                               }
@@ -1313,7 +1557,8 @@ const LessonDetails = () => {
                                   })
                                   setDataGpt(true)
                                   setTimeout(() => {
-                                    const lastItem = containerRef.current.lastElementChild
+                                    const lastItem =
+                                      containerRef.current.lastElementChild
                                     if (lastItem) {
                                       lastItem.scrollIntoView({
                                         behavior: 'smooth',
@@ -1333,11 +1578,17 @@ const LessonDetails = () => {
                           </Box>
                         </Box>
                         {questionLimit != null && questionLimit != 0 ? (
-                          <Box sx={{ color: '#c7c6c6', marginTop: '5px', marginLeft: '10px' }}>
+                          <Box
+                            sx={{
+                              color: '#c7c6c6',
+                              marginTop: '5px',
+                              marginLeft: '10px',
+                            }}
+                          >
                             {data &&
                               questionLimit -
                                 chatData.data.messages.filter(
-                                  (message: any) => message.from == 'chat'
+                                  (message: any) => message.from == 'chat',
                                 ).length +
                                 ' ' +
                                 t.requestsLeft}
@@ -1358,7 +1609,12 @@ const LessonDetails = () => {
             </Box>
           ) : (
             <Box
-              sx={{ display: 'flex', justifyContent: 'center', marginTop: 40, marginBottom: 70 }}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: 40,
+                marginBottom: 70,
+              }}
             >
               <CircularProgress sx={{ color: '#ffec3e' }} />
             </Box>
@@ -1386,7 +1642,12 @@ const LessonDetails = () => {
               />
             ) : selectedCourse ? (
               <Box
-                sx={{ display: 'flex', justifyContent: 'center', marginTop: 10, marginBottom: 10 }}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
               >
                 <CircularProgress sx={{ color: '#c7c6c6' }} />
               </Box>
@@ -1399,7 +1660,9 @@ const LessonDetails = () => {
               {selectedCourse &&
                 userData &&
                 userData?.purchased_courses_id &&
-                userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+                userData?.purchased_courses_id.indexOf(
+                  Number(selectedCourse),
+                ) != -1 && (
                   <Box
                     sx={{
                       marginTop: 2,
@@ -1418,7 +1681,9 @@ const LessonDetails = () => {
                           selectedCourse &&
                           userData &&
                           userData?.purchased_courses_id &&
-                          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                          userData?.purchased_courses_id.indexOf(
+                            Number(selectedCourse),
+                          ) != -1
                         )
                       }
                       onChange={async (event, newValue) => {
@@ -1428,7 +1693,9 @@ const LessonDetails = () => {
                               selectedCourse &&
                               userData &&
                               userData?.purchased_courses_id &&
-                              userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                              userData?.purchased_courses_id.indexOf(
+                                Number(selectedCourse),
+                              ) != -1
                             ) {
                               const { value: text } = await Swal.fire({
                                 background: '#171622',
@@ -1454,7 +1721,7 @@ const LessonDetails = () => {
                                   '&lessonId=' +
                                   id +
                                   '&feedbackName=' +
-                                  text
+                                  text,
                               )
                               Swal.fire({
                                 title: t.thanks,
@@ -1473,7 +1740,12 @@ const LessonDetails = () => {
                           }
                         }
                       }}
-                      emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
+                      emptyIcon={
+                        <StarBorderIcon
+                          fontSize="inherit"
+                          sx={{ color: '#45454e' }}
+                        />
+                      }
                       sx={{
                         fontSize: 22,
                         '& .MuiRating-iconFilled': {
@@ -1492,7 +1764,8 @@ const LessonDetails = () => {
           {selectedCourse &&
             userData &&
             userData?.purchased_courses_id &&
-            userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1 && (
+            userData?.purchased_courses_id.indexOf(Number(selectedCourse)) !=
+              -1 && (
               <Box
                 sx={{
                   marginTop: 2,
@@ -1511,7 +1784,9 @@ const LessonDetails = () => {
                       selectedCourse &&
                       userData &&
                       userData?.purchased_courses_id &&
-                      userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                      userData?.purchased_courses_id.indexOf(
+                        Number(selectedCourse),
+                      ) != -1
                     )
                   }
                   onChange={async (event, newValue) => {
@@ -1521,7 +1796,9 @@ const LessonDetails = () => {
                           selectedCourse &&
                           userData &&
                           userData?.purchased_courses_id &&
-                          userData?.purchased_courses_id.indexOf(Number(selectedCourse)) != -1
+                          userData?.purchased_courses_id.indexOf(
+                            Number(selectedCourse),
+                          ) != -1
                         ) {
                           const { value: text } = await Swal.fire({
                             background: '#171622',
@@ -1547,7 +1824,7 @@ const LessonDetails = () => {
                               '&lessonId=' +
                               id +
                               '&feedbackName=' +
-                              text
+                              text,
                           )
                           Swal.fire({
                             title: t.thanks,
@@ -1566,7 +1843,12 @@ const LessonDetails = () => {
                       }
                     }
                   }}
-                  emptyIcon={<StarBorderIcon fontSize='inherit' sx={{ color: '#45454e' }} />}
+                  emptyIcon={
+                    <StarBorderIcon
+                      fontSize="inherit"
+                      sx={{ color: '#45454e' }}
+                    />
+                  }
                   sx={{
                     fontSize: 22,
                     '& .MuiRating-iconFilled': {
