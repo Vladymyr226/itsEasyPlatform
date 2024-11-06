@@ -76,6 +76,18 @@
   cursor: pointer;
 }
 
+.sidebarFillButtonInner {
+  width: 100%;
+  border: none;
+  background: var(--main-color);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: center;
+  color: var(--text-alt-color);
+  cursor: pointer;
+}
+
 .sidebarOutlinedButton {
   margin-top: 14px;
   width: 100%;

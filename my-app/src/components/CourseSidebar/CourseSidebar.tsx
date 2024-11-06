@@ -23,6 +23,7 @@ const Prices = ({
   groupPrice?: number
   title?: string
 }) => {
+  const [formHTML, setFormHTML] = useState<string | null>(null)
   const [userData, setUserData] = useState<any>()
   const userId = localStorage.getItem('UserID')
   const courseId = localStorage.getItem('SelectedCourse')
@@ -45,8 +46,26 @@ const Prices = ({
         const checkPaymentStatus = await axios.post(
           `https://its-easy-platform-back-end.vercel.app/api/payment/payment-status-by-id?userId=${Number(userId)}&courseId=${Number(courseId)}`,
         )
+
         if (!resultUser?.purchased_courses_id?.includes(Number(courseId))) {
-          if (checkPaymentStatus?.data.order_status === 'approved') {
+          try {
+            const response = await axios.post(
+              `https://its-easy-platform-back-end.vercel.app/api/payment/liqpay/?userId=${userId}&courseId=${courseId}&description=${title}&price=${priceDiscount && priceDiscount > 0 ? priceDiscount : price}`,
+            )
+
+            const modifiedFormHTML = response.data
+              .replace('<form', `<form style="all: unset;"`)
+              .replace(
+                `<input type="image" src="//static.liqpay.ua/buttons/payUk.png"/>`,
+                `<button type="submit" class="${s.sidebarFillButtonInner}">${t.buy_now}</button>`,
+              )
+            // Зберігаємо отриману форму у вигляді HTML
+            setFormHTML(modifiedFormHTML)
+          } catch (error) {
+            console.error('Error fetching data:', error)
+          }
+
+          if (checkPaymentStatus?.data.order_status === 'success') {
             const asd = await axios.put(urlUser + '?id=' + resultUser.id, {
               purchasedCoursesId: [
                 ...resultUser.purchased_courses_id,
@@ -73,17 +92,6 @@ const Prices = ({
 
   const t = getLocale()
 
-  const getPayLink = async () => {
-    try {
-      const response = await axios.post(
-        `https://its-easy-platform-back-end.vercel.app/api/payment/fondy/?userId=${userId}&courseId=${courseId}&description=${title}&price=${priceDiscount && priceDiscount > 0 ? priceDiscount : price}00`,
-      )
-      window.location.href = response.data.body.checkout_url
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    }
-  }
-
   return (
     <>
       <h3 className={s.sidebarTitle}>{t.self_education}</h3>
@@ -97,14 +105,15 @@ const Prices = ({
           ${priceDiscount && priceDiscount > 0 ? priceDiscount : price}
         </span>
       </div>
-      <button
-        className={s.sidebarFillButton}
-        onClick={async (e) => {
-          getPayLink()
-        }}
-      >
-        {t.buy_now}
-      </button>
+      {formHTML ? (
+        // Відображення форми замість кнопки, коли вона завантажена
+        <div
+          className={s.sidebarFillButton}
+          dangerouslySetInnerHTML={{ __html: formHTML }}
+        />
+      ) : (
+        ''
+      )}
       {groupPrice && (
         <div>
           <div className={s.divide}></div>
