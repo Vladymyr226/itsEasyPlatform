@@ -285,7 +285,7 @@ const Index = () => {
                           borderRight: '2px solid #000',
                         }}
                       >
-                        {element.price / 100}$
+                        {element.price}$
                       </Box>
                       <Box
                         sx={{
