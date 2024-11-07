@@ -66,12 +66,19 @@ const Login = () => {
 
     if (!passwordForgot) {
       try {
-        const response = await axios.post(url + 'email=' + email + '&password=' + password)
+        const response = await axios.post(
+          url + 'email=' + email + '&password=' + password,
+        )
         const resultResponse = response.data
         if (resultResponse) {
           router.push('/')
           localStorage.setItem('UserID', resultResponse.user.id)
-          setCookie('jwt', resultResponse.token, { maxAge: 100 * 24 * 60 * 60 * 1000 })
+          setCookie('cookieUserID', resultResponse.user.id, {
+            maxAge: 100 * 24 * 60 * 60 * 1000,
+          })
+          setCookie('jwt', resultResponse.token, {
+            maxAge: 100 * 24 * 60 * 60 * 1000,
+          })
         }
       } catch (error) {
         Swal.fire({
@@ -89,19 +96,24 @@ const Login = () => {
   const t = getLocale()
   return (
     <Box sx={{ background: 'none', width: '100%' }}>
-      <Typography component='h1' variant='h5' sx={{ color: '#ffec3e' }}>
+      <Typography component="h1" variant="h5" sx={{ color: '#ffec3e' }}>
         {passwordForgot ? t.reset_password : t.sign_in}
       </Typography>
-      <Box component='form' id='formSignIn' onSubmit={handleSubmit} sx={{ mt: 1 }}>
+      <Box
+        component="form"
+        id="formSignIn"
+        onSubmit={handleSubmit}
+        sx={{ mt: 1 }}
+      >
         <TextField
-          margin='normal'
+          margin="normal"
           required
           fullWidth
-          id='email'
-          type='email'
-          label='Email'
-          name='email'
-          autoComplete='email'
+          id="email"
+          type="email"
+          label="Email"
+          name="email"
+          autoComplete="email"
           autoFocus
           onChange={(e) => setEmail(e.target.value)}
           InputLabelProps={{
@@ -118,14 +130,14 @@ const Login = () => {
         />
         {!passwordForgot && (
           <TextField
-            margin='normal'
+            margin="normal"
             required
             fullWidth
-            name='password'
+            name="password"
             label={t.password}
             type={showPass ? 'text' : 'password'}
-            id='password'
-            autoComplete='current-password'
+            id="password"
+            autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
             InputLabelProps={{
               sx: {
@@ -140,9 +152,15 @@ const Login = () => {
                   }}
                 >
                   {showPass ? (
-                    <VisibilityOffIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
+                    <VisibilityOffIcon
+                      sx={{ color: '#ffec3e' }}
+                      fontSize="medium"
+                    />
                   ) : (
-                    <VisibilityIcon sx={{ color: '#ffec3e' }} fontSize='medium' />
+                    <VisibilityIcon
+                      sx={{ color: '#ffec3e' }}
+                      fontSize="medium"
+                    />
                   )}
                 </IconButton>
               ),
@@ -165,9 +183,9 @@ const Login = () => {
           {passwordForgot ? t.sign_in : t.forgot_my_password}
         </Box>
         <Button
-          type='submit'
+          type="submit"
           fullWidth
-          variant='contained'
+          variant="contained"
           sx={{
             mt: 2,
             mb: 2,

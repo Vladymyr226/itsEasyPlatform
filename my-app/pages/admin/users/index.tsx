@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { deleteCookie } from 'cookies-next'
 import '../../../app/globals.css'
 import Logo from '@/components/Logo/Logo'
+import axios from 'axios'
 
 const tableColumn = {
   minWidth: '10rem',
@@ -16,6 +17,7 @@ const tableColumn = {
   background: '#cccccc',
 }
 const url = `${process.env.NEXT_BACK_HOST_API}/auth/users`
+const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 const TableColumns = () => {
   return (
@@ -41,6 +43,12 @@ const TableColumns = () => {
       >
         Created at
       </Box>
+      <Box
+        sx={{
+          ...tableColumn,
+          maxWidth: '10rem',
+        }}
+      ></Box>
     </>
   )
 }
@@ -246,6 +254,7 @@ const AdminTable = () => {
                       </Box>
                       <Box
                         sx={{
+                          borderRight: '2px solid #000',
                           minWidth: '10rem',
                           width: '100%',
                           textAlign: 'center',
@@ -256,6 +265,30 @@ const AdminTable = () => {
                         {new Date(element.created_at).toLocaleDateString() +
                           ' , ' +
                           new Date(element.created_at).toLocaleTimeString()}
+                      </Box>
+                      <Box
+                        sx={{
+                          maxWidth: '10rem',
+                          width: '100%',
+                          textAlign: 'center',
+                          paddingTop: 1,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        <Button
+                          onClick={async () => {
+                            const response = await axios.put(
+                              urlUser +
+                                '?id=' +
+                                element.id +
+                                '&isVerified=true&isAdmin=true',
+                              {},
+                            )
+                            const resultResponse = response.data
+                          }}
+                        >
+                          Make admin
+                        </Button>
                       </Box>
                     </Box>
                   </div>

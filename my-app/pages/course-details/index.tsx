@@ -326,23 +326,48 @@ const CourseDetails = () => {
             )}
 
             <p
-              style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}
+              style={{
+                textAlign: `${width < 1200 ? 'center' : 'left'}`,
+                marginBottom: '24px',
+              }}
               className={s.courseSubTitle}
             >
               <span className={s.accentuated}>{t.course_materials}</span>
             </p>
-            {data && <CourseMaterials modules={data.data.modules} />}
+            {data &&
+              userData?.purchased_courses_id.filter(
+                (courseId: any) => courseId == data?.id,
+              ).length == 0 && <CourseMaterials modules={data.data.modules} />}
             {width < 1200 && (
-              <CourseSidebar
-                duration={data?.data.duration ?? 0}
-                lessonsNum={lessSum ?? 0}
-                price={data?.data.price ?? 0}
-                priceDiscount={data?.data.priceDiscount ?? 0}
-                modules={data?.data.modules}
-                rating={data?.data.rating ?? 0}
-                views={data?.views ?? 0}
-                title={data?.data.title ?? 'Course payment'}
-              />
+              <div className={s.rightSide}>
+                {userData?.purchased_courses_id.filter(
+                  (courseId: any) => courseId == data?.id,
+                ).length > 0 ? (
+                  <Box>
+                    {modules && data && userData && (
+                      <CourseLessonMaterials
+                        setId={-1}
+                        modules={modules}
+                        selectedLesson={-1}
+                        completedLessonTrigger={false}
+                        userDataStart={userData}
+                        courseStart={data}
+                      />
+                    )}
+                  </Box>
+                ) : (
+                  <CourseSidebar
+                    duration={data?.data.duration ?? 0}
+                    lessonsNum={lessSum ?? 0}
+                    price={data?.data.price ?? 0}
+                    priceDiscount={data?.data.priceDiscount ?? 0}
+                    modules={data?.data.modules}
+                    rating={data?.data.rating ?? 0}
+                    views={data?.views ?? 0}
+                    title={data?.data.title ?? 'Course payment'}
+                  />
+                )}
+              </div>
             )}
             <p style={{ fontSize: '24px' }} className={s.courseSubTitle}>
               <span className={s.accentuated}>{t.what_alumni_say}</span>
