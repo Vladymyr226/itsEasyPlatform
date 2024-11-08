@@ -15,6 +15,7 @@ import Container from '../Container/Container'
 import Link from 'next/link'
 import { getLocale } from '@/utils/getLocale'
 import LogoFooter from '@/components/LogoFooter/LogoFooter'
+import Head from 'next/head'
 
 type LayoutProps = {
   children: ReactNode
@@ -42,6 +43,9 @@ const Layout = ({ children }: LayoutProps) => {
   const t = getLocale()
   return (
     <Container>
+      <Head>
+        <meta name="google-site-verification" content="vrQhC2ShJ1bmPDrs6dGRtyiIl-NSykZJUsTJg0HwYzY" />
+      </Head>
       {/* блок контент чтобы прижать футер к низу странички */}
       <div className={s.content}>
         <header className={s.header}>
