@@ -45,6 +45,7 @@ const Layout = ({ children }: LayoutProps) => {
     <Container>
       <Head>
         <meta name="google-site-verification" content="vrQhC2ShJ1bmPDrs6dGRtyiIl-NSykZJUsTJg0HwYzY" />
+        <meta name="yandex-verification" content="b4494b28ec149832" />
       </Head>
       {/* блок контент чтобы прижать футер к низу странички */}
       <div className={s.content}>
