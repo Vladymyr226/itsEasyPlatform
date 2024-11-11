@@ -7,15 +7,16 @@ import aboutUs1 from '../src/assets/aboutUs1.png'
 import aboutUs2 from '../src/assets/aboutUs2.jpg'
 import aboutUs3 from '../src/assets/aboutUs3.png'
 import JoinUs from '@/components/JoinUs'
+import { getLocale } from '@/utils/getLocale'
 
 const AboutUs = () => {
+  const t = getLocale()
   
   return (
     <Layout>
       <div className={s.wrapper}>
-        <h1>About Us</h1>
-        <h2>Welcome to it-tutor.ai, your gateway to the future of learning in the<br/>
-          rapidly evolving world of technology.</h2>
+        <h1>{t.aboutUs}</h1>
+        <h2>{t.aboutUs1}<br/>{t.aboutUs2}</h2>
         <div className={s.image}>
           <Image
             src={aboutUs1}
@@ -35,23 +36,13 @@ const AboutUs = () => {
             ></Image>
           </div>
           <div className={s.text}>
-            <p>
-              In today&apos;s fast-paced digital landscape, artificial intelligence (AI) is transforming every industry, and
-              education is no exception. At it-tutor.ai, we believe that learning should be more than just acquiring
-              knowledge—it should be an experience that adapts to you. That&apos;s why we&apos;ve integrated cutting-edge AI
-              technology into our platform, making it easier, smarter, and more personalized for every learner.
-            </p>
+            <p>{t.aboutUs3}</p>
           </div>
         </section>
 
         <section>
           <div className={s.text}>
-            <p>
-              Our AI-driven courses are designed to adapt to your unique learning style and pace. Whether you&apos;re a
-              complete beginner or advancing your career, AI helps create a tailored path for you. It provides real-time
-              feedback, custom exercises, and learning recommendations based on your progress. With it-tutor.ai, you&apos;ll
-              never feel lost or overwhelmed—our AI is like having a personal tutor guiding you at every step.
-            </p>
+            <p>{t.aboutUs4}</p>
           </div>
           <div className={s.image}>
             <Image
@@ -73,11 +64,7 @@ const AboutUs = () => {
             ></Image>
           </div>
           <div className={s.text}>
-            <p>
-              We understand that the demand for tech skills is growing fast. That&apos;s why we&apos;ve built a platform
-              that doesn&apos;t just teach; it empowers you to learn efficiently and effectively, equipping you with the
-              skills you need to succeed in today&apos;s tech-driven world.
-            </p>
+            <p>{t.aboutUs5}</p>
           </div>
         </section>
 

@@ -105,6 +105,27 @@ export const en = {
   minuteShort: 'min',
   mailTaken: 'This email is already taken by another user',
 
+  joinUs1: 'Join us on this journey where technology',
+  joinUs2: 'meets learning, and let it-tutor.ai guide you',
+  joinUs3: 'toward mastering the skills of tomorrow —',
+  joinUs4: 'faster and smarter than ever before.',
+  joinUsButton: 'View Courses',
+
+  aboutUs: 'About Us',
+  aboutUs1: 'Welcome to it-tutor.ai, your gateway to the future of learning',
+  aboutUs2: 'in the rapidly evolving world of technology.',
+  aboutUs3: `In today's fast-paced digital landscape, artificial intelligence (AI) is transforming every industry, and
+    education is no exception. At it-tutor.ai, we believe that learning should be more than just acquiring
+    knowledge—it should be an experience that adapts to you. That's why we've integrated cutting-edge AI
+    technology into our platform, making it easier, smarter, and more personalized for every learner.`,
+  aboutUs4: `Our AI-driven courses are designed to adapt to your unique learning style and pace. Whether you're a
+    complete beginner or advancing your career, AI helps create a tailored path for you. It provides real-time
+    feedback, custom exercises, and learning recommendations based on your progress. With it-tutor.ai, you'll
+    never feel lost or overwhelmed—our AI is like having a personal tutor guiding you at every step.`,
+  aboutUs5: `We understand that the demand for tech skills is growing fast. That's why we've built a platform
+    that doesn't just teach; it empowers you to learn efficiently and effectively, equipping you with the
+    skills you need to succeed in today's tech-driven world.`,
+
   termsAndConditions: 'Terms and Conditions',
   tac_00: `Welcome to IT-TUTOR.AI! By accessing or using our website and purchasing courses from us, you agree to abide
     by the following Terms and Conditions. Please read them carefully. If you do not agree to these Terms, please do
@@ -136,7 +157,7 @@ export const en = {
     owners and may not be used without permission.`,
   tac_05: '5. User Conduct',
   tac_05_1: `You agree to use our website and services in a manner that is lawful and respectful of others.`,
-  tac_05_2: `You must not upload, post, or share any content that is offensive, unlawful, or infringes on others&apos;
+  tac_05_2: `You must not upload, post, or share any content that is offensive, unlawful, or infringes on others'
     rights.`,
   tac_05_3: `We reserve the right to suspend or terminate your access if you violate these Terms or engage in behavior
     that, in our sole discretion, is harmful to our website or other users.`,
@@ -155,7 +176,7 @@ export const en = {
     inability to use our courses, including direct, indirect, incidental, punitive, or consequential damages.`,
   tac_09: '9. Indemnification',
   tac_09_1: `You agree to indemnify and hold us harmless from any claims, losses, damages, or expenses (including
-    attorneys&apos; fees) arising out of or related to your use of our website, any violation of these Terms, or any
+    attorneys' fees) arising out of or related to your use of our website, any violation of these Terms, or any
     activity related to your account.`,
   tac_10: '10. Changes to Terms',
   tac_10_1: `We reserve the right to update or change these Terms at any time. Your continued use of the website

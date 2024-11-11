@@ -8,19 +8,23 @@
   height: 300px;
   border-radius: 10px;
   background: linear-gradient(114.81deg, #FFEC3E 4.85%, #00E0BE 70.11%);
+  text-align: center;
   font-size: 25px;
   font-weight: 700;
   line-height: 32px;
   color: var(--text-alt-color);
 }
 
-.hero > button {
-  display: block;
+.hero > a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 30px;
-  width: 90px;
+  width: 150px;
   height: 30px;
   border: 2px solid var(--text-alt-color);
   border-radius: 15px;
   background-color: transparent;
-  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-alt-color);
 }
