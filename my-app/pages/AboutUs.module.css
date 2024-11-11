@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: auto;
   max-width: 1200px;
   color: var(--text-color);
   font-weight: 500;
@@ -60,31 +61,4 @@
 
 .wrapper > section:nth-of-type(even) > .text > p {
   margin-right: 40px;
-}
-
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 80px;
-  width: 100%;
-  height: 300px;
-  border-radius: 10px;
-  background: linear-gradient(114.81deg, #FFEC3E 4.85%, #00E0BE 70.11%);
-  font-size: 25px;
-  font-weight: 700;
-  line-height: 32px;
-  color: var(--text-alt-color);
-}
-
-.hero > button {
-  display: block;
-  margin-top: 30px;
-  width: 90px;
-  height: 30px;
-  border: 2px solid var(--text-alt-color);
-  border-radius: 15px;
-  background-color: transparent;
-  cursor: pointer;
 }

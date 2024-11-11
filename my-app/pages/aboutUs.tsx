@@ -6,7 +6,7 @@ import Image from 'next/image'
 import aboutUs1 from '../src/assets/aboutUs1.png'
 import aboutUs2 from '../src/assets/aboutUs2.jpg'
 import aboutUs3 from '../src/assets/aboutUs3.png'
-import arrowTop from '../src/assets/arrowTop.svg'
+import JoinUs from '@/components/JoinUs'
 
 const AboutUs = () => {
   
@@ -81,15 +81,7 @@ const AboutUs = () => {
           </div>
         </section>
 
-        <div className={s.hero}>
-          <p>
-            Join us on this journey where technology<br/>meets learning, and let it-tutor.ai guide you<br/>toward mastering the
-            skills of tomorrow—<br/>faster and smarter than ever before.
-          </p>
-          <button>
-            Join
-          </button>
-        </div>
+        <JoinUs></JoinUs>
       </div>
     </Layout>
   )

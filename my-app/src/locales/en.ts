@@ -104,4 +104,64 @@ export const en = {
   hourShort: 'h',
   minuteShort: 'min',
   mailTaken: 'This email is already taken by another user',
+
+  termsAndConditions: 'Terms and Conditions',
+  tac_00: `Welcome to IT-TUTOR.AI! By accessing or using our website and purchasing courses from us, you agree to abide
+    by the following Terms and Conditions. Please read them carefully. If you do not agree to these Terms, please do
+    not use our website or services.`,
+  tac_01: '1. Acceptance of Terms',
+  tac_01_1: `By using our website and purchasing our courses, you accept and agree to be bound by these Terms and
+    Conditions, as well as our Privacy Policy, which is incorporated into these Terms.`,
+  tac_02: '2. Account Registration',
+  tac_02_1: `To access certain features of our website, you may be required to create an account. You agree to provide
+    accurate, current, and complete information during the registration process and to update such information as
+    needed. You are responsible for maintaining the confidentiality of your account and password.`,
+  tac_03: '3. Course Purchases',
+  tac_03_1: 'Payment:',
+  tac_03_2: `All payments for our courses are due in full at the time of purchase. Prices are subject to change without
+    notice, but changes will not affect orders already placed.`,
+  tac_03_3: 'License to Use:',
+  tac_03_4: `Upon purchase, you are granted a limited, non-transferable, non-exclusive license to access the course
+    content solely for your personal, non-commercial use.`,
+  tac_03_5: 'Refund Policy:',
+  tac_03_6: `All sales are final unless otherwise stated. Refunds are granted only in exceptional cases as per our
+    [Refund Policy link].`,
+  tac_04: '4. Intellectual Property',
+  tac_04_1: 'Ownership:',
+  tac_04_2: `All course materials, including text, videos, and other content, are protected by intellectual property
+    laws. You agree not to reproduce, distribute, modify, create derivative works of, publicly display, or publicly
+    perform the content without our prior written consent.`,
+  tac_04_3: 'Trademarks:',
+  tac_04_4: `All trademarks, service marks, and logos displayed on our website are the property of their respective
+    owners and may not be used without permission.`,
+  tac_05: '5. User Conduct',
+  tac_05_1: `You agree to use our website and services in a manner that is lawful and respectful of others.`,
+  tac_05_2: `You must not upload, post, or share any content that is offensive, unlawful, or infringes on others&apos;
+    rights.`,
+  tac_05_3: `We reserve the right to suspend or terminate your access if you violate these Terms or engage in behavior
+    that, in our sole discretion, is harmful to our website or other users.`,
+  tac_06: '6. Third-Party Links',
+  tac_06_1: `Our website may contain links to third-party websites. We do not endorse or control these websites and are
+    not responsible for their content or practices. Accessing third-party sites is at your own risk.`,
+  tac_07: '7. Disclaimers',
+  tac_07_1: 'No Guarantee of Results:',
+  tac_07_2: `Our courses are for educational purposes only. We do not guarantee specific results or outcomes from your
+    use of our courses.`,
+  tac_07_3: 'No Warranty:',
+  tac_07_4: `Our courses and services are provided on an "as-is" and "as-available" basis, without warranties of any
+    kind, express or implied.`,
+  tac_08: '8. Limitation of Liability',
+  tac_08_1: `To the maximum extent permitted by law, we are not liable for any damages resulting from your use or
+    inability to use our courses, including direct, indirect, incidental, punitive, or consequential damages.`,
+  tac_09: '9. Indemnification',
+  tac_09_1: `You agree to indemnify and hold us harmless from any claims, losses, damages, or expenses (including
+    attorneys&apos; fees) arising out of or related to your use of our website, any violation of these Terms, or any
+    activity related to your account.`,
+  tac_10: '10. Changes to Terms',
+  tac_10_1: `We reserve the right to update or change these Terms at any time. Your continued use of the website
+    following any changes constitutes your acceptance of the new Terms.`,
+  tac_11: '11. Contact Us',
+  tac_11_1: `If you have any questions about these Terms, please contact us at contact@it-tutor.ai`,
+  tac_12: `By using our website and purchasing our courses, you acknowledge that you have read, understood, and agree
+    to these Terms and Conditions.`,
 }

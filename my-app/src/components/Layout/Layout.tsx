@@ -138,20 +138,22 @@ const Layout = ({ children }: LayoutProps) => {
 
               {width >= 1200 ? (
                 <ul className={s.footerInfoList}>
-                  <li className={s.footerInfoItem}>{t.about_us}</li>
+                  <li className={s.footerInfoItem}><Link href="aboutUs">{t.about_us}</Link></li>
                   <li className={s.footerInfoItem}>{t.job}</li>
                   <li className={s.footerInfoItem}>{t.career}</li>
                   <li className={s.footerInfoItem}>{t.for_partners}</li>
+                  <li className={s.footerInfoItem}><Link href="termsAndConditions">{t.termsAndConditions}</Link></li>
                 </ul>
               ) : (
                 <div className={s.listWrapper}>
                   <ul className={s.footerInfoList}>
-                    <li className={s.footerInfoItem}>{t.about_us}</li>
+                    <li className={s.footerInfoItem}><Link href="aboutUs">{t.about_us}</Link></li>
                     <li className={s.footerInfoItem}>{t.job}</li>
                   </ul>
                   <ul className={s.footerInfoList}>
                     <li className={s.footerInfoItem}>{t.career}</li>
                     <li className={s.footerInfoItem}>{t.for_partners}</li>
+                    <li className={s.footerInfoItem}><Link href="termsAndConditions">{t.termsAndConditions}</Link></li>
                   </ul>
                 </div>
               )}
