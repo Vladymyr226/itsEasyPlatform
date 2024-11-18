@@ -111,7 +111,7 @@ const CourseGridCard = ({ course, showProgress }: { course: any; showProgress?: 
             <ul className={s.courseInfo}>
               <li style={{ display: 'flex', gap: '10px' }}>
                 <span className={s.accentuated}>{t.language}</span>
-                {course.data.language == 'RU' && (
+                {course.language == 'RU' && (
                   <div style={{ height: '20px', width: '10px' }}>
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
@@ -125,7 +125,7 @@ const CourseGridCard = ({ course, showProgress }: { course: any; showProgress?: 
                     </svg>
                   </div>
                 )}
-                {course.data.language == 'UA' && (
+                {course.language == 'UA' && (
                   <div style={{ height: '20px', width: '20px', position: 'relative' }}>
                     <svg xmlns='http://www.w3.org/2000/svg' width='20' height='10'>
                       <rect width='1200' height='5' fill='#0057B7' />
@@ -133,7 +133,7 @@ const CourseGridCard = ({ course, showProgress }: { course: any; showProgress?: 
                     </svg>
                   </div>
                 )}
-                {course.data.language == 'EN' && (
+                {course.language == 'EN' && (
                   <div style={{ height: '20px', width: '20px', position: 'relative' }}>
                     <svg
                       xmlns='http://www.w3.org/2000/svg'

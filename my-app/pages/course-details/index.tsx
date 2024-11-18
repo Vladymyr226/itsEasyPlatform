@@ -220,7 +220,7 @@ const CourseDetails = () => {
                 <p className={s.infoItemContent}>
                   {data && (
                     <>
-                      {data.data.language == 'RU' && (
+                      {data.language == 'RU' && (
                         <div style={{ height: '20px', width: '20px' }}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -234,7 +234,7 @@ const CourseDetails = () => {
                           </svg>
                         </div>
                       )}
-                      {data.data.language == 'UA' && (
+                      {data.language == 'UA' && (
                         <div
                           style={{
                             height: '20px',
@@ -257,7 +257,7 @@ const CourseDetails = () => {
                           </svg>
                         </div>
                       )}
-                      {data.data.language == 'EN' && (
+                      {data.language == 'EN' && (
                         <div
                           style={{
                             height: '20px',

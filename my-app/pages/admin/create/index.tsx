@@ -8,6 +8,7 @@ import PreviewIcon from '@mui/icons-material/Preview'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Link from 'next/link'
+import Image from 'next/image'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import TextField from '@mui/material/TextField'
@@ -18,7 +19,7 @@ import { InputLabel } from '@mui/material'
 
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import axios, { all } from 'axios'
+import axios from 'axios'
 import Rating from '@mui/material/Rating'
 import { useRouter } from 'next/navigation'
 import MyEditor from '@/components/SlateEditor/Editor'
@@ -35,6 +36,8 @@ import {
   Module,
   Tag,
   Skill,
+  Language,
+  Course,
 } from '@/utils/interfaces'
 import * as AWS from 'aws-sdk'
 import { isEqual } from 'lodash-es'
@@ -45,6 +48,12 @@ import { removeLessonIds } from '@/utils/removeAllLessonId'
 import LessonCreateQuiz from '@/components/LessonCreate/LessonCreateQuiz'
 import LessonCreatePractice from '@/components/LessonCreate/LessonCreatePractice'
 import LessonCreateDefault from '@/components/LessonCreate/LessonCreateDefault'
+import { languages } from '@/utils'
+
+const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
+const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
+const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
+const urlSkill = `${process.env.NEXT_BACK_HOST_API}/cabinet/skill`
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
@@ -61,11 +70,6 @@ function ExampleYouTube(props: YouTubeProp) {
 
   return <YouTube videoId={props.url} opts={opts} onReady={onPlayerReady} />
 }
-
-const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
-const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
-const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
-const urlSkill = `${process.env.NEXT_BACK_HOST_API}/cabinet/skill`
 
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props
@@ -87,10 +91,12 @@ const CourseCreate = () => {
   const router = useRouter()
 
   const [createLessonIndx, setCreateLessonIndx] = useState(-1)
-  const [id, setId] = useState()
+  const [id, setId] = useState<string>()
+  const [enId, setEnId] = useState<string>()
   const [idLessonEdit, setIdLessonEdit] = useState<string | null>(null)
   const [value, setValue] = useState(0)
-  const [language, setLanguage] = useState('')
+  const [language, setLanguage] = useState<Language>('EN')
+  const [languageDisabled, setLanguageDisabled] = useState(false)
   const [level, setLevel] = useState('')
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
@@ -111,16 +117,9 @@ const CourseCreate = () => {
     priceDiscount: null,
   })
   const [lessonType, setLessonType] = useState('')
-  const [fetchedData, setFetchedData] = useState<any>()
   const [fetchedMediaData, setFetchedMediaData] = useState<any>()
   const [rating, setRating] = useState(0.0)
   const [richValue, setRichValue] = useState<Array<any>>([
-    {
-      type: 'paragaph',
-      children: [{ text: '' }],
-    },
-  ])
-  const [richValueLesson, setRichValueLesson] = useState([
     {
       type: 'paragaph',
       children: [{ text: '' }],
@@ -151,37 +150,38 @@ const CourseCreate = () => {
       hours: 0,
       minutes: 0,
     })
-    setRichValueLesson([
-      {
-        type: 'paragaph',
-        children: [{ text: '' }],
-      },
-    ])
     setValue(newValue)
   }
+
   const handleChangeLanguage = (event: SelectChangeEvent) => {
-    setLanguage(event.target.value as string)
+    getPageData(event.target.value as Language)
+    setLanguage(event.target.value as Language)
     setEditTrigger(true)
     setError({})
   }
+
   const handleChangeLevel = (event: SelectChangeEvent) => {
     setEditTrigger(true)
     setError({})
     setLevel(event.target.value as string)
   }
+
   const handleChangeType = (event: SelectChangeEvent) => {
     setEditTrigger(true)
     setError({})
     setType(event.target.value as string)
   }
+
   const handleChangeStatus = (event: SelectChangeEvent) => {
     setEditTrigger(true)
     setError({})
     setStatus(event.target.value as string)
   }
+
   const handleChangeLessonType = (event: SelectChangeEvent) => {
     setLessonType(event.target.value as string)
   }
+
   const handlePreviewMediaChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -194,6 +194,7 @@ const CourseCreate = () => {
       })
     }
   }
+
   const handleSubmit = async (e: any) => {
     if (id && !editTrigger) {
       router.push('/admin')
@@ -224,7 +225,7 @@ const CourseCreate = () => {
         form.priceDiscount == null ||
         form.priceDiscount == 0 ||
         form.priceDiscount < 0,
-      language: language == '',
+      language: language === undefined,
       level: level == '',
       type: type == '',
       status: status == '',
@@ -237,7 +238,7 @@ const CourseCreate = () => {
       form.price == null ||
       form.price == 0 ||
       form.price < 0 ||
-      language == '' ||
+      language == undefined ||
       level == '' ||
       type == '' ||
       status == '' ||
@@ -277,7 +278,6 @@ const CourseCreate = () => {
               : null,
       },
       description: richValue,
-      language: language,
       level: level,
       type: type,
       modules: modules.map((module) => {
@@ -301,7 +301,9 @@ const CourseCreate = () => {
             '?id=' +
             id +
             '&isActive=' +
-            (status == 'active' ? true : false),
+            (status == 'active' ? true : false) +
+            '&language=' + language +
+            '&en_id=' + enId,
           json,
         )
         const resultResponse = response.data
@@ -317,7 +319,10 @@ const CourseCreate = () => {
         }
       } else {
         const response = await axios.post(
-          url + '?isActive=' + (status == 'active' ? true : false),
+          url +
+            '?isActive=' + (status == 'active' ? true : false) +
+            '&language=' + language +
+            '&en_id=' + enId,
           json,
         )
         const resultResponse = response.data
@@ -371,6 +376,7 @@ const CourseCreate = () => {
       router.push(url)
     }
   }
+
   const showSwalSkill = () => {
     Swal.fire({
       title: 'Create Skill',
@@ -411,6 +417,7 @@ const CourseCreate = () => {
       }
     })
   }
+
   const showSwalTag = () => {
     Swal.fire({
       title: 'Create tag',
@@ -466,145 +473,156 @@ const CourseCreate = () => {
     })
   }
 
-  async function getPageData() {
-    if (typeof window !== 'undefined') {
-      const fullUrl = window.location.href
+  async function getPageData(lang?: Language) {
+    if (typeof window === 'undefined') return
 
-      const responseTag = await fetch(urlTag + 's', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const resultTag = await responseTag.json()
-      setAllCategorySelect(
-        resultTag.getTags.map((tag: any) => {
-          return tag
-        }),
+    const response = await fetch(url + 's?id=0', {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const result = await response.json()
+    let resultData: Course[] = []
+
+    if (lang) {
+      resultData = result.getCourses.filter(
+        (course: Course) => course.language === lang && course.en_id == enId
       )
 
-      const responseSkill = await fetch(urlSkill + 's', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const resultSkill = await responseSkill.json()
-      setAllSkillSelect(
-        resultSkill.getSkills.map((skill: any) => {
-          return skill
-        }),
+    } else {
+      const idParam = window.location.href.split('_id=')[1]
+      resultData = result.getCourses.filter(
+        (course: Course) => course.id == idParam
       )
 
-      if (fullUrl.split('_id=')[1]) {
-        const response = await fetch(url + 's?id=' + fullUrl.split('_id=')[1], {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        const result = await response.json()
-        const responseLesson = await fetch(urlLesson + 's', {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        const resultLesson = await responseLesson.json()
-        const resultData = result.getCourses.filter(
-          (course: any) => course.id == fullUrl.split('_id=')[1],
-        )
-        let allLessons = resultLesson.getLessons.map((lesson: any) => {
-          return {
-            id: lesson.id,
-            type: lesson.type,
-            ...lesson.data,
-          }
-        })
-        if (resultData[0].data.mediaValue) {
-          setMediaValue({
-            type: resultData[0].data.mediaValue.type,
-            content: resultData[0].data.mediaValue.content,
-          })
-        }
-
-        setCategorySelect(
-          resultTag.getTags.filter((tag: any) => {
-            if (resultData[0].data.category.indexOf(tag.id) != -1) {
-              return tag
-            }
-          }),
-        )
-        setFetchedData(resultData[0].data.description)
-        setFetchedMediaData(resultData[0].data.mediaValue)
-        setStatus(resultData[0].data.status ? 'active' : 'draft')
-        setId(resultData[0].id)
-        setLanguage(resultData[0].data.language)
-        setLevel(resultData[0].data.level)
-        setRichValue(resultData[0].data.description)
-        setType(resultData[0].data.type)
-        setRating(resultData[0].data.rating)
-        setModules(
-          resultData[0].data.modules.map((module: any) => {
-            return {
-              title: module.title,
-              lessons: module.lessons.map((lessonId: string) => {
-                const found = allLessons.filter(
-                  (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId,
-                )
-                return found[0]
-              }),
-            }
-          }),
-        )
-        resultData[0].data.modules.map((module: any) => {
-          module.lessons.map((lessonId: string) => {
-            allLessons = allLessons.filter(
-              (moduleElemFilter: Lesson) => moduleElemFilter.id != lessonId,
-            )
-          })
-        })
-        setStoredModules(allLessons)
-        setForm({
-          questionLimit: resultData[0].data.questionLimit,
-          title: resultData[0].data.title,
-          description: resultData[0].data.description,
-          richtext: resultData[0].data.richtext,
-          date: resultData[0].data.date,
-          duration: resultData[0].data.duration,
-          lector: resultData[0].data.lector,
-          price: resultData[0].data.price,
-          priceDiscount: resultData[0].data?.priceDiscount,
-        })
-        setValue(2)
-        setTimeout(() => {
-          setValue(0)
-        }, 1)
-      } else {
+      if (!resultData.length) {
+        setLanguageDisabled(true)
         setRichValue([
           {
             type: 'paragaph',
             children: [{ text: '' }],
           },
-        ])
-        const response = await fetch(urlLesson + 's', {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        const result = await response.json()
-        setStoredModules(
-          result.getLessons.map((lesson: any) => {
-            return {
-              id: lesson.id,
-              type: lesson.type,
-              ...lesson.data,
-            }
-          }),
-        )
+        ])  
       }
-      setIsLoaded(true)
     }
+
+    if (resultData.length) {
+      router.push('/admin/create/?_id=' + resultData[0].id, { shallow: true })
+
+      if (resultData[0].data.mediaValue) {
+        setMediaValue({
+          type: resultData[0].data.mediaValue.type,
+          content: resultData[0].data.mediaValue.content,
+        })
+      }
+
+      setFetchedMediaData(resultData[0].data.mediaValue)
+      setStatus(resultData[0].data.status ? 'active' : 'draft')
+      setId(resultData[0].id)
+      setEnId(resultData[0].en_id)
+      setLanguage(resultData[0].language)
+      setLanguageDisabled(false)
+      setLevel(resultData[0].data.level)
+      setRichValue(resultData[0].data.description)
+      setType(resultData[0].data.type)
+      setRating(resultData[0].data.rating)
+
+      setForm({
+        questionLimit: resultData[0].data.questionLimit,
+        title: resultData[0].data.title,
+        description: resultData[0].data.description,
+        richtext: resultData[0].data.richtext,
+        date: resultData[0].data.date,
+        duration: resultData[0].data.duration,
+        lector: resultData[0].data.lector,
+        price: resultData[0].data.price,
+        priceDiscount: resultData[0].data?.priceDiscount,
+      })
+
+      setValue(2)
+      setTimeout(() => {
+        setValue(0)
+      }, 1)
+
+    } else {
+      router.push('/admin/create/', { shallow: true })
+      setId(undefined)
+    }
+
+    const responseTag = await fetch(urlTag + 's', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const resultTag = await responseTag.json()
+    setAllCategorySelect(
+      resultTag.getTags.map((tag: any) => {
+        return tag
+      }),
+    )
+
+    const responseSkill = await fetch(urlSkill + 's', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const resultSkill = await responseSkill.json()
+    setAllSkillSelect(
+      resultSkill.getSkills.map((skill: any) => {
+        return skill
+      }),
+    )
+
+    const responseLesson = await fetch(urlLesson + 's', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const resultLesson = await responseLesson.json()
+    let allLessons = resultLesson.getLessons.map((lesson: any) => {
+      return {
+        id: lesson.id,
+        type: lesson.type,
+        ...lesson.data,
+      }
+    })
+
+    if (resultData.length) {
+      setCategorySelect(
+        resultTag.getTags.filter((tag: any) => {
+          if (resultData[0].data.category.indexOf(tag.id) != -1) {
+            return tag
+          }
+        }),
+      )
+
+      setModules(
+        resultData[0].data.modules.map((module: any) => {
+          return {
+            title: module.title,
+            lessons: module.lessons.map((lessonId: string) => {
+              const found = allLessons.filter(
+                (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId,
+              )
+              return found[0]
+            }),
+          }
+        }),
+      )
+
+      resultData[0].data.modules.forEach((module: any) => {
+        module.lessons.forEach((lessonId: string) => {
+          allLessons = allLessons.filter((l: Lesson) => l.id != lessonId)
+        })
+      })
+    }
+
+    setStoredModules(allLessons)
+    setIsLoaded(true)
   }
-  useEffect(() => {
-    getPageData()
-  }, [id])
+
+  // useEffect(() => {
+  //   getPageData()
+  // }, [id])
+  
   useEffect(() => {
     getPageData()
     function handleOnBeforeUnload(e: BeforeUnloadEvent) {
@@ -671,11 +689,13 @@ const CourseCreate = () => {
     }
     return result
   }
+
   function countModuleNameMeet(str: string) {
     const result = modules.filter((module) => module.title.trim() == str.trim())
 
     return result.length
   }
+
   function isEdited() {
     return (
       form.title != '' ||
@@ -686,7 +706,7 @@ const CourseCreate = () => {
       form.priceDiscount != undefined ||
       form.questionLimit != null ||
       modules.length != 0 ||
-      language != '' ||
+      language !== undefined ||
       level != '' ||
       type != '' ||
       status != '' ||
@@ -911,6 +931,19 @@ const CourseCreate = () => {
                   </Tabs>
                   <CustomTabPanel value={value} index={0}>
                     <Box sx={{ color: '#fff' }}>
+                      <Box sx={{ marginTop: 2 }}>
+                        <InputLabel>Language</InputLabel>
+                        <Select
+                          inputProps={{ disabled: languageDisabled }}
+                          error={(error && error.language) ?? false}
+                          fullWidth
+                          id="languageSelect"
+                          value={language}
+                          onChange={handleChangeLanguage}
+                        >
+                          {languages.map((l: Language) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
+                        </Select>
+                      </Box>
                       <TextField
                         autoComplete="off"
                         margin="normal"
@@ -993,20 +1026,6 @@ const CourseCreate = () => {
                         }}
                         value={form.priceDiscount || ''}
                       />
-                      <Box sx={{ marginTop: 2 }}>
-                        <InputLabel>Language</InputLabel>
-                        <Select
-                          error={(error && error.language) ?? false}
-                          fullWidth
-                          id="languageSelect"
-                          value={language}
-                          onChange={handleChangeLanguage}
-                        >
-                          <MenuItem value={'RU'}>RU</MenuItem>
-                          <MenuItem value={'UA'}>UA</MenuItem>
-                          <MenuItem value={'EN'}>EN</MenuItem>
-                        </Select>
-                      </Box>
                       <Box sx={{ marginTop: 2 }}>
                         <InputLabel>Level</InputLabel>
                         <Select
@@ -1147,11 +1166,13 @@ const CourseCreate = () => {
                             }}
                           >
                             {option.icon_url && (
-                              <img
+                              <Image
                                 src={option.icon_url}
                                 alt={'tagIcon_' + option.id}
                                 style={{ width: 20, height: 20 }}
-                              ></img>
+                                width={20}
+                                height={20}
+                              ></Image>
                             )}
                             <div
                               style={{
@@ -1294,7 +1315,7 @@ const CourseCreate = () => {
                         <>
                           {mediaValue.type == 'image' ? (
                             <>
-                              <img src={mediaValue?.content} />
+                              <Image src={mediaValue?.content} alt="" width={1200} height={675} />
                             </>
                           ) : (
                             <>
@@ -1379,13 +1400,7 @@ const CourseCreate = () => {
                                   children: [{ text: '' }],
                                 },
                               ])
-                              setRichValueLesson([
-                                {
-                                  type: 'paragaph',
-                                  children: [{ text: '' }],
-                                },
-                              ])
-                              setLanguage('')
+                              setLanguage('EN')
                               setLevel('')
                               setType('')
                               setStatus('')
@@ -1591,9 +1606,6 @@ const CourseCreate = () => {
                                                         : null,
                                                   )
                                                   setLessonForm(lesson)
-                                                  setRichValueLesson(
-                                                    lesson.description,
-                                                  )
                                                   setCreateLessonIndx(i)
                                                   setLessonType(lesson.type)
                                                   setValue(2)
@@ -1830,12 +1842,6 @@ const CourseCreate = () => {
                                           hours: 0,
                                           minutes: 0,
                                         })
-                                        setRichValueLesson([
-                                          {
-                                            type: 'paragaph',
-                                            children: [{ text: '' }],
-                                          },
-                                        ])
                                         setValue(2)
                                       }}
                                     >

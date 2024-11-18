@@ -19,6 +19,9 @@ const nextConfig = {
         port: '',
         pathname: '**',
       },
+      {
+        hostname: 'platform-files-2024.s3.eu-north-1.amazonaws.com'
+      },
     ],
   },
 }

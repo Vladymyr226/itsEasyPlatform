@@ -319,7 +319,7 @@ const AdminTable = () => {
                           width: '100%',
                         }}
                       >
-                        {element.data.language}
+                        {element.language}
                       </Box>
                       <Box
                         sx={{
