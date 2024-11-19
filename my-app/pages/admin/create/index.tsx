@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import '../../../app/globals.css'
 import { Box, Button, CircularProgress } from '@mui/material'
 
@@ -153,8 +153,9 @@ const CourseCreate = () => {
     setValue(newValue)
   }
 
-  const handleChangeLanguage = (event: SelectChangeEvent) => {
-    getPageData(event.target.value as Language)
+  const handleChangeLanguage = async (event: SelectChangeEvent) => {
+    const idParam = await getPageData(event.target.value as Language, enId)
+    router.push('/admin/create/' + (idParam ? '?_id=' + idParam : ''), { shallow: true })
     setLanguage(event.target.value as Language)
     setEditTrigger(true)
     setError({})
@@ -200,6 +201,7 @@ const CourseCreate = () => {
       router.push('/admin')
       return
     }
+
     if (
       modules.filter((elem) => {
         if (countModuleNameMeet(elem.title) > 1) {
@@ -216,6 +218,7 @@ const CourseCreate = () => {
       })
       return
     }
+
     setError({
       title: form.title == '',
       duration: form.duration == null || form.duration == 0,
@@ -230,6 +233,7 @@ const CourseCreate = () => {
       type: type == '',
       status: status == '',
     })
+
     if (
       form.title == '' ||
       form.duration == null ||
@@ -266,6 +270,7 @@ const CourseCreate = () => {
       })
       return
     }
+
     const json = {
       ...form,
       mediaValue: {
@@ -294,6 +299,7 @@ const CourseCreate = () => {
         return tag.id
       }),
     }
+
     try {
       if (id) {
         const response = await axios.put(
@@ -322,7 +328,7 @@ const CourseCreate = () => {
           url +
             '?isActive=' + (status == 'active' ? true : false) +
             '&language=' + language +
-            '&en_id=' + enId,
+            (enId ? '&en_id=' + enId : ''),
           json,
         )
         const resultResponse = response.data
@@ -337,6 +343,7 @@ const CourseCreate = () => {
           })
           setEditTrigger(false)
           setId(resultResponse.courseId)
+          router.push('/admin/create/?_id=' + resultResponse.courseId)
         }
       }
     } catch (error) {
@@ -473,18 +480,48 @@ const CourseCreate = () => {
     })
   }
 
-  async function getPageData(lang?: Language) {
+  const getPageData = useCallback(async (lang?: Language, enIdParam?: string): Promise<string | undefined> => {
     if (typeof window === 'undefined') return
+
+    const responseTag = await fetch(urlTag + 's', {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const resultTag = await responseTag.json()
+    setAllCategorySelect(
+      resultTag.getTags.map((tag: any) => tag)
+    )
+
+    const responseSkill = await fetch(urlSkill + 's', {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const resultSkill = await responseSkill.json()
+    setAllSkillSelect(
+      resultSkill.getSkills.map((skill: any) => skill)
+    )
+
+    const responseLesson = await fetch(urlLesson + 's', {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const resultLesson = await responseLesson.json()
+    let allLessons = resultLesson.getLessons.map((lesson: any) => {
+      return {
+        id: lesson.id,
+        type: lesson.type,
+        ...lesson.data,
+      }
+    })
 
     const response = await fetch(url + 's?id=0', {
       headers: { 'Content-Type': 'application/json' },
     })
     const result = await response.json()
-    let resultData: Course[] = []
 
-    if (lang) {
+    let resultData: Course[] = []
+    let newIdParam
+
+    if (lang && enIdParam) {
       resultData = result.getCourses.filter(
-        (course: Course) => course.language === lang && course.en_id == enId
+        (course: Course) => course.language === lang && course.en_id == enIdParam
       )
 
     } else {
@@ -505,7 +542,7 @@ const CourseCreate = () => {
     }
 
     if (resultData.length) {
-      router.push('/admin/create/?_id=' + resultData[0].id, { shallow: true })
+      newIdParam = resultData[0].id
 
       if (resultData[0].data.mediaValue) {
         setMediaValue({
@@ -516,7 +553,7 @@ const CourseCreate = () => {
 
       setFetchedMediaData(resultData[0].data.mediaValue)
       setStatus(resultData[0].data.status ? 'active' : 'draft')
-      setId(resultData[0].id)
+      setId(newIdParam)
       setEnId(resultData[0].en_id)
       setLanguage(resultData[0].language)
       setLanguageDisabled(false)
@@ -537,55 +574,6 @@ const CourseCreate = () => {
         priceDiscount: resultData[0].data?.priceDiscount,
       })
 
-      setValue(2)
-      setTimeout(() => {
-        setValue(0)
-      }, 1)
-
-    } else {
-      router.push('/admin/create/', { shallow: true })
-      setId(undefined)
-    }
-
-    const responseTag = await fetch(urlTag + 's', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const resultTag = await responseTag.json()
-    setAllCategorySelect(
-      resultTag.getTags.map((tag: any) => {
-        return tag
-      }),
-    )
-
-    const responseSkill = await fetch(urlSkill + 's', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const resultSkill = await responseSkill.json()
-    setAllSkillSelect(
-      resultSkill.getSkills.map((skill: any) => {
-        return skill
-      }),
-    )
-
-    const responseLesson = await fetch(urlLesson + 's', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const resultLesson = await responseLesson.json()
-    let allLessons = resultLesson.getLessons.map((lesson: any) => {
-      return {
-        id: lesson.id,
-        type: lesson.type,
-        ...lesson.data,
-      }
-    })
-
-    if (resultData.length) {
       setCategorySelect(
         resultTag.getTags.filter((tag: any) => {
           if (resultData[0].data.category.indexOf(tag.id) != -1) {
@@ -613,16 +601,21 @@ const CourseCreate = () => {
           allLessons = allLessons.filter((l: Lesson) => l.id != lessonId)
         })
       })
+
+      setValue(2)
+      setTimeout(() => {
+        setValue(0)
+      }, 1)
+
+    } else {
+      setId(undefined)
     }
 
     setStoredModules(allLessons)
     setIsLoaded(true)
-  }
+    return newIdParam
+  }, [])
 
-  // useEffect(() => {
-  //   getPageData()
-  // }, [id])
-  
   useEffect(() => {
     getPageData()
     function handleOnBeforeUnload(e: BeforeUnloadEvent) {
@@ -637,7 +630,7 @@ const CourseCreate = () => {
         capture: true,
       })
     }
-  }, [])
+  }, [getPageData])
 
   if (
     !process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ||

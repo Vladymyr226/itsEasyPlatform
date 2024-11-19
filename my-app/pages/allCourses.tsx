@@ -671,7 +671,7 @@ const AllCoursesDetails = () => {
                       <>
                         <CourseCard
                           title={course.data.title}
-                          language={course.data.language}
+                          language={course.language}
                           level={course.data.level}
                           date={course.data.date}
                           type={course.data.type}
