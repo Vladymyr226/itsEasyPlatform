@@ -141,6 +141,177 @@ const CourseCreate = () => {
   }>()
   const [error, setError] = useState<any>()
 
+  const dragLesson = useRef<any>(0)
+  const draggedOverLesson = useRef<any>(0)
+
+  if (
+    !process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ||
+    !process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ||
+    !process.env.NEXT_PUBLIC_AWS_BUCKET_NAME
+  ) {
+    throw new Error('Отсутствуют переменные окружения NEXT_PUBLIC_AWS_ACCESS_KEY_ID или NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY'
+      + ' или NEXT_PUBLIC_AWS_BUCKET_NAME')
+  }
+
+  AWS.config.update({
+    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+    region: 'eu-west-3',
+  })
+  const s3 = new AWS.S3()
+
+  const getPageData = useCallback(async (lang?: Language, enIdParam?: string): Promise<string | undefined> => {
+    if (typeof window === 'undefined') return
+
+    const responseTag = await fetch(urlTag + 's', {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const resultTag = await responseTag.json()
+    setAllCategorySelect(
+      resultTag.getTags.map((tag: any) => tag)
+    )
+
+    const responseSkill = await fetch(urlSkill + 's', {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const resultSkill = await responseSkill.json()
+    setAllSkillSelect(
+      resultSkill.getSkills.map((skill: any) => skill)
+    )
+
+    const responseLesson = await fetch(urlLesson + 's', {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const resultLesson = await responseLesson.json()
+    let allLessons = resultLesson.getLessons.map((lesson: any) => {
+      return {
+        id: lesson.id,
+        type: lesson.type,
+        ...lesson.data,
+      }
+    })
+
+    const response = await fetch(url + 's?id=0', {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const result = await response.json()
+
+    let resultData: Course[] = []
+    let newIdParam
+
+    if (lang && enIdParam) {
+      resultData = result.getCourses.filter(
+        (course: Course) => course.language === lang && course.en_id == enIdParam
+      )
+
+    } else {
+      const idParam = window.location.href.split('_id=')[1]
+      resultData = result.getCourses.filter(
+        (course: Course) => course.id == idParam
+      )
+
+      if (!resultData.length) {
+        setLanguageDisabled(true)
+        setRichValue([
+          {
+            type: 'paragaph',
+            children: [{ text: '' }],
+          },
+        ])  
+      }
+    }
+
+    if (resultData.length) {
+      newIdParam = resultData[0].id
+
+      if (resultData[0].data.mediaValue) {
+        setMediaValue({
+          type: resultData[0].data.mediaValue.type,
+          content: resultData[0].data.mediaValue.content,
+        })
+      }
+
+      setFetchedMediaData(resultData[0].data.mediaValue)
+      setStatus(resultData[0].data.status ? 'active' : 'draft')
+      setId(newIdParam)
+      setEnId(resultData[0].en_id)
+      setLanguage(resultData[0].language)
+      setLanguageDisabled(false)
+      setLevel(resultData[0].data.level)
+      setRichValue(resultData[0].data.description)
+      setType(resultData[0].data.type)
+      setRating(resultData[0].data.rating)
+
+      setForm({
+        questionLimit: resultData[0].data.questionLimit,
+        title: resultData[0].data.title,
+        description: resultData[0].data.description,
+        richtext: resultData[0].data.richtext,
+        date: resultData[0].data.date,
+        duration: resultData[0].data.duration,
+        lector: resultData[0].data.lector,
+        price: resultData[0].data.price,
+        priceDiscount: resultData[0].data?.priceDiscount,
+      })
+
+      setCategorySelect(
+        resultTag.getTags.filter((tag: any) => {
+          if (resultData[0].data.category.indexOf(tag.id) != -1) {
+            return tag
+          }
+        }),
+      )
+
+      setModules(
+        resultData[0].data.modules.map((module: any) => {
+          return {
+            title: module.title,
+            lessons: module.lessons.map((lessonId: string) => {
+              const found = allLessons.filter(
+                (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId,
+              )
+              return found[0]
+            }),
+          }
+        }),
+      )
+
+      resultData[0].data.modules.forEach((module: any) => {
+        module.lessons.forEach((lessonId: string) => {
+          allLessons = allLessons.filter((l: Lesson) => l.id != lessonId)
+        })
+      })
+
+      setValue(2)
+      setTimeout(() => {
+        setValue(0)
+      }, 1)
+
+    } else {
+      setId(undefined)
+    }
+
+    setStoredModules(allLessons)
+    setIsLoaded(true)
+    return newIdParam
+  }, [])
+
+  useEffect(() => {
+    getPageData()
+    function handleOnBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault()
+      return (e.returnValue = '')
+    }
+    window.addEventListener('beforeunload', handleOnBeforeUnload, {
+      capture: true,
+    })
+    return () => {
+      window.removeEventListener('beforeunload', handleOnBeforeUnload, {
+        capture: true,
+      })
+    }
+  }, [getPageData])
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setIdLessonEdit(null)
     setLessonForm({
@@ -183,9 +354,7 @@ const CourseCreate = () => {
     setLessonType(event.target.value as string)
   }
 
-  const handlePreviewMediaChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setEditTrigger(true)
       setError({})
@@ -342,8 +511,8 @@ const CourseCreate = () => {
             icon: 'success',
           })
           setEditTrigger(false)
-          setId(resultResponse.courseId)
           router.push('/admin/create/?_id=' + resultResponse.courseId)
+          await getPageData()
         }
       }
     } catch (error) {
@@ -359,7 +528,7 @@ const CourseCreate = () => {
     }
   }
 
-  function showPushAction(url: string) {
+  const showPushAction = (url: string) => {
     if (id ? editTrigger : isEdited()) {
       Swal.fire({
         title: 'Do you want to save changes?',
@@ -480,175 +649,6 @@ const CourseCreate = () => {
     })
   }
 
-  const getPageData = useCallback(async (lang?: Language, enIdParam?: string): Promise<string | undefined> => {
-    if (typeof window === 'undefined') return
-
-    const responseTag = await fetch(urlTag + 's', {
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const resultTag = await responseTag.json()
-    setAllCategorySelect(
-      resultTag.getTags.map((tag: any) => tag)
-    )
-
-    const responseSkill = await fetch(urlSkill + 's', {
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const resultSkill = await responseSkill.json()
-    setAllSkillSelect(
-      resultSkill.getSkills.map((skill: any) => skill)
-    )
-
-    const responseLesson = await fetch(urlLesson + 's', {
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const resultLesson = await responseLesson.json()
-    let allLessons = resultLesson.getLessons.map((lesson: any) => {
-      return {
-        id: lesson.id,
-        type: lesson.type,
-        ...lesson.data,
-      }
-    })
-
-    const response = await fetch(url + 's?id=0', {
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const result = await response.json()
-
-    let resultData: Course[] = []
-    let newIdParam
-
-    if (lang && enIdParam) {
-      resultData = result.getCourses.filter(
-        (course: Course) => course.language === lang && course.en_id == enIdParam
-      )
-
-    } else {
-      const idParam = window.location.href.split('_id=')[1]
-      resultData = result.getCourses.filter(
-        (course: Course) => course.id == idParam
-      )
-
-      if (!resultData.length) {
-        setLanguageDisabled(true)
-        setRichValue([
-          {
-            type: 'paragaph',
-            children: [{ text: '' }],
-          },
-        ])  
-      }
-    }
-
-    if (resultData.length) {
-      newIdParam = resultData[0].id
-
-      if (resultData[0].data.mediaValue) {
-        setMediaValue({
-          type: resultData[0].data.mediaValue.type,
-          content: resultData[0].data.mediaValue.content,
-        })
-      }
-
-      setFetchedMediaData(resultData[0].data.mediaValue)
-      setStatus(resultData[0].data.status ? 'active' : 'draft')
-      setId(newIdParam)
-      setEnId(resultData[0].en_id)
-      setLanguage(resultData[0].language)
-      setLanguageDisabled(false)
-      setLevel(resultData[0].data.level)
-      setRichValue(resultData[0].data.description)
-      setType(resultData[0].data.type)
-      setRating(resultData[0].data.rating)
-
-      setForm({
-        questionLimit: resultData[0].data.questionLimit,
-        title: resultData[0].data.title,
-        description: resultData[0].data.description,
-        richtext: resultData[0].data.richtext,
-        date: resultData[0].data.date,
-        duration: resultData[0].data.duration,
-        lector: resultData[0].data.lector,
-        price: resultData[0].data.price,
-        priceDiscount: resultData[0].data?.priceDiscount,
-      })
-
-      setCategorySelect(
-        resultTag.getTags.filter((tag: any) => {
-          if (resultData[0].data.category.indexOf(tag.id) != -1) {
-            return tag
-          }
-        }),
-      )
-
-      setModules(
-        resultData[0].data.modules.map((module: any) => {
-          return {
-            title: module.title,
-            lessons: module.lessons.map((lessonId: string) => {
-              const found = allLessons.filter(
-                (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId,
-              )
-              return found[0]
-            }),
-          }
-        }),
-      )
-
-      resultData[0].data.modules.forEach((module: any) => {
-        module.lessons.forEach((lessonId: string) => {
-          allLessons = allLessons.filter((l: Lesson) => l.id != lessonId)
-        })
-      })
-
-      setValue(2)
-      setTimeout(() => {
-        setValue(0)
-      }, 1)
-
-    } else {
-      setId(undefined)
-    }
-
-    setStoredModules(allLessons)
-    setIsLoaded(true)
-    return newIdParam
-  }, [])
-
-  useEffect(() => {
-    getPageData()
-    function handleOnBeforeUnload(e: BeforeUnloadEvent) {
-      e.preventDefault()
-      return (e.returnValue = '')
-    }
-    window.addEventListener('beforeunload', handleOnBeforeUnload, {
-      capture: true,
-    })
-    return () => {
-      window.removeEventListener('beforeunload', handleOnBeforeUnload, {
-        capture: true,
-      })
-    }
-  }, [getPageData])
-
-  if (
-    !process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ||
-    !process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ||
-    !process.env.NEXT_PUBLIC_AWS_BUCKET_NAME
-  ) {
-    throw new Error(
-      'Отсутствуют переменные окружения NEXT_PUBLIC_AWS_ACCESS_KEY_ID или NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY или NEXT_PUBLIC_AWS_BUCKET_NAME',
-    )
-  }
-
-  AWS.config.update({
-    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-    region: 'eu-west-3',
-  })
-
-  const s3 = new AWS.S3()
   const uploadFileToS3 = async (file: File) => {
     const uploadParams = {
       Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME ?? '',
@@ -671,7 +671,7 @@ const CourseCreate = () => {
     })
   }
 
-  function compareRichTexts(first: Array<any>, second: Array<any>) {
+  const compareRichTexts = (first: Array<any>, second: Array<any>) => {
     let result = first.length == second.length
     if (result) {
       first.map((elem, i) => {
@@ -683,13 +683,13 @@ const CourseCreate = () => {
     return result
   }
 
-  function countModuleNameMeet(str: string) {
+  const countModuleNameMeet = (str: string) => {
     const result = modules.filter((module) => module.title.trim() == str.trim())
 
     return result.length
   }
 
-  function isEdited() {
+  const isEdited = () => {
     return (
       form.title != '' ||
       form.date != new Date().toISOString().split('T')[0] ||
@@ -714,10 +714,7 @@ const CourseCreate = () => {
     )
   }
 
-  const dragLesson = useRef<any>(0)
-  const draggedOverLesson = useRef<any>(0)
-
-  function handleSort(lessonsGet: any, i: number) {
+  const handleSort = (lessonsGet: any, i: number) => {
     const lessonClone = [...lessonsGet]
     let draggedIdx = -1
     const temp = lessonClone.filter((less, i) => {
@@ -883,6 +880,19 @@ const CourseCreate = () => {
                     width: '100%',
                   }}
                 >
+                  <Box sx={{ margin: 2 }}>
+                    <InputLabel>Language</InputLabel>
+                    <Select
+                      inputProps={{ disabled: languageDisabled }}
+                      error={(error && error.language) ?? false}
+                      fullWidth
+                      id="languageSelect"
+                      value={language}
+                      onChange={handleChangeLanguage}
+                    >
+                      {languages.map((l: Language) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
+                    </Select>
+                  </Box>
                   <Tabs
                     value={value}
                     onChange={handleChange}
@@ -924,19 +934,6 @@ const CourseCreate = () => {
                   </Tabs>
                   <CustomTabPanel value={value} index={0}>
                     <Box sx={{ color: '#fff' }}>
-                      <Box sx={{ marginTop: 2 }}>
-                        <InputLabel>Language</InputLabel>
-                        <Select
-                          inputProps={{ disabled: languageDisabled }}
-                          error={(error && error.language) ?? false}
-                          fullWidth
-                          id="languageSelect"
-                          value={language}
-                          onChange={handleChangeLanguage}
-                        >
-                          {languages.map((l: Language) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
-                        </Select>
-                      </Box>
                       <TextField
                         autoComplete="off"
                         margin="normal"
