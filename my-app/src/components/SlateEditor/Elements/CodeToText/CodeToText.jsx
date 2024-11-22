@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import './CodeToText.css'
 import Icon from '../../common/Icon'
-import Interweave from 'interweave'
+import { Interweave } from 'interweave'
 import { Transforms } from 'slate'
 import { useSlateStatic } from 'slate-react'
 const CodeToText = (props) => {

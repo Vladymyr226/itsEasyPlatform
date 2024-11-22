@@ -1,4 +1,4 @@
-import Interweave from 'interweave'
+import { Interweave } from 'interweave'
 import React, { useEffect } from 'react'
 import { Transforms, Path, Node } from 'slate'
 import { useSelected, useFocused, useSlateStatic, ReactEditor } from 'slate-react'

@@ -10,6 +10,7 @@ const Logo = () => {
       <Image
         src={logoImage}
         alt="logo"
+        priority={true}
       />
     </Link>
   )

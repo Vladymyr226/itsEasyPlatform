@@ -19,7 +19,7 @@ import { InputLabel } from '@mui/material'
 
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import Rating from '@mui/material/Rating'
 import { useRouter } from 'next/navigation'
 import MyEditor from '@/components/SlateEditor/Editor'
@@ -48,14 +48,14 @@ import { removeLessonIds } from '@/utils/removeAllLessonId'
 import LessonCreateQuiz from '@/components/LessonCreate/LessonCreateQuiz'
 import LessonCreatePractice from '@/components/LessonCreate/LessonCreatePractice'
 import LessonCreateDefault from '@/components/LessonCreate/LessonCreateDefault'
-import { languages } from '@/utils'
+import { langNames, languages } from '@/utils'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const urlSkill = `${process.env.NEXT_BACK_HOST_API}/cabinet/skill`
 
-function ExampleYouTube(props: YouTubeProp) {
+const ExampleYouTube = (props: YouTubeProp) => {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
     event.target.pauseVideo()
   }
@@ -71,7 +71,7 @@ function ExampleYouTube(props: YouTubeProp) {
   return <YouTube videoId={props.url} opts={opts} onReady={onPlayerReady} />
 }
 
-function CustomTabPanel(props: TabPanelProps) {
+const CustomTabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props
 
   return (
@@ -94,7 +94,7 @@ const CourseCreate = () => {
   const [id, setId] = useState<string>()
   const [enId, setEnId] = useState<string>()
   const [idLessonEdit, setIdLessonEdit] = useState<string | null>(null)
-  const [value, setValue] = useState(0)
+  const [tabValue, setTabValue] = useState(0)
   const [language, setLanguage] = useState<Language>('EN')
   const [languageDisabled, setLanguageDisabled] = useState(false)
   const [level, setLevel] = useState('')
@@ -282,9 +282,9 @@ const CourseCreate = () => {
         })
       })
 
-      setValue(2)
+      setTabValue(2)
       setTimeout(() => {
-        setValue(0)
+        setTabValue(0)
       }, 1)
 
     } else {
@@ -321,7 +321,7 @@ const CourseCreate = () => {
       hours: 0,
       minutes: 0,
     })
-    setValue(newValue)
+    setTabValue(newValue)
   }
 
   const handleChangeLanguage = async (event: SelectChangeEvent) => {
@@ -330,6 +330,70 @@ const CourseCreate = () => {
     setLanguage(event.target.value as Language)
     setEditTrigger(true)
     setError({})
+  }
+
+  const handleTranslate = async () => {
+    const url = 'https://api.openai.com/v1/chat/completions'
+    const apiKey =
+      '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'
+
+    const content = {
+      title: form.title,
+      richValue,
+      modules: modules.map(m => m.title)
+    }
+    
+    try {
+      const response: AxiosResponse<any, any> = await axios.post(
+        url,
+        {
+          model: 'gpt-4o',
+          messages: [
+            { role: 'system', content: 'You are a helpful assistant that translates text in JSON structures.'},
+            { role: 'user', content: `
+                Translate the text content in the following JSON structure to ${langNames[language]}
+                without changing the JSON structure:   
+                ${JSON.stringify(content)}`
+            }
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+
+      if (response.status === 200) {
+        const result = JSON.parse(
+          response.data.choices[0].message.content
+            .replace('```json', '')
+            .replace('```', '')
+        )
+
+        setForm({ ...form, title: result.title })
+        setRichValue(result.richValue)
+        setModules(modules.map((m, i) => ({ ...m, title: result.modules[i] })))
+
+        Swal.fire({
+          title: 'Translated!',
+          background: '#171622',
+          color: '#ffec3e',
+          confirmButtonColor: '#c58efe',
+          icon: 'success',
+        })
+        setEditTrigger(true)
+
+        setTabValue(2)
+        setTimeout(() => {
+          setTabValue(0)
+        }, 1)  
+      }
+
+    } catch (error) {
+      console.error('Ошибка при отправке запроса:', error)
+    }
   }
 
   const handleChangeLevel = (event: SelectChangeEvent) => {
@@ -429,7 +493,7 @@ const CourseCreate = () => {
     }
 
     if (modules.filter((module) => module.title.trim() == '').length > 0) {
-      setValue(1)
+      setTabValue(1)
       Swal.fire({
         title: 'Module title is empty!',
         background: '#171622',
@@ -551,6 +615,20 @@ const CourseCreate = () => {
     } else {
       router.push(url)
     }
+  }
+
+  const showSwalTranslate = () => {
+    Swal.fire({
+      title: `Do you want to translate course to ${langNames[language]}?`,
+      background: '#171622',
+      color: '#ffec3e',
+      confirmButtonColor: '#c58efe',
+      showCancelButton: true,
+      confirmButtonText: 'Translate',
+      denyButtonText: 'Leave and Discard Changes',
+    }).then(async (result) => {
+      if (result.isConfirmed) handleTranslate()
+    })
   }
 
   const showSwalSkill = () => {
@@ -892,12 +970,13 @@ const CourseCreate = () => {
                     >
                       {languages.map((l: Language) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
                     </Select>
+                    <Button onClick={e => showSwalTranslate()}>Translate</Button>
                   </Box>
                   <Tabs
-                    value={value}
+                    value={tabValue}
                     onChange={handleChange}
                     aria-label="basic tabs example"
-                    variant="scrollable"
+                    variant="fullWidth"
                     TabIndicatorProps={{
                       style: {
                         backgroundColor: '#000',
@@ -908,10 +987,7 @@ const CourseCreate = () => {
                       value={0}
                       label="General"
                       sx={{
-                        minWidth: '50%',
-                        width: '100%',
                         color: '#000',
-
                         '&.Mui-selected': {
                           color: '#000',
                           fontWeight: 'bold',
@@ -922,8 +998,6 @@ const CourseCreate = () => {
                       value={1}
                       label="Structure"
                       sx={{
-                        minWidth: '50%',
-                        width: '100%',
                         color: '#000',
                         '&.Mui-selected': {
                           color: '#000',
@@ -931,8 +1005,14 @@ const CourseCreate = () => {
                         },
                       }}
                     />
+                    <Tab
+                      value={2}
+                      sx={{
+                        display: 'none',
+                      }}
+                    />
                   </Tabs>
-                  <CustomTabPanel value={value} index={0}>
+                  <CustomTabPanel value={tabValue} index={0}>
                     <Box sx={{ color: '#fff' }}>
                       <TextField
                         autoComplete="off"
@@ -1396,9 +1476,9 @@ const CourseCreate = () => {
                               setStatus('')
                               setRating(0.0)
                               setCategorySelect([])
-                              setValue(1)
+                              setTabValue(1)
                               setTimeout(() => {
-                                setValue(0)
+                                setTabValue(0)
                               }, 10)
                             }}
                           >
@@ -1416,7 +1496,7 @@ const CourseCreate = () => {
                             if (!id && editTrigger) {
                               handleSubmit('')
                             }
-                            setValue(1)
+                            setTabValue(1)
                           }}
                         >
                           Go to structure
@@ -1424,7 +1504,7 @@ const CourseCreate = () => {
                       </Box>
                     </Box>
                   </CustomTabPanel>
-                  <CustomTabPanel value={value} index={1}>
+                  <CustomTabPanel value={tabValue} index={1}>
                     <Box sx={{ width: '100%' }}>
                       <Box
                         sx={{
@@ -1598,7 +1678,7 @@ const CourseCreate = () => {
                                                   setLessonForm(lesson)
                                                   setCreateLessonIndx(i)
                                                   setLessonType(lesson.type)
-                                                  setValue(2)
+                                                  setTabValue(2)
                                                 }}
                                               >
                                                 <EditIcon />
@@ -1832,7 +1912,7 @@ const CourseCreate = () => {
                                           hours: 0,
                                           minutes: 0,
                                         })
-                                        setValue(2)
+                                        setTabValue(2)
                                       }}
                                     >
                                       Create lesson
@@ -1859,7 +1939,7 @@ const CourseCreate = () => {
                       </Button>
                     </Box>
                   </CustomTabPanel>
-                  <CustomTabPanel value={value} index={2}>
+                  <CustomTabPanel value={tabValue} index={2}>
                     <Box
                       sx={{
                         color: '#fff',
@@ -1883,7 +1963,7 @@ const CourseCreate = () => {
                       {lessonType == 'quiz' && (
                         <LessonCreateQuiz
                           startData={lessonForm}
-                          setValue={setValue}
+                          setValue={setTabValue}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
                           createLessonIndx={createLessonIndx}
@@ -1898,7 +1978,7 @@ const CourseCreate = () => {
                       {lessonType == 'practice' && (
                         <LessonCreatePractice
                           startData={lessonForm}
-                          setValue={setValue}
+                          setValue={setTabValue}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
                           createLessonIndx={createLessonIndx}
@@ -1913,7 +1993,7 @@ const CourseCreate = () => {
                       {lessonType == 'default' && (
                         <LessonCreateDefault
                           startData={lessonForm}
-                          setValue={setValue}
+                          setValue={setTabValue}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
                           createLessonIndx={createLessonIndx}
