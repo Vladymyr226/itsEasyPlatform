@@ -10,6 +10,21 @@ export interface TabPanelProps {
   value: number
 }
 
+export interface DefaultLessonCreation {
+  setTabValue: any
+  idLessonEdit: any
+  setIdLessonEdit: any
+  createLessonIndx: any
+  setCreateLessonIndx: any
+  modules: any
+  setModules: any
+  setEditTrigger: any
+  setError: any
+  storedModules: any
+  startData?: any
+}
+
+
 export interface Lesson {
   id?: string
   image?: string
@@ -37,9 +52,10 @@ export interface Module {
 }
 
 export interface Tag {
-  icon_url: string
-  name_of_tag: string
   id: string
+  icon_url: string
+  name_of_tag?: string
+  name_skill?: string
 }
 
 export interface Skill {

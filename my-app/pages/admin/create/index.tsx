@@ -1,54 +1,58 @@
 'use client'
-import { useCallback, useEffect, useRef, useState } from 'react'
 import '../../../app/globals.css'
-import { Box, Button, CircularProgress } from '@mui/material'
-
-import IconButton from '@mui/material/IconButton'
-import PreviewIcon from '@mui/icons-material/Preview'
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
-import TextField from '@mui/material/TextField'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-
-import { InputLabel } from '@mui/material'
-
-import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import axios, { AxiosResponse } from 'axios'
-import Rating from '@mui/material/Rating'
 import { useRouter } from 'next/navigation'
-import MyEditor from '@/components/SlateEditor/Editor'
-import SlateView from '@/components/SlateEditor/View'
 
+import axios, { AxiosResponse } from 'axios'
+import SlateView from '@/components/SlateEditor/View'
 import Swal from 'sweetalert2'
-import React from 'react'
 import YouTube, { YouTubeProps } from 'react-youtube'
-import Autocomplete from '@mui/material/Autocomplete'
+
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Autocomplete,
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Tabs,
+  Tab,
+  TextField,
+} from '@mui/material'
+
+import {
+  Delete as DeleteIcon,
+  DragIndicator as DragIndicatorIcon,
+  Edit as EditIcon,
+  ExpandMore as ExpandMoreIcon,
+  Preview as PreviewIcon,
+} from '@mui/icons-material'
+
 import {
   YouTubeProp,
   TabPanelProps,
   Lesson,
   Module,
   Tag,
-  Skill,
   Language,
   Course,
+  Skill,
 } from '@/utils/interfaces'
-import * as AWS from 'aws-sdk'
+
 import { isEqual } from 'lodash-es'
 import { deleteCookie } from 'cookies-next'
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import Logo from '@/components/Logo/Logo'
 import { removeLessonIds } from '@/utils/removeAllLessonId'
-import LessonCreateQuiz from '@/components/LessonCreate/LessonCreateQuiz'
-import LessonCreatePractice from '@/components/LessonCreate/LessonCreatePractice'
-import LessonCreateDefault from '@/components/LessonCreate/LessonCreateDefault'
-import { langNames, languages } from '@/utils'
+import { LessonCreateDefault, LessonCreateQuiz, LessonCreatePractice } from '@/components/LessonCreate'
+import { langNames, languages, uploadFileToS3 } from '@/utils'
+import CourseCreate from '@/components/CourseCreate'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
@@ -87,7 +91,7 @@ const CustomTabPanel = (props: TabPanelProps) => {
   )
 }
 
-const CourseCreate = () => {
+const Create = () => {
   const router = useRouter()
 
   const [createLessonIndx, setCreateLessonIndx] = useState(-1)
@@ -104,7 +108,6 @@ const CourseCreate = () => {
   const [allModules, setAllModules] = useState<Array<Lesson>>([])
   const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
   const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
-  const [skillsSelect, setSkillsSelect] = useState<Array<Skill>>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
   const [allSkillSelect, setAllSkillSelect] = useState<Array<Skill>>([])
   const [form, setForm] = useState<any>({
@@ -143,22 +146,6 @@ const CourseCreate = () => {
 
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
-
-  if (
-    !process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ||
-    !process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ||
-    !process.env.NEXT_PUBLIC_AWS_BUCKET_NAME
-  ) {
-    throw new Error('Отсутствуют переменные окружения NEXT_PUBLIC_AWS_ACCESS_KEY_ID или NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY'
-      + ' или NEXT_PUBLIC_AWS_BUCKET_NAME')
-  }
-
-  AWS.config.update({
-    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-    region: 'eu-west-3',
-  })
-  const s3 = new AWS.S3()
 
   const getPageData = useCallback(async (lang?: Language, enIdParam?: string): Promise<string | undefined> => {
     if (typeof window === 'undefined') return
@@ -377,7 +364,7 @@ const CourseCreate = () => {
         setModules(modules.map((m, i) => ({ ...m, title: result.modules[i] })))
 
         Swal.fire({
-          title: 'Translated!',
+          title: 'Course translated!',
           background: '#171622',
           color: '#ffec3e',
           confirmButtonColor: '#c58efe',
@@ -396,37 +383,18 @@ const CourseCreate = () => {
     }
   }
 
-  const handleChangeLevel = (event: SelectChangeEvent) => {
-    setEditTrigger(true)
-    setError({})
-    setLevel(event.target.value as string)
-  }
-
-  const handleChangeType = (event: SelectChangeEvent) => {
-    setEditTrigger(true)
-    setError({})
-    setType(event.target.value as string)
-  }
-
-  const handleChangeStatus = (event: SelectChangeEvent) => {
-    setEditTrigger(true)
-    setError({})
-    setStatus(event.target.value as string)
-  }
+  const handleTranslateLesson = async () => {
+    Swal.fire({
+      title: 'Lesson translated!',
+      background: '#171622',
+      color: '#ffec3e',
+      confirmButtonColor: '#c58efe',
+      icon: 'success',
+    })
+}
 
   const handleChangeLessonType = (event: SelectChangeEvent) => {
     setLessonType(event.target.value as string)
-  }
-
-  const handlePreviewMediaChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setEditTrigger(true)
-      setError({})
-      setMediaValue({
-        type: event.target.files[0].type.split('/')[0],
-        content: event.target.files[0],
-      })
-    }
   }
 
   const handleSubmit = async (e: any) => {
@@ -618,135 +586,36 @@ const CourseCreate = () => {
   }
 
   const showSwalTranslate = () => {
-    Swal.fire({
-      title: `Do you want to translate course to ${langNames[language]}?`,
-      background: '#171622',
-      color: '#ffec3e',
-      confirmButtonColor: '#c58efe',
-      showCancelButton: true,
-      confirmButtonText: 'Translate',
-      denyButtonText: 'Leave and Discard Changes',
-    }).then(async (result) => {
-      if (result.isConfirmed) handleTranslate()
-    })
-  }
-
-  const showSwalSkill = () => {
-    Swal.fire({
-      title: 'Create Skill',
-      html: `
-          <input type="text" id="textInput" class="swal2-input" placeholder="Enter title">
-      `,
-      focusConfirm: false,
-      preConfirm: () => {
-        const textInput = (
-          Swal.getPopup()?.querySelector('#textInput') as HTMLInputElement
-        ).value
-
-        if (!textInput || textInput.trim() == '') {
-          Swal.showValidationMessage(`Please enter text`)
-        }
-
-        return { textInput: textInput }
-      },
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const response = await axios.post(
-          urlSkill + '?title=' + result.value.textInput + '&iconUrl=' + '',
-        )
-        const resultResponse = response.data
-        if (resultResponse) {
-          Swal.fire('Created!', '', 'success')
-          setEditTrigger(true)
-          setError({})
-          setAllSkillSelect([
-            ...allSkillSelect,
-            {
-              name_skill: result.value.textInput,
-              id: resultResponse.skillId,
-              icon_url: '',
-            },
-          ])
-        }
-      }
-    })
-  }
-
-  const showSwalTag = () => {
-    Swal.fire({
-      title: 'Create tag',
-      html: `
-          <input type="text" id="textInput" class="swal2-input" placeholder="Enter title">
-          <input type="file" id="fileInput" class="swal2-file">
-      `,
-      focusConfirm: false,
-      preConfirm: () => {
-        const textInput = (
-          Swal.getPopup()?.querySelector('#textInput') as HTMLInputElement
-        ).value
-        const fileInput = (
-          Swal.getPopup()?.querySelector('#fileInput') as HTMLInputElement
-        ).files
-
-        if (!textInput || textInput.trim() == '') {
-          Swal.showValidationMessage(`Please enter text`)
-        }
-
-        return { textInput: textInput, fileInput: fileInput }
-      },
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const selectedFileURL =
-          result.value.fileInput.length > 0
-            ? await uploadFileToS3(result.value.fileInput[0])
-            : ''
-
-        const response = await axios.post(
-          urlTag +
-            '?title=' +
-            result.value.textInput +
-            '&iconUrl=' +
-            selectedFileURL,
-        )
-        const resultResponse = response.data
-        if (resultResponse) {
-          Swal.fire('Created!', '', 'success')
-          setEditTrigger(true)
-          setError({})
-
-          setAllCategorySelect([
-            ...allCategorySelect,
-            {
-              name_of_tag: result.value.textInput,
-              id: resultResponse.tagId,
-              icon_url: selectedFileURL as string,
-            },
-          ])
-        }
-      }
-    })
-  }
-
-  const uploadFileToS3 = async (file: File) => {
-    const uploadParams = {
-      Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME ?? '',
-      Key: `${file.name}`,
-      Body: file,
-      ContentType: file.type,
-      ACL: 'public-read',
-    }
-    return new Promise((resolve, reject) => {
-      s3.upload(uploadParams, (err: any, data: any) => {
-        if (err) {
-          console.error('Ошибка загрузки файла:', err)
-
-          reject(`Ошибка загрузки файла: ${err}`)
-        } else {
-          console.log('Файл успешно загружен:', data.Location)
-          resolve(data.Location)
-        }
+    if (tabValue === 2)
+      Swal.fire({
+        title: `Do you want to translate lesson to ${langNames[language]}?`,
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        showCancelButton: true,
+        confirmButtonText: 'Translate',
+      }).then(async (result) => {
+        if (result.isConfirmed) handleTranslateLesson()
       })
-    })
+    else if (window.location.href.includes('_id='))    
+      Swal.fire({
+        title: `Do you want to translate course to ${langNames[language]}?`,
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        showCancelButton: true,
+        confirmButtonText: 'Translate',
+      }).then(async (result) => {
+        if (result.isConfirmed) handleTranslate()
+      })
+    else
+      Swal.fire({
+        title: 'First you need to save the course',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
   }
 
   const compareRichTexts = (first: Array<any>, second: Array<any>) => {
@@ -1013,496 +882,42 @@ const CourseCreate = () => {
                     />
                   </Tabs>
                   <CustomTabPanel value={tabValue} index={0}>
-                    <Box sx={{ color: '#fff' }}>
-                      <TextField
-                        autoComplete="off"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="title"
-                        type="text"
-                        label="Title"
-                        name="title"
-                        error={(error && error.title) ?? false}
-                        autoFocus
-                        onChange={(e) => {
-                          setForm({ ...form, title: e.target.value })
-                          setEditTrigger(true)
-                          setError({})
-                        }}
-                        value={form.title}
-                      />
-                      <Box sx={{ color: '#000000' }}>
-                        <MyEditor value={richValue} setValue={setRichValue} />
-                      </Box>
-                      <TextField
-                        autoComplete="off"
-                        margin="normal"
-                        required
-                        fullWidth
-                        error={(error && error.duration) ?? false}
-                        id="duration"
-                        type="number"
-                        label="Duration"
-                        name="duration"
-                        InputProps={{
-                          inputProps: { min: 1 },
-                        }}
-                        onChange={(e) => {
-                          setForm({ ...form, duration: Number(e.target.value) })
-                          setEditTrigger(true)
-                          setError({})
-                        }}
-                        value={form.duration || ''}
-                        sx={{ marginTop: 3 }}
-                      />
-                      <TextField
-                        autoComplete="off"
-                        margin="normal"
-                        required
-                        fullWidth
-                        error={(error && error.price) ?? false}
-                        id="price"
-                        type="number"
-                        label="Price"
-                        name="price"
-                        InputProps={{
-                          inputProps: { min: 1 },
-                        }}
-                        onChange={(e) => {
-                          setForm({ ...form, price: Number(e.target.value) })
-                          setEditTrigger(true)
-                          setError({})
-                        }}
-                        value={form.price || ''}
-                      />
-                      <TextField
-                        autoComplete="off"
-                        margin="normal"
-                        fullWidth
-                        id="priceDiscount"
-                        type="number"
-                        label="Price with discount"
-                        name="priceDiscount"
-                        InputProps={{
-                          inputProps: { min: 1 },
-                        }}
-                        onChange={(e) => {
-                          setForm({
-                            ...form,
-                            priceDiscount: Number(e.target.value),
-                          })
-                          setEditTrigger(true)
-                        }}
-                        value={form.priceDiscount || ''}
-                      />
-                      <Box sx={{ marginTop: 2 }}>
-                        <InputLabel>Level</InputLabel>
-                        <Select
-                          error={(error && error.level) ?? false}
-                          fullWidth
-                          id="levelSelect"
-                          value={level}
-                          onChange={handleChangeLevel}
-                        >
-                          <MenuItem value={'Beginner'}>Beginner</MenuItem>
-                          <MenuItem value={'Junior'}>Junior</MenuItem>
-                          <MenuItem value={'Middle'}>Middle</MenuItem>
-                          <MenuItem value={'Senior'}>Senior</MenuItem>
-                        </Select>
-                      </Box>
-                      <Box sx={{ marginTop: 2 }}>
-                        <InputLabel>Type</InputLabel>
-                        <Select
-                          error={(error && error.type) ?? false}
-                          fullWidth
-                          id="typeSelect"
-                          value={type}
-                          onChange={handleChangeType}
-                        >
-                          <MenuItem value={'self-education'}>
-                            Self education
-                          </MenuItem>
-                          <MenuItem value={'with-lector'}>With lector</MenuItem>
-                        </Select>
-                      </Box>
-                      {type == 'with-lector' && (
-                        <TextField
-                          autoComplete="off"
-                          margin="normal"
-                          required
-                          fullWidth
-                          error={(error && error.lector) ?? false}
-                          id="lector"
-                          type="text"
-                          label="Lector"
-                          name="lector"
-                          onChange={(e) => {
-                            setForm({ ...form, lector: e.target.value })
-                            setEditTrigger(true)
-                            setError({})
-                          }}
-                          value={form.lector}
-                        />
-                      )}
-                      {type == 'with-lector' && (
-                        <TextField
-                          autoComplete="off"
-                          margin="normal"
-                          required
-                          fullWidth
-                          id="date"
-                          type="date"
-                          label="Date"
-                          name="date"
-                          onChange={(e) => {
-                            setForm({ ...form, date: e.target.value })
-                            setEditTrigger(true)
-                            setError({})
-                          }}
-                          value={
-                            form.date || new Date().toISOString().split('T')[0]
-                          }
-                          sx={{
-                            marginTop: 3,
-                          }}
-                        />
-                      )}
-                      <Box sx={{ marginTop: 2 }}>
-                        <InputLabel>Status</InputLabel>
-                        <Select
-                          error={(error && error.status) ?? false}
-                          fullWidth
-                          id="statusSelect"
-                          value={status}
-                          onChange={handleChangeStatus}
-                        >
-                          <MenuItem value={'active'}>Active</MenuItem>
-                          <MenuItem value={'draft'}>Draft</MenuItem>
-                        </Select>
-                      </Box>
-                      <Box sx={{ display: 'flex', marginTop: 1 }}>
-                        <Box
-                          sx={{
-                            marginTop: 1,
-                            fontWeight: 'bold',
-                            color: '#000',
-                          }}
-                        >
-                          Rating
-                        </Box>
-                        <Rating
-                          name="rating"
-                          precision={0.1}
-                          onChange={(event, newValue) => {
-                            setRating(newValue ?? 5.0)
-                            setEditTrigger(true)
-                            setError({})
-                          }}
-                          value={rating || 0}
-                          sx={{
-                            marginLeft: 4,
-                            paddingTop: 1,
-                            paddingBottom: 1,
-                          }}
-                        />
-                      </Box>
-                      <Autocomplete
-                        disablePortal
-                        multiple
-                        id="combo-box-demo"
-                        value={categorySelect}
-                        onChange={(event, value: any) => {
-                          setCategorySelect(value)
-                          setEditTrigger(true)
-                          setError({})
-                        }}
-                        getOptionLabel={(option: any) => option.name_of_tag}
-                        options={allCategorySelect}
-                        fullWidth
-                        renderInput={(params) => (
-                          <TextField {...params} label="Category" />
-                        )}
-                        renderOption={(
-                          props: object,
-                          option: any,
-                          state: object,
-                        ) => (
-                          <div
-                            {...props}
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                          >
-                            {option.icon_url && (
-                              <Image
-                                src={option.icon_url}
-                                alt={'tagIcon_' + option.id}
-                                style={{ width: 20, height: 20 }}
-                                width={20}
-                                height={20}
-                              ></Image>
-                            )}
-                            <div
-                              style={{
-                                textAlign: 'left',
-                                width: '100%',
-                                paddingLeft: '10px',
-                              }}
-                            >
-                              {option.name_of_tag}
-                            </div>
-                            <IconButton
-                              key={'deleteButton_' + option.id}
-                              aria-label="delete"
-                              onClick={async (e) => {
-                                const deletingOption = option
-                                const response = await axios.delete(
-                                  urlTag + '?id=' + option.id,
-                                )
-                                const resultResponse = response.data
-                                if (resultResponse) {
-                                  setAllCategorySelect(
-                                    allCategorySelect.filter(
-                                      (category) =>
-                                        category.id !== deletingOption.id,
-                                    ),
-                                  )
-                                  setCategorySelect(
-                                    categorySelect.filter(
-                                      (category) =>
-                                        category.id !== deletingOption.id,
-                                    ),
-                                  )
-                                  Swal.fire({
-                                    title: 'Deleted!',
-                                    background: '#171622',
-                                    color: '#ffec3e',
-                                    confirmButtonColor: '#c58efe',
-                                    icon: 'success',
-                                  })
-                                }
-                              }}
-                            >
-                              <DeleteIcon key={'deleteIcon_'} color="primary" />
-                            </IconButton>
-                          </div>
-                        )}
-                      />
-                      <Button onClick={showSwalTag}>Create Tag</Button>
-
-                      <Autocomplete
-                        disablePortal
-                        multiple
-                        id="skills"
-                        value={skillsSelect}
-                        onChange={(event, value: any) => {
-                          setSkillsSelect(value)
-                          setEditTrigger(true)
-                          setError({})
-                        }}
-                        getOptionLabel={(option: any) => option.name_skill}
-                        options={allSkillSelect}
-                        fullWidth
-                        renderInput={(params) => (
-                          <TextField {...params} label="Skill" />
-                        )}
-                        renderOption={(
-                          props: object,
-                          option: any,
-                          state: object,
-                        ) => (
-                          <div
-                            {...props}
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                          >
-                            <div>{option.name_skill}</div>
-                            <IconButton
-                              key={'deleteButtonSkill_' + option.id}
-                              aria-label="delete"
-                              onClick={async (e) => {
-                                const deletingOption = option
-                                const response = await axios.delete(
-                                  urlSkill + '?id=' + option.id,
-                                )
-                                const resultResponse = response.data
-                                if (resultResponse) {
-                                  setAllSkillSelect(
-                                    allSkillSelect.filter(
-                                      (skill) => skill.id !== deletingOption.id,
-                                    ),
-                                  )
-                                  setSkillsSelect(
-                                    skillsSelect.filter(
-                                      (skill) => skill.id !== deletingOption.id,
-                                    ),
-                                  )
-                                  Swal.fire({
-                                    title: 'Deleted!',
-                                    background: '#171622',
-                                    color: '#ffec3e',
-                                    confirmButtonColor: '#c58efe',
-                                    icon: 'success',
-                                  })
-                                }
-                              }}
-                            >
-                              <DeleteIcon
-                                key={'deleteIconSkill_'}
-                                color="primary"
-                              />
-                            </IconButton>
-                          </div>
-                        )}
-                      />
-                      <Button onClick={showSwalSkill}>Create skill</Button>
-                      <TextField
-                        fullWidth
-                        required
-                        autoComplete="off"
-                        margin="normal"
-                        id="QuestionLimit"
-                        type="number"
-                        label="Question Limit"
-                        name="questionLimit"
-                        InputProps={{
-                          inputProps: { min: -1 },
-                        }}
-                        onChange={(e) => {
-                          setEditTrigger(true)
-                          setForm({
-                            ...form,
-                            questionLimit: Number(e.target.value),
-                          })
-                        }}
-                        value={form.questionLimit ? form.questionLimit : null}
-                      />
-                      {typeof mediaValue?.content == 'string' && (
-                        <>
-                          {mediaValue.type == 'image' ? (
-                            <>
-                              <Image src={mediaValue?.content} alt="" width={1200} height={675} />
-                            </>
-                          ) : (
-                            <>
-                              <video
-                                controls
-                                src={mediaValue?.content}
-                                style={{ width: '100%' }}
-                              />
-                            </>
-                          )}
-                        </>
-                      )}
-                      <Box sx={{ display: 'flex' }}>
-                        <Button
-                          variant="contained"
-                          component="label"
-                          onClick={() => {
-                            setEditTrigger(true)
-                            setError({})
-                            setMediaValue(undefined)
-                          }}
-                          sx={{ mt: 1, mr: 1 }}
-                        >
-                          Remove
-                        </Button>
-
-                        <Button
-                          fullWidth
-                          variant="contained"
-                          component="label"
-                          sx={{ mt: 1 }}
-                        >
-                          <input
-                            type="file"
-                            accept="video/mp4, image/png, image/jpeg"
-                            onChange={handlePreviewMediaChange}
-                          />
-                        </Button>
-                      </Box>
-                      <Box sx={{ display: 'flex' }}>
-                        {isEdited() && (
-                          <Button
-                            variant="contained"
-                            sx={{
-                              marginTop: 2,
-                              fontWeight: 'bold',
-                              width: '12rem',
-                              marginRight: 2,
-                            }}
-                            onClick={(e) => {
-                              setForm({
-                                title: '',
-                                questionLimit: null,
-                                date: new Date().toISOString().split('T')[0],
-                                duration: null,
-                                lector: '',
-                                price: null,
-                                priceDiscount: null,
-                              })
-                              setLessonForm({
-                                title: '',
-                                link: '',
-                                image: '',
-                                hours: 0,
-                                minutes: 0,
-                              })
-                              let selectedModulesArr: Array<Lesson> = []
-                              modules.map((module: Module) => {
-                                module.lessons.map((less: Lesson) => {
-                                  selectedModulesArr.push(less)
-                                })
-                              })
-                              setAllModules([
-                                ...allModules,
-                                ...selectedModulesArr,
-                              ])
-                              setModules([])
-
-                              setRichValue([
-                                {
-                                  type: 'paragaph',
-                                  children: [{ text: '' }],
-                                },
-                              ])
-                              setLanguage('EN')
-                              setLevel('')
-                              setType('')
-                              setStatus('')
-                              setRating(0.0)
-                              setCategorySelect([])
-                              setTabValue(1)
-                              setTimeout(() => {
-                                setTabValue(0)
-                              }, 10)
-                            }}
-                          >
-                            Clear draft
-                          </Button>
-                        )}
-                        <Button
-                          variant="contained"
-                          fullWidth
-                          sx={{
-                            marginTop: 2,
-                            fontWeight: 'bold',
-                          }}
-                          onClick={(e) => {
-                            if (!id && editTrigger) {
-                              handleSubmit('')
-                            }
-                            setTabValue(1)
-                          }}
-                        >
-                          Go to structure
-                        </Button>
-                      </Box>
-                    </Box>
+                    <CourseCreate
+                      error={error}
+                      setError={setError}
+                      id={id}
+                      form={form}
+                      setForm={setForm}
+                      editTrigger={editTrigger}
+                      setEditTrigger={setEditTrigger}
+                      richValue={richValue}
+                      setRichValue={setRichValue}
+                      level={level}
+                      setLevel={setLevel}
+                      type={type}
+                      setType={setType}
+                      status={status}
+                      setStatus={setStatus}
+                      rating={rating}
+                      setRating={setRating}
+                      mediaValue={mediaValue}
+                      setMediaValue={setMediaValue}
+                      categorySelect={categorySelect}
+                      setCategorySelect={setCategorySelect}
+                      allCategorySelect={allCategorySelect}
+                      setAllCategorySelect={setAllCategorySelect}
+                      allSkillSelect={allSkillSelect}
+                      setAllSkillSelect={setAllSkillSelect}
+                      modules={modules}
+                      setModules={setModules}
+                      allModules={allModules}
+                      setAllModules={setAllModules}
+                      setLanguage={setLanguage}
+                      setTabValue={setTabValue}
+                      setLessonForm={setLessonForm}
+                      isEdited={isEdited}
+                      handleSubmit={handleSubmit}
+                    />
                   </CustomTabPanel>
                   <CustomTabPanel value={tabValue} index={1}>
                     <Box sx={{ width: '100%' }}>
@@ -1993,7 +1408,7 @@ const CourseCreate = () => {
                       {lessonType == 'default' && (
                         <LessonCreateDefault
                           startData={lessonForm}
-                          setValue={setTabValue}
+                          setTabValue={setTabValue}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
                           createLessonIndx={createLessonIndx}
@@ -2041,4 +1456,4 @@ const CourseCreate = () => {
   )
 }
 
-export default CourseCreate
+export default Create

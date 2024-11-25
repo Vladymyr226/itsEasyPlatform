@@ -445,7 +445,7 @@ const LessonCreateQuiz = ({
             setValue(1)
           }}
         >
-          Ruturn
+          Return
         </Button>
         <Button
           variant='contained'

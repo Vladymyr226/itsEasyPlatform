@@ -8,8 +8,8 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MyEditor from '@/components/SlateEditor/Editor'
 import YouTube, { YouTubeProps } from 'react-youtube'
-import { YouTubeProp } from '@/utils/interfaces'
-import AWS from 'aws-sdk'
+import { DefaultLessonCreation, YouTubeProp } from '@/utils/interfaces'
+import { uploadFileToS3 } from '@/utils'
 
 function ExampleYouTube(props: YouTubeProp) {
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
@@ -30,21 +30,8 @@ function ExampleYouTube(props: YouTubeProp) {
 }
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 
-interface defaultCreation {
-  setValue: any
-  idLessonEdit: any
-  setIdLessonEdit: any
-  createLessonIndx: any
-  setCreateLessonIndx: any
-  modules: any
-  setModules: any
-  setEditTrigger: any
-  setError: any
-  storedModules: any
-  startData?: any
-}
 const LessonCreateDefault = ({
-  setValue,
+  setTabValue,
   idLessonEdit,
   setIdLessonEdit,
   createLessonIndx,
@@ -55,7 +42,7 @@ const LessonCreateDefault = ({
   setError,
   storedModules,
   startData,
-}: defaultCreation) => {
+}: DefaultLessonCreation) => {
   const [lessonForm, setLessonForm] = useState({
     title: startData ? startData.title : '',
     image: startData ? startData.image : null,
@@ -71,6 +58,17 @@ const LessonCreateDefault = ({
 
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
+
+  useEffect(() => {
+    if (startData && startData.fields) {
+      setLessonModules(
+        startData.fields.map((module: any, i: number) => {
+          return { ...module, tmpId: new Date().getTime() + i }
+        })
+      )
+    }
+  }, [startData])
+
   function handleSort() {
     const lessonClone = [...lessonModules]
     let draggedIdx = -1
@@ -99,53 +97,174 @@ const LessonCreateDefault = ({
       )
     )
   }
-  useEffect(() => {
-    if (startData && startData.fields) {
-      setLessonModules(
-        startData.fields.map((module: any, i: number) => {
-          return { ...module, tmpId: new Date().getTime() + i }
-        })
-      )
-    }
-  }, [startData])
 
-  if (
-    !process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ||
-    !process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ||
-    !process.env.NEXT_PUBLIC_AWS_BUCKET_NAME
-  ) {
-    throw new Error(
-      'Отсутствуют переменные окружения NEXT_PUBLIC_AWS_ACCESS_KEY_ID или NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY или NEXT_PUBLIC_AWS_BUCKET_NAME'
-    )
-  }
-
-  AWS.config.update({
-    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-    region: 'eu-west-3',
-  })
-
-  const s3 = new AWS.S3()
-  const uploadFileToS3 = async (file: File) => {
-    const uploadParams = {
-      Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME ?? '',
-      Key: `${file.name}`,
-      Body: file,
-      ContentType: file.type,
-      ACL: 'public-read',
-    }
-    return new Promise((resolve, reject) => {
-      s3.upload(uploadParams, (err: any, data: any) => {
-        if (err) {
-          console.error('Ошибка загрузки файла:', err)
-
-          reject(`Ошибка загрузки файла: ${err}`)
-        } else {
-          console.log('Файл успешно загружен:', data.Location)
-          resolve(data.Location)
-        }
+  const handleSubmit = async (e: any) => {
+    if (lessonForm.title == '') {
+      Swal.fire({
+        title: 'Lesson title can not be empty!',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
       })
-    })
+      return
+    }
+
+    try {
+      setEditTrigger(true)
+      setError({})
+      if (idLessonEdit) {
+        let found = false
+        storedModules.map((less: any) => {
+          if (less.title == lessonForm.title.trim()) found = true
+        })
+
+        modules.map((module: any) => {
+          module.lessons.map((less: any) => {
+            if (less.title == lessonForm.title.trim() && idLessonEdit != less.id)
+              found = true
+          })
+        })
+
+        if (!found || (startData && startLessonTitle == lessonForm.title)) {
+          const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
+            title: lessonForm.title,
+            fields: lessonModules,
+            image: lessonForm.image,
+            hours: lessonForm.hours,
+            minutes: lessonForm.minutes,
+          })
+          const resultResponse = response.data
+          if (resultResponse) {
+            setModules(
+              modules.map((elem: any, index: any) => {
+                if (createLessonIndx === index) {
+                  return {
+                    title: elem.title,
+                    lessons: elem.lessons.map((lessonFilter: any, lessonIndex: any) => {
+                      if (lessonFilter.id !== idLessonEdit) {
+                        return lessonFilter
+                      }
+                      return {
+                        ...lessonForm,
+                        id: idLessonEdit,
+                        title: lessonForm.title,
+                        fields: lessonModules.map((module: any) => {
+                          return { type: module.type, value: module.value }
+                        }),
+                        type: 'default',
+                      }
+                    }),
+                    image: elem.image,
+                  }
+                }
+                return elem
+              })
+            )
+            setLessonForm({
+              title: '',
+              image: null,
+              hours: 0,
+              minutes: 0,
+            })
+            setIdLessonEdit(null)
+            setTabValue(1)
+          }
+
+        } else {
+          Swal.fire({
+            title: 'Lesson name is already taken!',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#c58efe',
+            icon: 'error',
+          })
+        }
+
+      } else {
+        let found = false
+        storedModules.map((less: any) => {
+          if (less.title == lessonForm.title.trim()) found = true
+        })
+
+        modules.map((module: any) => {
+          module.lessons.map((less: any) => {
+            if (less.title == lessonForm.title.trim()) found = true
+          })
+        })
+
+        if (!found) {
+          const response = await axios.post(urlLesson + '?type=default', {
+            title: lessonForm.title,
+            image: lessonForm.image,
+            hours: lessonForm.hours,
+            minutes: lessonForm.minutes,
+            fields: lessonModules.map((module: any) => {
+              return { type: module.type, value: module.value }
+            }),
+          })
+
+          const resultResponse = response.data
+          if (resultResponse) {
+            setModules(
+              modules.map((modulesElem: any, index: any) => {
+                if (
+                  index == createLessonIndx &&
+                  modulesElem.lessons.filter(
+                    (reDropElem: any) => reDropElem.id === resultResponse.lessonId
+                  ).length === 0
+                ) {
+                  return {
+                    title: modulesElem.title,
+                    lessons: [
+                      ...modulesElem.lessons,
+                      {
+                        ...lessonForm,
+                        id: resultResponse.lessonId,
+                        title: lessonForm.title,
+                        fields: lessonModules.map((module: any) => {
+                          return { type: module.type, value: module.value }
+                        }),
+                        image: lessonForm.image,
+                        type: 'default',
+                      },
+                    ],
+                  }
+                }
+                return modulesElem
+              })
+            )
+
+            setLessonForm({
+              title: '',
+              image: null,
+              hours: 0,
+              minutes: 0,
+            })
+            setCreateLessonIndx(-1)
+            setTabValue(1)
+          }
+        } else {
+          Swal.fire({
+            title: 'Lesson name is already taken!',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#c58efe',
+            icon: 'error',
+          })
+        }
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'Something went wrong!',
+        text: error + '',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
+      return
+    }
   }
 
   return (
@@ -510,10 +629,10 @@ const LessonCreateDefault = ({
             fontWeight: 'bold',
           }}
           onClick={async (e) => {
-            setValue(1)
+            setTabValue(1)
           }}
         >
-          Ruturn
+          Return
         </Button>
         <Button
           variant='contained'
@@ -522,165 +641,7 @@ const LessonCreateDefault = ({
             marginTop: 2,
             fontWeight: 'bold',
           }}
-          onClick={async (e) => {
-            if (lessonForm.title == '') {
-              Swal.fire({
-                title: 'Lesson title can not be empty!',
-                background: '#171622',
-                color: '#ffec3e',
-                confirmButtonColor: '#c58efe',
-                icon: 'error',
-              })
-              return
-            }
-            try {
-              setEditTrigger(true)
-              setError({})
-              if (idLessonEdit) {
-                let found = false
-                storedModules.map((less: any) => {
-                  if (less.title == lessonForm.title.trim()) found = true
-                })
-                modules.map((module: any) => {
-                  module.lessons.map((less: any) => {
-                    if (less.title == lessonForm.title.trim() && idLessonEdit != less.id)
-                      found = true
-                  })
-                })
-                if (!found || (startData && startLessonTitle == lessonForm.title)) {
-                  const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
-                    title: lessonForm.title,
-                    fields: lessonModules,
-                    image: lessonForm.image,
-                    hours: lessonForm.hours,
-                    minutes: lessonForm.minutes,
-                  })
-                  const resultResponse = response.data
-                  if (resultResponse) {
-                    setModules(
-                      modules.map((elem: any, index: any) => {
-                        if (createLessonIndx === index) {
-                          return {
-                            title: elem.title,
-                            lessons: elem.lessons.map((lessonFilter: any, lessonIndex: any) => {
-                              if (lessonFilter.id !== idLessonEdit) {
-                                return lessonFilter
-                              }
-                              return {
-                                ...lessonForm,
-                                id: idLessonEdit,
-                                title: lessonForm.title,
-                                fields: lessonModules.map((module: any) => {
-                                  return { type: module.type, value: module.value }
-                                }),
-                                type: 'default',
-                              }
-                            }),
-                            image: elem.image,
-                          }
-                        }
-                        return elem
-                      })
-                    )
-                    setLessonForm({
-                      title: '',
-                      image: null,
-                      hours: 0,
-                      minutes: 0,
-                    })
-                    setIdLessonEdit(null)
-                    setValue(1)
-                  }
-                } else {
-                  Swal.fire({
-                    title: 'Lesson name is already taken!',
-                    background: '#171622',
-                    color: '#ffec3e',
-                    confirmButtonColor: '#c58efe',
-                    icon: 'error',
-                  })
-                }
-              } else {
-                let found = false
-                storedModules.map((less: any) => {
-                  if (less.title == lessonForm.title.trim()) found = true
-                })
-                modules.map((module: any) => {
-                  module.lessons.map((less: any) => {
-                    if (less.title == lessonForm.title.trim()) found = true
-                  })
-                })
-                if (!found) {
-                  const response = await axios.post(urlLesson + '?type=default', {
-                    title: lessonForm.title,
-                    image: lessonForm.image,
-                    hours: lessonForm.hours,
-                    minutes: lessonForm.minutes,
-                    fields: lessonModules.map((module: any) => {
-                      return { type: module.type, value: module.value }
-                    }),
-                  })
-                  const resultResponse = response.data
-                  if (resultResponse) {
-                    setModules(
-                      modules.map((modulesElem: any, index: any) => {
-                        if (
-                          index == createLessonIndx &&
-                          modulesElem.lessons.filter(
-                            (reDropElem: any) => reDropElem.id === resultResponse.lessonId
-                          ).length === 0
-                        ) {
-                          return {
-                            title: modulesElem.title,
-                            lessons: [
-                              ...modulesElem.lessons,
-                              {
-                                ...lessonForm,
-                                id: resultResponse.lessonId,
-                                title: lessonForm.title,
-                                fields: lessonModules.map((module: any) => {
-                                  return { type: module.type, value: module.value }
-                                }),
-                                image: lessonForm.image,
-                                type: 'default',
-                              },
-                            ],
-                          }
-                        }
-                        return modulesElem
-                      })
-                    )
-                    setLessonForm({
-                      title: '',
-                      image: null,
-                      hours: 0,
-                      minutes: 0,
-                    })
-                    setCreateLessonIndx(-1)
-                    setValue(1)
-                  }
-                } else {
-                  Swal.fire({
-                    title: 'Lesson name is already taken!',
-                    background: '#171622',
-                    color: '#ffec3e',
-                    confirmButtonColor: '#c58efe',
-                    icon: 'error',
-                  })
-                }
-              }
-            } catch (error) {
-              Swal.fire({
-                title: 'Something went wrong!',
-                text: error + '',
-                background: '#171622',
-                color: '#ffec3e',
-                confirmButtonColor: '#c58efe',
-                icon: 'error',
-              })
-              return
-            }
-          }}
+          onClick={handleSubmit}
         >
           {idLessonEdit ? 'Save' : 'Create'}
         </Button>
