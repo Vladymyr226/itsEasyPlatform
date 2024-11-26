@@ -20,8 +20,8 @@ interface practiceCreation {
   setModules: any
   setEditTrigger: any
   setError: any
-  storedModules: any
-  startData?: any
+  storedLessons: any
+  lessonForm?: any
 }
 const LessonCreatePractice = ({
   setValue,
@@ -33,16 +33,16 @@ const LessonCreatePractice = ({
   setModules,
   setEditTrigger,
   setError,
-  storedModules,
-  startData,
+  storedLessons,
+  lessonForm,
 }: practiceCreation) => {
-  const [lessonForm, setLessonForm] = useState({
-    title: startData ? startData.title : '',
-    hours: startData ? startData.hours : 0,
-    minutes: startData ? startData.minutes : 0,
+  const [lessonFormCurrent, setLessonFormCurrent] = useState({
+    title: lessonForm ? lessonForm.title : '',
+    hours: lessonForm ? lessonForm.hours : 0,
+    minutes: lessonForm ? lessonForm.minutes : 0,
   })
   const [taskModules, setTaskModules] = useState<any>(
-    startData && startData.fields ? startData.fields : []
+    lessonForm && lessonForm.fields ? lessonForm.fields : []
   )
   const [displayDrag, setDisplayDrag] = useState<any>(true)
 
@@ -77,14 +77,14 @@ const LessonCreatePractice = ({
     )
   }
   useEffect(() => {
-    if (startData && startData.fields) {
+    if (lessonForm && lessonForm.fields) {
       setTaskModules(
-        startData.fields.map((module: any, i: number) => {
+        lessonForm.fields.map((module: any, i: number) => {
           return { ...module, tmpId: new Date().getTime() + i }
         })
       )
     }
-  }, [startData])
+  }, [lessonForm])
   return (
     <Box>
       <Box sx={{ display: 'flex' }}>
@@ -99,9 +99,9 @@ const LessonCreatePractice = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, hours: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, hours: e.target.value })
           }}
-          value={lessonForm.hours}
+          value={lessonFormCurrent.hours}
         />
         <TextField
           margin='normal'
@@ -114,9 +114,9 @@ const LessonCreatePractice = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, minutes: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, minutes: e.target.value })
           }}
-          value={lessonForm.minutes}
+          value={lessonFormCurrent.minutes}
         />
       </Box>
       <Box sx={{ display: 'flex', gap: 1 }}>
@@ -131,9 +131,9 @@ const LessonCreatePractice = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, title: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, title: e.target.value })
           }}
-          value={lessonForm.title}
+          value={lessonFormCurrent.title}
         />
       </Box>
       <Box sx={{ width: '100%' }}>
@@ -370,7 +370,7 @@ const LessonCreatePractice = ({
             fontWeight: 'bold',
           }}
           onClick={async (e) => {
-            if (lessonForm.title == '') {
+            if (lessonFormCurrent.title == '') {
               Swal.fire({
                 title: 'Lesson title can not be empty!',
                 background: '#171622',
@@ -385,21 +385,21 @@ const LessonCreatePractice = ({
               setError({})
               if (idLessonEdit) {
                 let found = false
-                storedModules.map((less: any) => {
-                  if (less.title == lessonForm.title.trim()) found = true
+                storedLessons.map((less: any) => {
+                  if (less.title == lessonFormCurrent.title.trim()) found = true
                 })
                 modules.map((module: any) => {
                   module.lessons.map((less: any) => {
-                    if (less.title == lessonForm.title.trim() && idLessonEdit != less.id)
+                    if (less.title == lessonFormCurrent.title.trim() && idLessonEdit != less.id)
                       found = true
                   })
                 })
                 if (!found) {
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
-                    title: lessonForm.title,
+                    title: lessonFormCurrent.title,
                     fields: taskModules,
-                    hours: lessonForm.hours,
-                    minutes: lessonForm.minutes,
+                    hours: lessonFormCurrent.hours,
+                    minutes: lessonFormCurrent.minutes,
                   })
                   const resultResponse = response.data
                   if (resultResponse) {
@@ -413,9 +413,9 @@ const LessonCreatePractice = ({
                                 return lessonFilter
                               }
                               return {
-                                ...lessonForm,
+                                ...lessonFormCurrent,
                                 id: idLessonEdit,
-                                title: lessonForm.title,
+                                title: lessonFormCurrent.title,
                                 fields: taskModules.map((module: any) => {
                                   return { type: module.type, value: module.value }
                                 }),
@@ -427,7 +427,7 @@ const LessonCreatePractice = ({
                         return elem
                       })
                     )
-                    setLessonForm({
+                    setLessonFormCurrent({
                       title: '',
                       hours: 0,
                       minutes: 0,
@@ -446,19 +446,19 @@ const LessonCreatePractice = ({
                 }
               } else {
                 let found = false
-                storedModules.map((less: any) => {
-                  if (less.title == lessonForm.title.trim()) found = true
+                storedLessons.map((less: any) => {
+                  if (less.title == lessonFormCurrent.title.trim()) found = true
                 })
                 modules.map((module: any) => {
                   module.lessons.map((less: any) => {
-                    if (less.title == lessonForm.title.trim()) found = true
+                    if (less.title == lessonFormCurrent.title.trim()) found = true
                   })
                 })
                 if (!found) {
                   const response = await axios.post(urlLesson + '?type=practice', {
-                    title: lessonForm.title,
-                    hours: lessonForm.hours,
-                    minutes: lessonForm.minutes,
+                    title: lessonFormCurrent.title,
+                    hours: lessonFormCurrent.hours,
+                    minutes: lessonFormCurrent.minutes,
                     fields: taskModules.map((module: any) => {
                       return { type: module.type, value: module.value }
                     }),
@@ -478,9 +478,9 @@ const LessonCreatePractice = ({
                             lessons: [
                               ...modulesElem.lessons,
                               {
-                                ...lessonForm,
+                                ...lessonFormCurrent,
                                 id: resultResponse.lessonId,
-                                title: lessonForm.title,
+                                title: lessonFormCurrent.title,
                                 fields: taskModules.map((module: any) => {
                                   return { type: module.type, value: module.value }
                                 }),
@@ -492,7 +492,7 @@ const LessonCreatePractice = ({
                         return modulesElem
                       })
                     )
-                    setLessonForm({
+                    setLessonFormCurrent({
                       title: '',
                       hours: 0,
                       minutes: 0,

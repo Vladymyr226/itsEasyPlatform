@@ -10,31 +10,25 @@ export interface TabPanelProps {
   value: number
 }
 
-export interface DefaultLessonCreation {
-  setTabValue: any
-  idLessonEdit: any
-  setIdLessonEdit: any
-  createLessonIndx: any
-  setCreateLessonIndx: any
-  modules: any
-  setModules: any
-  setEditTrigger: any
-  setError: any
-  storedModules: any
-  startData?: any
+export interface LessonField {
+  tmpId: number
+  type: string
+  value: any
 }
-
 
 export interface Lesson {
   id?: string
+  title: string
+  link: string
   image?: string
   questionLimit?: number
-  type: string
-  title: string
-  description: any
-  link: string
-  language: Language
-  en_id: string
+  type?: string
+  description?: any
+  language?: Language
+  en_id?: string
+  hours?: number
+  minutes?: number
+  fields?: LessonField[]
 }
 
 export interface LessonData {

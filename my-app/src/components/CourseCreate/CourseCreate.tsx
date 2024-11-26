@@ -39,7 +39,7 @@ const CourseCreate = ({
   allCategorySelect, setAllCategorySelect,
   allSkillSelect, setAllSkillSelect,
   modules, setModules,
-  allModules, setAllModules,
+  allLessons, setAllLessons,
   setLessonForm,
   setLanguage,
   setTabValue,
@@ -74,12 +74,12 @@ const CourseCreate = ({
   setAllSkillSelect: React.Dispatch<React.SetStateAction<Skill[]>>,
   modules: Module[],
   setModules: React.Dispatch<React.SetStateAction<Module[]>>,
-  allModules: Lesson[],
-  setAllModules: React.Dispatch<React.SetStateAction<Lesson[]>>,
+  allLessons: Lesson[],
+  setAllLessons: React.Dispatch<React.SetStateAction<Lesson[]>>,
 
   setLanguage: React.Dispatch<React.SetStateAction<Language>>,
   setTabValue: React.Dispatch<React.SetStateAction<number>>,
-  setLessonForm: React.Dispatch<any>,
+  setLessonForm: React.Dispatch<React.SetStateAction<Lesson>>,
   isEdited: () => boolean,
   handleSubmit: (e: any) => Promise<void>,
 }) => {
@@ -113,6 +113,57 @@ const CourseCreate = ({
         content: event.target.files[0],
       })
     }
+  }
+
+  const handleClearDraft = (e: any) => {
+    setForm({
+      title: '',
+      questionLimit: null,
+      date: new Date().toISOString().split('T')[0],
+      duration: null,
+      lector: '',
+      price: null,
+      priceDiscount: null,
+    })
+
+    setLessonForm({
+      title: '',
+      link: '',
+      image: '',
+      hours: 0,
+      minutes: 0,
+    })
+
+    let selectedModulesArr: Array<Lesson> = []
+    modules.map((module: Module) => {
+      module.lessons.map((less: Lesson) => {
+        selectedModulesArr.push(less)
+      })
+    })
+
+    setAllLessons([
+      ...allLessons,
+      ...selectedModulesArr,
+    ])
+    setModules([])
+
+    setRichValue([
+      {
+        type: 'paragaph',
+        children: [{ text: '' }],
+      },
+    ])
+
+    setLanguage('EN')
+    setLevel('')
+    setType('')
+    setStatus('')
+    setRating(0.0)
+    setCategorySelect([])
+    setTabValue(1)
+    setTimeout(() => {
+      setTabValue(0)
+    }, 10)
   }
 
   const showSwalSkill = () => {
@@ -210,6 +261,116 @@ const CourseCreate = ({
       }
     })
   }
+
+  const renderOptionTag = (props: object, option: any, state: object) => (
+    <div
+      {...props}
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+      }}
+    >
+      {option.icon_url && (
+        <Image
+          src={option.icon_url}
+          alt={'tagIcon_' + option.id}
+          style={{ width: 20, height: 20 }}
+          width={20}
+          height={20}
+        ></Image>
+      )}
+      <div
+        style={{
+          textAlign: 'left',
+          width: '100%',
+          paddingLeft: '10px',
+        }}
+      >
+        {option.name_of_tag}
+      </div>
+      <IconButton
+        key={'deleteButton_' + option.id}
+        aria-label="delete"
+        onClick={async (e) => {
+          const deletingOption = option
+          const response = await axios.delete(
+            urlTag + '?id=' + option.id,
+          )
+          const resultResponse = response.data
+          if (resultResponse) {
+            setAllCategorySelect(
+              allCategorySelect.filter(
+                (category) =>
+                  category.id !== deletingOption.id,
+              ),
+            )
+            setCategorySelect(
+              categorySelect.filter(
+                (category) =>
+                  category.id !== deletingOption.id,
+              ),
+            )
+            Swal.fire({
+              title: 'Deleted!',
+              background: '#171622',
+              color: '#ffec3e',
+              confirmButtonColor: '#c58efe',
+              icon: 'success',
+            })
+          }
+        }}
+      >
+        <DeleteIcon key={'deleteIcon_'} color="primary" />
+      </IconButton>
+    </div>
+  )
+
+  const renderOptionSkill = (props: object, option: any, state: object) => (
+    <div
+      {...props}
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+      }}
+    >
+      <div>{option.name_skill}</div>
+      <IconButton
+        key={'deleteButtonSkill_' + option.id}
+        aria-label="delete"
+        onClick={async (e) => {
+          const deletingOption = option
+          const response = await axios.delete(
+            urlSkill + '?id=' + option.id,
+          )
+          const resultResponse = response.data
+          if (resultResponse) {
+            setAllSkillSelect(
+              allSkillSelect.filter(
+                (skill) => skill.id !== deletingOption.id,
+              ),
+            )
+            setSkillsSelect(
+              skillsSelect.filter(
+                (skill) => skill.id !== deletingOption.id,
+              ),
+            )
+            Swal.fire({
+              title: 'Deleted!',
+              background: '#171622',
+              color: '#ffec3e',
+              confirmButtonColor: '#c58efe',
+              icon: 'success',
+            })
+          }
+        }}
+      >
+        <DeleteIcon
+          key={'deleteIconSkill_'}
+          color="primary"
+        />
+      </IconButton>
+    </div>
+  )
 
   return <Box sx={{ color: '#fff' }}>
     <TextField
@@ -318,9 +479,7 @@ const CourseCreate = ({
         value={type}
         onChange={handleChangeType}
       >
-        <MenuItem value={'self-education'}>
-          Self education
-        </MenuItem>
+        <MenuItem value={'self-education'}>Self education</MenuItem>
         <MenuItem value={'with-lector'}>With lector</MenuItem>
       </Select>
     </Box>
@@ -405,6 +564,7 @@ const CourseCreate = ({
         }}
       />
     </Box>
+
     <Autocomplete
       disablePortal
       multiple
@@ -421,72 +581,7 @@ const CourseCreate = ({
       renderInput={(params) => (
         <TextField {...params} label="Category" />
       )}
-      renderOption={(
-        props: object,
-        option: any,
-        state: object,
-      ) => (
-        <div
-          {...props}
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          {option.icon_url && (
-            <Image
-              src={option.icon_url}
-              alt={'tagIcon_' + option.id}
-              style={{ width: 20, height: 20 }}
-              width={20}
-              height={20}
-            ></Image>
-          )}
-          <div
-            style={{
-              textAlign: 'left',
-              width: '100%',
-              paddingLeft: '10px',
-            }}
-          >
-            {option.name_of_tag}
-          </div>
-          <IconButton
-            key={'deleteButton_' + option.id}
-            aria-label="delete"
-            onClick={async (e) => {
-              const deletingOption = option
-              const response = await axios.delete(
-                urlTag + '?id=' + option.id,
-              )
-              const resultResponse = response.data
-              if (resultResponse) {
-                setAllCategorySelect(
-                  allCategorySelect.filter(
-                    (category) =>
-                      category.id !== deletingOption.id,
-                  ),
-                )
-                setCategorySelect(
-                  categorySelect.filter(
-                    (category) =>
-                      category.id !== deletingOption.id,
-                  ),
-                )
-                Swal.fire({
-                  title: 'Deleted!',
-                  background: '#171622',
-                  color: '#ffec3e',
-                  confirmButtonColor: '#c58efe',
-                  icon: 'success',
-                })
-              }
-            }}
-          >
-            <DeleteIcon key={'deleteIcon_'} color="primary" />
-          </IconButton>
-        </div>
-      )}
+      renderOption={renderOptionTag}
     />
     <Button onClick={showSwalTag}>Create Tag</Button>
 
@@ -506,58 +601,10 @@ const CourseCreate = ({
       renderInput={(params) => (
         <TextField {...params} label="Skill" />
       )}
-      renderOption={(
-        props: object,
-        option: any,
-        state: object,
-      ) => (
-        <div
-          {...props}
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>{option.name_skill}</div>
-          <IconButton
-            key={'deleteButtonSkill_' + option.id}
-            aria-label="delete"
-            onClick={async (e) => {
-              const deletingOption = option
-              const response = await axios.delete(
-                urlSkill + '?id=' + option.id,
-              )
-              const resultResponse = response.data
-              if (resultResponse) {
-                setAllSkillSelect(
-                  allSkillSelect.filter(
-                    (skill) => skill.id !== deletingOption.id,
-                  ),
-                )
-                setSkillsSelect(
-                  skillsSelect.filter(
-                    (skill) => skill.id !== deletingOption.id,
-                  ),
-                )
-                Swal.fire({
-                  title: 'Deleted!',
-                  background: '#171622',
-                  color: '#ffec3e',
-                  confirmButtonColor: '#c58efe',
-                  icon: 'success',
-                })
-              }
-            }}
-          >
-            <DeleteIcon
-              key={'deleteIconSkill_'}
-              color="primary"
-            />
-          </IconButton>
-        </div>
-      )}
+      renderOption={renderOptionSkill}
     />
     <Button onClick={showSwalSkill}>Create skill</Button>
+
     <TextField
       fullWidth
       required
@@ -633,52 +680,7 @@ const CourseCreate = ({
             width: '12rem',
             marginRight: 2,
           }}
-          onClick={(e) => {
-            setForm({
-              title: '',
-              questionLimit: null,
-              date: new Date().toISOString().split('T')[0],
-              duration: null,
-              lector: '',
-              price: null,
-              priceDiscount: null,
-            })
-            setLessonForm({
-              title: '',
-              link: '',
-              image: '',
-              hours: 0,
-              minutes: 0,
-            })
-            let selectedModulesArr: Array<Lesson> = []
-            modules.map((module: Module) => {
-              module.lessons.map((less: Lesson) => {
-                selectedModulesArr.push(less)
-              })
-            })
-            setAllModules([
-              ...allModules,
-              ...selectedModulesArr,
-            ])
-            setModules([])
-
-            setRichValue([
-              {
-                type: 'paragaph',
-                children: [{ text: '' }],
-              },
-            ])
-            setLanguage('EN')
-            setLevel('')
-            setType('')
-            setStatus('')
-            setRating(0.0)
-            setCategorySelect([])
-            setTabValue(1)
-            setTimeout(() => {
-              setTabValue(0)
-            }, 10)
-          }}
+          onClick={handleClearDraft}
         >
           Clear draft
         </Button>

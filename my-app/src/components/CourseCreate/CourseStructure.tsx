@@ -1,11 +1,9 @@
-import { useState } from 'react'
 import Swal from 'sweetalert2'
-import YouTube, { YouTubeProps } from 'react-youtube'
 import axios from 'axios'
 
-import SlateView from '@/components/SlateEditor/View'
 import { removeLessonIds } from '@/utils/removeAllLessonId'
-import { Lesson, Module, YouTubeProp } from '@/utils/interfaces'
+import { Lesson, Module } from '@/utils/interfaces'
+import LessonBox from './LessonBox'
 
 import {
   Accordion,
@@ -20,38 +18,19 @@ import {
 
 import {
   Delete as DeleteIcon,
-  DragIndicator as DragIndicatorIcon,
-  Edit as EditIcon,
   ExpandMore as ExpandMoreIcon,
-  Preview as PreviewIcon,
 } from '@mui/icons-material'
 
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
-
-const ExampleYouTube = (props: YouTubeProp) => {
-  const onPlayerReady: YouTubeProps['onReady'] = (event) => {
-    event.target.pauseVideo()
-  }
-
-  const opts: YouTubeProps['opts'] = {
-    height: '390',
-    width: '100%',
-    playerVars: {
-      autoplay: 1,
-    },
-  }
-
-  return <YouTube videoId={props.url} opts={opts} onReady={onPlayerReady} />
-}
 
 const CourseStructure = ({
   dragLesson,
   draggedOverLesson,
   modules, setModules,
-  allModules, setAllModules,
+  allLessons, setAllLessons,
   idLessonEdit, setIdLessonEdit,
   createLessonIndx, setCreateLessonIndx,
-  storedModules, setStoredModules,
+  storedLessons, setStoredLessons,
   setEditTrigger,
   setError,
   setLessonForm,
@@ -63,23 +42,21 @@ const CourseStructure = ({
 
   modules: Module[],
   setModules: React.Dispatch<React.SetStateAction<Module[]>>,
-  allModules: Lesson[],
-  setAllModules: React.Dispatch<React.SetStateAction<Lesson[]>>,
+  allLessons: Lesson[],
+  setAllLessons: React.Dispatch<React.SetStateAction<Lesson[]>>,
   idLessonEdit: string | null,
   setIdLessonEdit: React.Dispatch<React.SetStateAction<string | null>>,
   createLessonIndx: number,
   setCreateLessonIndx: React.Dispatch<React.SetStateAction<number>>,
-  storedModules: Lesson[],
-  setStoredModules: React.Dispatch<React.SetStateAction<Lesson[]>>,
+  storedLessons: Lesson[],
+  setStoredLessons: React.Dispatch<React.SetStateAction<Lesson[]>>,
 
   setEditTrigger: React.Dispatch<React.SetStateAction<boolean>>,
   setError: React.Dispatch<any>,
-  setLessonForm: React.Dispatch<any>,
+  setLessonForm: React.Dispatch<React.SetStateAction<Lesson>>,
   setLessonType: React.Dispatch<React.SetStateAction<string>>,
   setTabValue: React.Dispatch<React.SetStateAction<number>>,
 }) => {
-
-  const [preview, setPreview] = useState('-1')
 
   const countModuleNameMeet = (str: string) => {
     const result = modules.filter((module) => module.title.trim() == str.trim())
@@ -87,42 +64,91 @@ const CourseStructure = ({
     return result.length
   }
 
-  const handleSort = (lessonsGet: any, i: number) => {
-    const lessonClone = [...lessonsGet]
-    let draggedIdx = -1
-    const temp = lessonClone.filter((less, i) => {
-      if (less.id == dragLesson.current) {
-        draggedIdx = i
-        return less
-      }
-    })[0]
-    lessonClone.splice(
-      draggedOverLesson.current > draggedIdx
-        ? draggedOverLesson.current + 1
-        : draggedOverLesson.current,
-      0,
-      temp,
-    )
+  const handleChangeStoredLessons = (value: any, i: number) => {
     setEditTrigger(true)
-    setModules(
-      modules.map((module: any, moduleIndex) => {
-        if (moduleIndex == i) {
-          return {
-            title: module.title,
-            lessons: lessonClone.filter(
-              (less, i) =>
-                less.id != dragLesson.current ||
-                i ==
-                  (draggedOverLesson.current > draggedIdx
-                    ? draggedOverLesson.current + 1
-                    : draggedOverLesson.current),
-            ),
-          }
-        }
-        return module
-      }),
-    )
+    setError({})
+    if (value) {
+      setModules(
+        modules.map(
+          (modulesElem, index) => {
+            if (
+              index == i &&
+              modulesElem.lessons.filter(
+                (reDropElem) =>
+                  reDropElem.id ===
+                  value.id,
+              ).length === 0
+            ) {
+              setStoredLessons(storedLessons.filter(l => l.id != value.id))
+              return {
+                title: modulesElem.title,
+                lessons: [
+                  ...modulesElem.lessons,
+                  {
+                    ...value,
+                  },
+                ],
+              }
+            }
+            return modulesElem
+          },
+        ),
+      )
+    }
   }
+
+  const renderOptionStoredLessons = (props: object, option: any, state: object) => (
+    <div
+      // {...props}
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+      }}
+    >
+      <div
+        {...props}
+        style={{ width: '100%' }}
+      >
+        {option.title}
+      </div>
+      <IconButton
+        key={'deleteButton_' + option.id}
+        aria-label="delete"
+        onClick={async (e) => {
+          Swal.fire({
+            title:
+              'Do you want to delete the lesson?',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#ff2052',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              removeLessonIds(option.id)
+              const response =
+                await axios.delete(
+                  urlLesson +
+                    '?id=' +
+                    option.id,
+                )
+              const resultResponse =
+                response.data
+              if (resultResponse) {
+                setStoredLessons(storedLessons.filter(l => l.id != option.id))
+              }
+            }
+          })
+        }}
+        sx={{}}
+      >
+        <DeleteIcon
+          key={'deleteIcon_'}
+          color="primary"
+        />
+      </IconButton>
+    </div>
+  )
 
   return <Box sx={{ width: '100%' }}>
     <Box
@@ -200,8 +226,8 @@ const CourseStructure = ({
                             if (i !== index) {
                               return moduleElem
                             }
-                            setAllModules([
-                              ...allModules,
+                            setAllLessons([
+                              ...allLessons,
                               ...moduleElem.lessons,
                             ])
                           },
@@ -229,159 +255,29 @@ const CourseStructure = ({
                   }}
                 >
                   <Box sx={{ width: '100%' }}>
-                    {element.lessons.map((lesson, index) => {
-                      return (
-                        <div
-                          key={'mainModuleContainer_' + i}
-                          style={{
-                            color: '#0f0e16',
-                            width: '100%',
-                            background: '#cccccc',
-                            marginTop: '16px',
-                            padding: '16px',
-                            boxShadow:
-                              '0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)',
-                          }}
-                          draggable
-                          onDragStart={() =>
-                            (dragLesson.current = lesson.id)
-                          }
-                          onDragEnter={() =>
-                            (draggedOverLesson.current =
-                              index)
-                          }
-                          onDragEnd={(e) =>
-                            handleSort(element.lessons, i)
-                          }
-                          onDragOver={(e) =>
-                            e.preventDefault()
-                          }
-                        >
-                          <Box
-                            sx={{ display: 'flex', gap: 1 }}
-                          >
-                            <DragIndicatorIcon />
-                            <Box sx={{ fontWeight: 'bold' }}>
-                              {lesson.title ?? ''}
-                            </Box>
-                          </Box>
-
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'end',
-                            }}
-                          >
-                            {lesson.type == 'defaultOld' && (
-                              <IconButton
-                                onClick={(e) => {
-                                  setPreview(
-                                    lesson.id == preview
-                                      ? '-1'
-                                      : (lesson.id ?? '-1'),
-                                  )
-                                }}
-                              >
-                                <PreviewIcon />
-                              </IconButton>
-                            )}
-                            <IconButton
-                              onClick={(e) => {
-                                setIdLessonEdit(
-                                  idLessonEdit == lesson.id
-                                    ? null
-                                    : lesson.id
-                                      ? lesson.id
-                                      : null,
-                                )
-                                setLessonForm(lesson)
-                                setCreateLessonIndx(i)
-                                setLessonType(lesson.type)
-                                setTabValue(2)
-                              }}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                            <IconButton
-                              onClick={async (e) => {
-                                setEditTrigger(true)
-                                setError({})
-                                setStoredModules([
-                                  ...storedModules,
-                                  lesson,
-                                ])
-                                setModules(
-                                  modules.map(
-                                    (elem, index) => {
-                                      if (i === index) {
-                                        return {
-                                          title: elem.title,
-                                          lessons:
-                                            elem.lessons.filter(
-                                              (
-                                                lessonFilter,
-                                                lessonIndex,
-                                              ) => {
-                                                if (
-                                                  lessonFilter.id !==
-                                                  lesson.id
-                                                ) {
-                                                  return lessonFilter
-                                                }
-                                                setStoredModules(
-                                                  [
-                                                    ...storedModules,
-                                                    lessonFilter,
-                                                  ],
-                                                )
-                                              },
-                                            ),
-                                        }
-                                      }
-                                      return elem
-                                    },
-                                  ),
-                                )
-                              }}
-                            >
-                              <DeleteIcon color="error" />
-                            </IconButton>
-                          </Box>
-                          {preview == lesson.id &&
-                            idLessonEdit != lesson.id && (
-                              <>
-                                <Box
-                                  sx={{
-                                    paddingLeft: '16px',
-                                    maxHeight: '10rem',
-                                    overflow: 'auto',
-                                    scrollbarWidth: 'none',
-                                  }}
-                                >
-                                  <SlateView
-                                    value={lesson.description}
-                                  />
-                                </Box>
-                                <Box
-                                  sx={{
-                                    overflow: 'auto',
-                                    scrollbarWidth: 'none',
-                                    marginTop: 2,
-                                  }}
-                                >
-                                  <ExampleYouTube
-                                    url={
-                                      lesson.link.split(
-                                        '?v=',
-                                      )[1]
-                                    }
-                                  />
-                                </Box>
-                              </>
-                            )}
-                        </div>
-                      )
-                    })}
+                    {element.lessons.map((lesson, index) =>
+                      <LessonBox
+                        key={'mainLessonContainer_' + index}
+                        element={element}
+                        i={i}
+                        lesson={lesson}
+                        index={index}
+                        dragLesson={dragLesson}
+                        draggedOverLesson={draggedOverLesson}
+                        modules={modules}
+                        setModules={setModules}
+                        idLessonEdit={idLessonEdit}
+                        setIdLessonEdit={setIdLessonEdit}
+                        storedLessons={storedLessons}
+                        setStoredLessons={setStoredLessons}
+                        setEditTrigger={setEditTrigger}
+                        setLessonForm={setLessonForm}
+                        setCreateLessonIndx={setCreateLessonIndx}
+                        setLessonType={setLessonType}
+                        setTabValue={setTabValue}
+                        setError={setError}
+                      />
+                    )}
                   </Box>
                 </Box>
                 <Box
@@ -400,7 +296,7 @@ const CourseStructure = ({
                       getOptionLabel={(option: any) =>
                         option.title
                       }
-                      options={storedModules}
+                      options={storedLessons}
                       value={{ title: '' }}
                       fullWidth
                       renderInput={(params) => (
@@ -409,106 +305,8 @@ const CourseStructure = ({
                           label="Stored lessons"
                         />
                       )}
-                      onChange={(event, value: any) => {
-                        setEditTrigger(true)
-                        setError({})
-                        if (value) {
-                          setModules(
-                            modules.map(
-                              (modulesElem, index) => {
-                                if (
-                                  index == i &&
-                                  modulesElem.lessons.filter(
-                                    (reDropElem) =>
-                                      reDropElem.id ===
-                                      value.id,
-                                  ).length === 0
-                                ) {
-                                  setStoredModules(
-                                    storedModules.filter(
-                                      (storedModule) =>
-                                        storedModule.id !=
-                                        value.id,
-                                    ),
-                                  )
-                                  return {
-                                    title: modulesElem.title,
-                                    lessons: [
-                                      ...modulesElem.lessons,
-                                      {
-                                        ...value,
-                                      },
-                                    ],
-                                  }
-                                }
-                                return modulesElem
-                              },
-                            ),
-                          )
-                        }
-                      }}
-                      renderOption={(
-                        props: object,
-                        option: any,
-                        state: object,
-                      ) => (
-                        <div
-                          // {...props}
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <div
-                            {...props}
-                            style={{ width: '100%' }}
-                          >
-                            {option.title}
-                          </div>
-                          <IconButton
-                            key={'deleteButton_' + option.id}
-                            aria-label="delete"
-                            onClick={async (e) => {
-                              Swal.fire({
-                                title:
-                                  'Do you want to delete the lesson?',
-                                background: '#171622',
-                                color: '#ffec3e',
-                                confirmButtonColor: '#ff2052',
-                                showCancelButton: true,
-                                confirmButtonText: 'Delete',
-                              }).then(async (result) => {
-                                if (result.isConfirmed) {
-                                  removeLessonIds(option.id)
-                                  const response =
-                                    await axios.delete(
-                                      urlLesson +
-                                        '?id=' +
-                                        option.id,
-                                    )
-                                  const resultResponse =
-                                    response.data
-                                  if (resultResponse) {
-                                    setStoredModules(
-                                      storedModules.filter(
-                                        (lesson) =>
-                                          lesson.id !=
-                                          option.id,
-                                      ),
-                                    )
-                                  }
-                                }
-                              })
-                            }}
-                            sx={{}}
-                          >
-                            <DeleteIcon
-                              key={'deleteIcon_'}
-                              color="primary"
-                            />
-                          </IconButton>
-                        </div>
-                      )}
+                      onChange={(event: any, value: any) => handleChangeStoredLessons(value, i)}
+                      renderOption={renderOptionStoredLessons}
                     />
                   </Box>
                 </Box>
@@ -527,7 +325,8 @@ const CourseStructure = ({
                       )
                       setLessonForm({
                         title: '',
-                        image: null,
+                        link: '',
+                        image: '',
                         hours: 0,
                         minutes: 0,
                       })

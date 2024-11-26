@@ -19,8 +19,8 @@ interface quizCreation {
   setModules: any
   setEditTrigger: any
   setError: any
-  storedModules: any
-  startData?: any
+  storedLessons: any
+  lessonForm?: any
 }
 const LessonCreateQuiz = ({
   setValue,
@@ -32,16 +32,16 @@ const LessonCreateQuiz = ({
   setModules,
   setEditTrigger,
   setError,
-  storedModules,
-  startData,
+  storedLessons,
+  lessonForm,
 }: quizCreation) => {
-  const [lessonForm, setLessonForm] = useState({
-    title: startData ? startData.title : '',
-    hours: startData ? startData.hours : 0,
-    minutes: startData ? startData.minutes : 0,
+  const [lessonFormCurrent, setLessonFormCurrent] = useState({
+    title: lessonForm ? lessonForm.title : '',
+    hours: lessonForm ? lessonForm.hours : 0,
+    minutes: lessonForm ? lessonForm.minutes : 0,
   })
   const [questionModules, setQuestionModules] = useState<any>(
-    startData && startData.questions ? startData.questions : []
+    lessonForm && lessonForm.questions ? lessonForm.questions : []
   )
 
   function compareIsLessonEdited(lessonId: string, moduleI: number) {
@@ -79,9 +79,9 @@ const LessonCreateQuiz = ({
       check = true
     }
     return (
-      lessonToCompare[0].hours === lessonForm.hours &&
-      lessonToCompare[0].minutes === lessonForm.minutes &&
-      lessonToCompare[0].title === lessonForm.title &&
+      lessonToCompare[0].hours === lessonFormCurrent.hours &&
+      lessonToCompare[0].minutes === lessonFormCurrent.minutes &&
+      lessonToCompare[0].title === lessonFormCurrent.title &&
       !check
     )
   }
@@ -138,9 +138,9 @@ const LessonCreateQuiz = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, hours: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, hours: e.target.value })
           }}
-          value={lessonForm.hours}
+          value={lessonFormCurrent.hours}
         />
         <TextField
           margin='normal'
@@ -153,9 +153,9 @@ const LessonCreateQuiz = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, minutes: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, minutes: e.target.value })
           }}
-          value={lessonForm.minutes}
+          value={lessonFormCurrent.minutes}
         />
       </Box>
       <Box sx={{ display: 'flex', gap: 1 }}>
@@ -170,9 +170,9 @@ const LessonCreateQuiz = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, title: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, title: e.target.value })
           }}
-          value={lessonForm.title}
+          value={lessonFormCurrent.title}
         />
       </Box>
       <Box sx={{ width: '100%' }}>
@@ -459,7 +459,7 @@ const LessonCreateQuiz = ({
               setValue(1)
               return
             }
-            if (lessonForm.title == '') {
+            if (lessonFormCurrent.title == '') {
               Swal.fire({
                 title: 'Lesson title can not be empty!',
                 background: '#171622',
@@ -474,21 +474,21 @@ const LessonCreateQuiz = ({
               setError({})
               if (idLessonEdit) {
                 let found = false
-                storedModules.map((less: any) => {
-                  if (less.title == lessonForm.title.trim()) found = true
+                storedLessons.map((less: any) => {
+                  if (less.title == lessonFormCurrent.title.trim()) found = true
                 })
                 modules.map((module: any) => {
                   module.lessons.map((less: any) => {
-                    if (less.title == lessonForm.title.trim() && idLessonEdit != less.id)
+                    if (less.title == lessonFormCurrent.title.trim() && idLessonEdit != less.id)
                       found = true
                   })
                 })
                 if (!found) {
                   const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
-                    title: lessonForm.title,
+                    title: lessonFormCurrent.title,
                     questions: questionModules,
-                    hours: lessonForm.hours,
-                    minutes: lessonForm.minutes,
+                    hours: lessonFormCurrent.hours,
+                    minutes: lessonFormCurrent.minutes,
                   })
                   const resultResponse = response.data
                   if (resultResponse) {
@@ -502,9 +502,9 @@ const LessonCreateQuiz = ({
                                 return lessonFilter
                               }
                               return {
-                                ...lessonForm,
+                                ...lessonFormCurrent,
                                 id: idLessonEdit,
-                                title: lessonForm.title,
+                                title: lessonFormCurrent.title,
                                 questions: questionModules,
                                 type: 'quiz',
                               }
@@ -514,7 +514,7 @@ const LessonCreateQuiz = ({
                         return elem
                       })
                     )
-                    setLessonForm({
+                    setLessonFormCurrent({
                       title: '',
                       hours: 0,
                       minutes: 0,
@@ -533,20 +533,20 @@ const LessonCreateQuiz = ({
                 }
               } else {
                 let found = false
-                storedModules.map((less: any) => {
-                  if (less.title == lessonForm.title.trim()) found = true
+                storedLessons.map((less: any) => {
+                  if (less.title == lessonFormCurrent.title.trim()) found = true
                 })
                 modules.map((module: any) => {
                   module.lessons.map((less: any) => {
-                    if (less.title == lessonForm.title.trim()) found = true
+                    if (less.title == lessonFormCurrent.title.trim()) found = true
                   })
                 })
                 if (!found) {
                   const response = await axios.post(urlLesson + '?type=quiz', {
-                    title: lessonForm.title,
+                    title: lessonFormCurrent.title,
                     questions: questionModules,
-                    hours: lessonForm.hours,
-                    minutes: lessonForm.minutes,
+                    hours: lessonFormCurrent.hours,
+                    minutes: lessonFormCurrent.minutes,
                   })
                   const resultResponse = response.data
                   if (resultResponse) {
@@ -563,9 +563,9 @@ const LessonCreateQuiz = ({
                             lessons: [
                               ...modulesElem.lessons,
                               {
-                                ...lessonForm,
+                                ...lessonFormCurrent,
                                 id: resultResponse.lessonId,
-                                title: lessonForm.title,
+                                title: lessonFormCurrent.title,
                                 questions: questionModules,
                                 type: 'quiz',
                               },
@@ -575,7 +575,7 @@ const LessonCreateQuiz = ({
                         return modulesElem
                       })
                     )
-                    setLessonForm({
+                    setLessonFormCurrent({
                       title: '',
                       hours: 0,
                       minutes: 0,

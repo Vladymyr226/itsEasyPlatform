@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
 import Swal from 'sweetalert2'
 import { Box, Button, TextField, IconButton } from '@mui/material'
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
@@ -8,7 +7,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MyEditor from '@/components/SlateEditor/Editor'
 import YouTube, { YouTubeProps } from 'react-youtube'
-import { DefaultLessonCreation, YouTubeProp } from '@/utils/interfaces'
+import { Lesson, LessonField, YouTubeProp } from '@/utils/interfaces'
 import { uploadFileToS3 } from '@/utils'
 
 function ExampleYouTube(props: YouTubeProp) {
@@ -28,49 +27,50 @@ function ExampleYouTube(props: YouTubeProp) {
 
   return <YouTube videoId={props.url} opts={opts} onReady={onPlayerReady} />
 }
-const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 
 const LessonCreateDefault = ({
-  setTabValue,
   idLessonEdit,
-  setIdLessonEdit,
-  createLessonIndx,
-  setCreateLessonIndx,
-  modules,
-  setModules,
+  lessonForm,
+  lessonFormCurrent, setLessonFormCurrent,
+  lessonFields, setLessonFields,
+  setTabValue,
   setEditTrigger,
   setError,
-  storedModules,
-  startData,
-}: DefaultLessonCreation) => {
-  const [lessonForm, setLessonForm] = useState({
-    title: startData ? startData.title : '',
-    image: startData ? startData.image : null,
-    hours: startData ? startData.hours : 0,
-    minutes: startData ? startData.minutes : 0,
-  })
-  const startLessonTitle = startData ? startData.title : null
+  handleSubmitLessonDefault,
+}: {
+  idLessonEdit: string | null
+  lessonForm: Lesson
 
-  const [lessonModules, setLessonModules] = useState<any>(
-    startData && startData.fields ? startData.fields : []
-  )
+  lessonFormCurrent: Lesson
+  setLessonFormCurrent: React.Dispatch<React.SetStateAction<Lesson>>
+  lessonFields: LessonField[]
+  setLessonFields: React.Dispatch<React.SetStateAction<LessonField[]>>
+
+  setTabValue: React.Dispatch<React.SetStateAction<number>>
+  setEditTrigger: React.Dispatch<React.SetStateAction<boolean>>
+  setError: React.Dispatch<any>
+  handleSubmitLessonDefault: (title: string) => Promise<void>
+}) => {
+
   const [displayDrag, setDisplayDrag] = useState<any>(true)
 
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
 
   useEffect(() => {
-    if (startData && startData.fields) {
-      setLessonModules(
-        startData.fields.map((module: any, i: number) => {
-          return { ...module, tmpId: new Date().getTime() + i }
+    setLessonFormCurrent(lessonForm)
+
+    if (lessonForm && lessonForm.fields) {
+      setLessonFields(
+        lessonForm.fields.map((f: LessonField, i: number) => {
+          return { ...f, tmpId: new Date().getTime() + i }
         })
       )
     }
-  }, [startData])
+  }, [lessonForm, setLessonFields, setLessonFormCurrent])
 
   function handleSort() {
-    const lessonClone = [...lessonModules]
+    const lessonClone = [...lessonFields]
     let draggedIdx = -1
     const temp = lessonClone.filter((module, i) => {
       if (module.tmpId == dragLesson.current) {
@@ -86,7 +86,7 @@ const LessonCreateDefault = ({
       temp
     )
     setEditTrigger(true)
-    setLessonModules(
+    setLessonFields(
       lessonClone.filter(
         (less, i) =>
           less.tmpId != dragLesson.current ||
@@ -96,175 +96,6 @@ const LessonCreateDefault = ({
               : draggedOverLesson.current)
       )
     )
-  }
-
-  const handleSubmit = async (e: any) => {
-    if (lessonForm.title == '') {
-      Swal.fire({
-        title: 'Lesson title can not be empty!',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
-        icon: 'error',
-      })
-      return
-    }
-
-    try {
-      setEditTrigger(true)
-      setError({})
-      if (idLessonEdit) {
-        let found = false
-        storedModules.map((less: any) => {
-          if (less.title == lessonForm.title.trim()) found = true
-        })
-
-        modules.map((module: any) => {
-          module.lessons.map((less: any) => {
-            if (less.title == lessonForm.title.trim() && idLessonEdit != less.id)
-              found = true
-          })
-        })
-
-        if (!found || (startData && startLessonTitle == lessonForm.title)) {
-          const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
-            title: lessonForm.title,
-            fields: lessonModules,
-            image: lessonForm.image,
-            hours: lessonForm.hours,
-            minutes: lessonForm.minutes,
-          })
-          const resultResponse = response.data
-          if (resultResponse) {
-            setModules(
-              modules.map((elem: any, index: any) => {
-                if (createLessonIndx === index) {
-                  return {
-                    title: elem.title,
-                    lessons: elem.lessons.map((lessonFilter: any, lessonIndex: any) => {
-                      if (lessonFilter.id !== idLessonEdit) {
-                        return lessonFilter
-                      }
-                      return {
-                        ...lessonForm,
-                        id: idLessonEdit,
-                        title: lessonForm.title,
-                        fields: lessonModules.map((module: any) => {
-                          return { type: module.type, value: module.value }
-                        }),
-                        type: 'default',
-                      }
-                    }),
-                    image: elem.image,
-                  }
-                }
-                return elem
-              })
-            )
-            setLessonForm({
-              title: '',
-              image: null,
-              hours: 0,
-              minutes: 0,
-            })
-            setIdLessonEdit(null)
-            setTabValue(1)
-          }
-
-        } else {
-          Swal.fire({
-            title: 'Lesson name is already taken!',
-            background: '#171622',
-            color: '#ffec3e',
-            confirmButtonColor: '#c58efe',
-            icon: 'error',
-          })
-        }
-
-      } else {
-        let found = false
-        storedModules.map((less: any) => {
-          if (less.title == lessonForm.title.trim()) found = true
-        })
-
-        modules.map((module: any) => {
-          module.lessons.map((less: any) => {
-            if (less.title == lessonForm.title.trim()) found = true
-          })
-        })
-
-        if (!found) {
-          const response = await axios.post(urlLesson + '?type=default', {
-            title: lessonForm.title,
-            image: lessonForm.image,
-            hours: lessonForm.hours,
-            minutes: lessonForm.minutes,
-            fields: lessonModules.map((module: any) => {
-              return { type: module.type, value: module.value }
-            }),
-          })
-
-          const resultResponse = response.data
-          if (resultResponse) {
-            setModules(
-              modules.map((modulesElem: any, index: any) => {
-                if (
-                  index == createLessonIndx &&
-                  modulesElem.lessons.filter(
-                    (reDropElem: any) => reDropElem.id === resultResponse.lessonId
-                  ).length === 0
-                ) {
-                  return {
-                    title: modulesElem.title,
-                    lessons: [
-                      ...modulesElem.lessons,
-                      {
-                        ...lessonForm,
-                        id: resultResponse.lessonId,
-                        title: lessonForm.title,
-                        fields: lessonModules.map((module: any) => {
-                          return { type: module.type, value: module.value }
-                        }),
-                        image: lessonForm.image,
-                        type: 'default',
-                      },
-                    ],
-                  }
-                }
-                return modulesElem
-              })
-            )
-
-            setLessonForm({
-              title: '',
-              image: null,
-              hours: 0,
-              minutes: 0,
-            })
-            setCreateLessonIndx(-1)
-            setTabValue(1)
-          }
-        } else {
-          Swal.fire({
-            title: 'Lesson name is already taken!',
-            background: '#171622',
-            color: '#ffec3e',
-            confirmButtonColor: '#c58efe',
-            icon: 'error',
-          })
-        }
-      }
-    } catch (error) {
-      Swal.fire({
-        title: 'Something went wrong!',
-        text: error + '',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
-        icon: 'error',
-      })
-      return
-    }
   }
 
   return (
@@ -281,9 +112,9 @@ const LessonCreateDefault = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, hours: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, hours: parseInt(e.target.value) })
           }}
-          value={lessonForm.hours}
+          value={lessonFormCurrent.hours}
         />
         <TextField
           margin='normal'
@@ -296,9 +127,9 @@ const LessonCreateDefault = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, minutes: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, minutes: parseInt(e.target.value) })
           }}
-          value={lessonForm.minutes}
+          value={lessonFormCurrent.minutes}
         />
       </Box>
       <Box sx={{ display: 'flex', gap: 1 }}>
@@ -313,14 +144,14 @@ const LessonCreateDefault = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonForm({ ...lessonForm, title: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, title: e.target.value })
           }}
-          value={lessonForm.title}
+          value={lessonFormCurrent.title}
         />
       </Box>
       <Box sx={{ width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {lessonModules.map((element: any, i: any) => {
+          {lessonFields.map((element: any, i: any) => {
             return (
               <Box key={'mainModuleContainer_' + i} sx={{ boxShadow: 2, border: '1px solid' }}>
                 <Accordion
@@ -348,10 +179,10 @@ const LessonCreateDefault = ({
                         onClick={(e) => {
                           setEditTrigger(true)
                           setError({})
-                          setLessonModules(
-                            lessonModules.filter((moduleElem: any, index: number) => {
+                          setLessonFields(
+                            lessonFields.filter((f: LessonField, index: number) => {
                               if (i !== index) {
-                                return moduleElem
+                                return f
                               }
                             })
                           )
@@ -383,12 +214,12 @@ const LessonCreateDefault = ({
                               <MyEditor
                                 value={element.value}
                                 setValue={function (data: any) {
-                                  setLessonModules(
-                                    lessonModules.map((module: any, index: number) => {
+                                  setLessonFields(
+                                    lessonFields.map((f: LessonField, index: number) => {
                                       if (index == i) {
-                                        return { ...module, value: data }
+                                        return { ...f, value: data }
                                       } else {
-                                        return module
+                                        return f
                                       }
                                     })
                                   )
@@ -410,12 +241,12 @@ const LessonCreateDefault = ({
                               autoFocus
                               autoComplete='off'
                               onChange={(e) => {
-                                setLessonModules(
-                                  lessonModules.map((module: any, index: number) => {
+                                setLessonFields(
+                                  lessonFields.map((f: LessonField, index: number) => {
                                     if (index == i) {
-                                      return { ...module, value: e.target.value }
+                                      return { ...f, value: e.target.value }
                                     } else {
-                                      return module
+                                      return f
                                     }
                                   })
                                 )
@@ -438,12 +269,12 @@ const LessonCreateDefault = ({
                               autoFocus
                               autoComplete='off'
                               onChange={(e) => {
-                                setLessonModules(
-                                  lessonModules.map((module: any, index: number) => {
+                                setLessonFields(
+                                  lessonFields.map((f: LessonField, index: number) => {
                                     if (index == i) {
-                                      return { ...module, value: e.target.value }
+                                      return { ...f, value: e.target.value }
                                     } else {
-                                      return module
+                                      return f
                                     }
                                   })
                                 )
@@ -469,12 +300,12 @@ const LessonCreateDefault = ({
                               autoFocus
                               autoComplete='off'
                               onChange={(e) => {
-                                setLessonModules(
-                                  lessonModules.map((module: any, index: number) => {
+                                setLessonFields(
+                                  lessonFields.map((f: LessonField, index: number) => {
                                     if (index == i) {
-                                      return { ...module, value: e.target.value }
+                                      return { ...f, value: e.target.value }
                                     } else {
-                                      return module
+                                      return f
                                     }
                                   })
                                 )
@@ -496,8 +327,8 @@ const LessonCreateDefault = ({
         <Button
           variant='contained'
           onClick={(e) => {
-            setLessonModules([
-              ...lessonModules,
+            setLessonFields([
+              ...lessonFields,
               {
                 tmpId: new Date().getTime(),
                 type: 'slate',
@@ -521,8 +352,8 @@ const LessonCreateDefault = ({
         <Button
           variant='contained'
           onClick={(e) => {
-            setLessonModules([
-              ...lessonModules,
+            setLessonFields([
+              ...lessonFields,
               {
                 tmpId: new Date().getTime(),
                 type: 'code',
@@ -542,8 +373,8 @@ const LessonCreateDefault = ({
         <Button
           variant='contained'
           onClick={(e) => {
-            setLessonModules([
-              ...lessonModules,
+            setLessonFields([
+              ...lessonFields,
               {
                 tmpId: new Date().getTime(),
                 type: 'codeHtml',
@@ -563,8 +394,8 @@ const LessonCreateDefault = ({
         <Button
           variant='contained'
           onClick={(e) => {
-            setLessonModules([
-              ...lessonModules,
+            setLessonFields([
+              ...lessonFields,
               {
                 tmpId: new Date().getTime(),
                 type: 'youTube',
@@ -587,7 +418,7 @@ const LessonCreateDefault = ({
           variant='contained'
           component='label'
           onClick={() => {
-            setLessonForm({ ...lessonForm, image: '' })
+            setLessonFormCurrent({ ...lessonFormCurrent, image: '' })
           }}
           sx={{ mt: 1, mr: 1 }}
         >
@@ -601,8 +432,8 @@ const LessonCreateDefault = ({
             onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
               if (event.target.files) {
                 try {
-                  setLessonForm({
-                    ...lessonForm,
+                  setLessonFormCurrent({
+                    ...lessonFormCurrent,
                     image: ((await uploadFileToS3(event.target.files[0])) as string) ?? '',
                   })
                 } catch (error) {
@@ -641,7 +472,7 @@ const LessonCreateDefault = ({
             marginTop: 2,
             fontWeight: 'bold',
           }}
-          onClick={handleSubmit}
+          onClick={e => handleSubmitLessonDefault(lessonFormCurrent.title)}
         >
           {idLessonEdit ? 'Save' : 'Create'}
         </Button>

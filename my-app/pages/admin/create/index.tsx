@@ -20,7 +20,6 @@ import {
 } from '@mui/material'
 
 import {
-  YouTubeProp,
   TabPanelProps,
   Lesson,
   Module,
@@ -28,6 +27,7 @@ import {
   Language,
   Course,
   Skill,
+  LessonField,
 } from '@/utils/interfaces'
 
 import { isEqual } from 'lodash-es'
@@ -71,12 +71,28 @@ const Create = () => {
   const [level, setLevel] = useState('')
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
-  const [modules, setModules] = useState<Array<Module>>([])
-  const [allModules, setAllModules] = useState<Array<Lesson>>([])
-  const [storedModules, setStoredModules] = useState<Array<Lesson>>([])
-  const [categorySelect, setCategorySelect] = useState<Array<Tag>>([])
-  const [allCategorySelect, setAllCategorySelect] = useState<Array<Tag>>([])
-  const [allSkillSelect, setAllSkillSelect] = useState<Array<Skill>>([])
+  const [modules, setModules] = useState<Module[]>([])
+  const [allLessons, setAllLessons] = useState<Lesson[]>([])
+  const [storedLessons, setStoredLessons] = useState<Lesson[]>([])
+  const [categorySelect, setCategorySelect] = useState<Tag[]>([])
+  const [allCategorySelect, setAllCategorySelect] = useState<Tag[]>([])
+  const [allSkillSelect, setAllSkillSelect] = useState<Skill[]>([])
+  const [lessonType, setLessonType] = useState('')
+  const [fetchedMediaData, setFetchedMediaData] = useState<any>()
+  const [rating, setRating] = useState(0.0)
+  const [editTrigger, setEditTrigger] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [error, setError] = useState<any>()
+  const [mediaValue, setMediaValue] = useState<{ type: string, content: File }>()
+  const [lessonFields, setLessonFields] = useState<LessonField[]>([])
+
+  const [richValue, setRichValue] = useState<any[]>([
+    {
+      type: 'paragaph',
+      children: [{ text: '' }],
+    },
+  ])
+
   const [form, setForm] = useState<any>({
     title: '',
     questionLimit: null,
@@ -86,29 +102,22 @@ const Create = () => {
     price: null,
     priceDiscount: null,
   })
-  const [lessonType, setLessonType] = useState('')
-  const [fetchedMediaData, setFetchedMediaData] = useState<any>()
-  const [rating, setRating] = useState(0.0)
-  const [richValue, setRichValue] = useState<Array<any>>([
-    {
-      type: 'paragaph',
-      children: [{ text: '' }],
-    },
-  ])
-  const [lessonForm, setLessonForm] = useState<any>({
+
+  const [lessonForm, setLessonForm] = useState<Lesson>({
     title: '',
     link: '',
     image: '',
     hours: 0,
     minutes: 0,
   })
-  const [editTrigger, setEditTrigger] = useState(false)
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [mediaValue, setMediaValue] = useState<{
-    type: string
-    content: File
-  }>()
-  const [error, setError] = useState<any>()
+
+  const [lessonFormCurrent, setLessonFormCurrent] = useState<Lesson>({
+    title: '',
+    link: '',
+    image: '',
+    hours: 0,
+    minutes: 0,
+  })
 
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
@@ -136,7 +145,7 @@ const Create = () => {
       headers: { 'Content-Type': 'application/json' },
     })
     const resultLesson = await responseLesson.json()
-    let allLessons = resultLesson.getLessons.map((lesson: any) => {
+    let lessons = resultLesson.getLessons.map((lesson: any) => {
       return {
         id: lesson.id,
         type: lesson.type,
@@ -220,7 +229,7 @@ const Create = () => {
           return {
             title: module.title,
             lessons: module.lessons.map((lessonId: string) => {
-              const found = allLessons.filter(
+              const found = lessons.filter(
                 (moduleElemFilter: Lesson) => moduleElemFilter.id == lessonId,
               )
               return found[0]
@@ -231,7 +240,7 @@ const Create = () => {
 
       resultData[0].data.modules.forEach((module: any) => {
         module.lessons.forEach((lessonId: string) => {
-          allLessons = allLessons.filter((l: Lesson) => l.id != lessonId)
+          lessons = lessons.filter((l: Lesson) => l.id != lessonId)
         })
       })
 
@@ -244,7 +253,7 @@ const Create = () => {
       setId(undefined)
     }
 
-    setStoredModules(allLessons)
+    setStoredLessons(lessons)
     setIsLoaded(true)
     return newIdParam
   }, [])
@@ -265,7 +274,7 @@ const Create = () => {
     }
   }, [getPageData])
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setIdLessonEdit(null)
     setLessonForm({
       title: '',
@@ -357,10 +366,6 @@ const Create = () => {
       confirmButtonColor: '#c58efe',
       icon: 'success',
     })
-}
-
-  const handleChangeLessonType = (event: SelectChangeEvent) => {
-    setLessonType(event.target.value as string)
   }
 
   const handleSubmit = async (e: any) => {
@@ -526,6 +531,167 @@ const Create = () => {
     }
   }
 
+  const handleSubmitLessonDefault = async (e: any) => { 
+    if (!lessonFormCurrent.title.trim()) {
+      Swal.fire({
+        title: 'Lesson title can not be empty!',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
+      return
+    }
+
+    try {
+      setEditTrigger(true)
+      setError({})
+
+      if (idLessonEdit) {
+        const found = storedLessons.some((l: Lesson) => l.title === lessonFormCurrent.title.trim()) ||
+          modules.some((m: Module) =>
+            m.lessons.some((l: Lesson) =>
+              l.title.trim() === lessonFormCurrent.title.trim() && idLessonEdit !== l.id))
+
+        if (!found || (lessonForm.title == lessonFormCurrent.title)) {
+          const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
+            title: lessonFormCurrent.title,
+            fields: lessonFields,
+            image: lessonFormCurrent.image,
+            hours: lessonFormCurrent.hours,
+            minutes: lessonFormCurrent.minutes,
+          })
+          const resultResponse = response.data
+          if (resultResponse) {
+            setModules(
+              modules.map((elem: any, index: any) => {
+                if (createLessonIndx === index) {
+                  return {
+                    title: elem.title,
+                    lessons: elem.lessons.map((lessonFilter: any, lessonIndex: any) => {
+                      if (lessonFilter.id !== idLessonEdit) {
+                        return lessonFilter
+                      }
+                      return {
+                        ...lessonFormCurrent,
+                        id: idLessonEdit,
+                        title: lessonFormCurrent.title,
+                        fields: lessonFields.map((f: LessonField) => {
+                          return { type: f.type, value: f.value }
+                        }),
+                        type: 'default',
+                      }
+                    }),
+                    image: elem.image,
+                  }
+                }
+                return elem
+              })
+            )
+            setLessonFormCurrent({
+              title: '',
+              link: '',
+              image: '',
+              hours: 0,
+              minutes: 0,
+            })
+            setIdLessonEdit(null)
+            setTabValue(1)
+          }
+
+        } else {
+          Swal.fire({
+            title: 'Lesson name is already taken!',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#c58efe',
+            icon: 'error',
+          })
+        }
+
+      } else {
+        const found = storedLessons.some((l: Lesson) => l.title === lessonFormCurrent.title.trim()) ||
+          modules.some((m: Module) =>
+            m.lessons.some((l: Lesson) =>
+              l.title.trim() === lessonFormCurrent.title.trim()))
+
+        if (!found) {
+          const response = await axios.post(urlLesson + '?type=default', {
+            title: lessonFormCurrent.title,
+            image: lessonFormCurrent.image,
+            hours: lessonFormCurrent.hours,
+            minutes: lessonFormCurrent.minutes,
+            fields: lessonFields.map((f: LessonField) => {
+              return { type: f.type, value: f.value }
+            }),
+          })
+
+          const resultResponse = response.data
+          if (resultResponse) {
+            setModules(
+              modules.map((modulesElem: any, index: any) => {
+                if (
+                  index == createLessonIndx &&
+                  modulesElem.lessons.filter(
+                    (reDropElem: any) => reDropElem.id === resultResponse.lessonId
+                  ).length === 0
+                ) {
+                  return {
+                    title: modulesElem.title,
+                    lessons: [
+                      ...modulesElem.lessons,
+                      {
+                        ...lessonFormCurrent,
+                        id: resultResponse.lessonId,
+                        title: lessonFormCurrent.title,
+                        fields: lessonFields.map((f: LessonField) => {
+                          return { type: f.type, value: f.value }
+                        }),
+                        image: lessonFormCurrent.image,
+                        type: 'default',
+                      },
+                    ],
+                  }
+                }
+                return modulesElem
+              })
+            )
+
+            setLessonFormCurrent({
+              title: '',
+              link: '',
+              image: '',
+              hours: 0,
+              minutes: 0,
+            })
+            setCreateLessonIndx(-1)
+            setTabValue(1)
+          }
+
+        } else {
+          Swal.fire({
+            title: 'Lesson name is already taken!',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#c58efe',
+            icon: 'error',
+          })
+        }
+      }
+
+    } catch (error) {
+      Swal.fire({
+        title: 'Something went wrong!',
+        text: error + '',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
+      return
+    }
+  }
+
   const showPushAction = (url: string) => {
     if (id ? editTrigger : isEdited()) {
       Swal.fire({
@@ -584,7 +750,7 @@ const Create = () => {
       })
   }
 
-  const compareRichTexts = (first: Array<any>, second: Array<any>) => {
+  const compareRichTexts = (first: any[], second: any[]) => {
     let result = first.length == second.length
     if (result) {
       first.map((elem, i) => {
@@ -772,7 +938,7 @@ const Create = () => {
                   </Box>
                   <Tabs
                     value={tabValue}
-                    onChange={handleChange}
+                    onChange={handleChangeTab}
                     aria-label="basic tabs example"
                     variant="fullWidth"
                     TabIndicatorProps={{
@@ -839,8 +1005,8 @@ const Create = () => {
                       setAllSkillSelect={setAllSkillSelect}
                       modules={modules}
                       setModules={setModules}
-                      allModules={allModules}
-                      setAllModules={setAllModules}
+                      allLessons={allLessons}
+                      setAllLessons={setAllLessons}
                       setLanguage={setLanguage}
                       setTabValue={setTabValue}
                       setLessonForm={setLessonForm}
@@ -854,14 +1020,14 @@ const Create = () => {
                       draggedOverLesson={draggedOverLesson}
                       modules={modules}
                       setModules={setModules}
-                      allModules={allModules}
-                      setAllModules={setAllModules}
+                      allLessons={allLessons}
+                      setAllLessons={setAllLessons}
                       idLessonEdit={idLessonEdit}
                       setIdLessonEdit={setIdLessonEdit}
                       createLessonIndx={createLessonIndx}
                       setCreateLessonIndx={setCreateLessonIndx}
-                      storedModules={storedModules}
-                      setStoredModules={setStoredModules}
+                      storedLessons={storedLessons}
+                      setStoredLessons={setStoredLessons}
                       setEditTrigger={setEditTrigger}
                       setError={setError}
                       setLessonForm={setLessonForm}
@@ -882,7 +1048,7 @@ const Create = () => {
                             fullWidth
                             id="lessonTypeSelect"
                             value={lessonType}
-                            onChange={handleChangeLessonType}
+                            onChange={(event: SelectChangeEvent) => setLessonType(event.target.value as string)}
                           >
                             <MenuItem value={'default'}>Default</MenuItem>
                             <MenuItem value={'quiz'}>Quiz</MenuItem>
@@ -892,7 +1058,7 @@ const Create = () => {
                       )}
                       {lessonType == 'quiz' && (
                         <LessonCreateQuiz
-                          startData={lessonForm}
+                          lessonForm={lessonForm}
                           setValue={setTabValue}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
@@ -902,12 +1068,12 @@ const Create = () => {
                           setModules={setModules}
                           setEditTrigger={setEditTrigger}
                           setError={setError}
-                          storedModules={storedModules}
+                          storedLessons={storedLessons}
                         />
                       )}
                       {lessonType == 'practice' && (
                         <LessonCreatePractice
-                          startData={lessonForm}
+                          lessonForm={lessonForm}
                           setValue={setTabValue}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
@@ -917,22 +1083,21 @@ const Create = () => {
                           setModules={setModules}
                           setEditTrigger={setEditTrigger}
                           setError={setError}
-                          storedModules={storedModules}
+                          storedLessons={storedLessons}
                         />
                       )}
                       {lessonType == 'default' && (
                         <LessonCreateDefault
-                          startData={lessonForm}
-                          setTabValue={setTabValue}
                           idLessonEdit={idLessonEdit}
-                          setIdLessonEdit={setIdLessonEdit}
-                          createLessonIndx={createLessonIndx}
-                          setCreateLessonIndx={setCreateLessonIndx}
-                          modules={modules}
-                          setModules={setModules}
+                          lessonForm={lessonForm}
+                          lessonFormCurrent={lessonFormCurrent}
+                          setLessonFormCurrent={setLessonFormCurrent}
+                          lessonFields={lessonFields}
+                          setLessonFields={setLessonFields}
+                          setTabValue={setTabValue}
                           setEditTrigger={setEditTrigger}
                           setError={setError}
-                          storedModules={storedModules}
+                          handleSubmitLessonDefault={handleSubmitLessonDefault}
                         />
                       )}
                     </Box>
