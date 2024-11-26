@@ -13,8 +13,8 @@ interface quizCreation {
   setValue: any
   idLessonEdit: any
   setIdLessonEdit: any
-  createLessonIndx: any
-  setCreateLessonIndx: any
+  moduleIndexCreate: any
+  setModuleIndexCreate: any
   modules: any
   setModules: any
   setEditTrigger: any
@@ -26,8 +26,8 @@ const LessonCreateQuiz = ({
   setValue,
   idLessonEdit,
   setIdLessonEdit,
-  createLessonIndx,
-  setCreateLessonIndx,
+  moduleIndexCreate,
+  setModuleIndexCreate,
   modules,
   setModules,
   setEditTrigger,
@@ -455,7 +455,7 @@ const LessonCreateQuiz = ({
             fontWeight: 'bold',
           }}
           onClick={async (e) => {
-            if (idLessonEdit && compareIsLessonEdited(idLessonEdit, createLessonIndx)) {
+            if (idLessonEdit && compareIsLessonEdited(idLessonEdit, moduleIndexCreate)) {
               setValue(1)
               return
             }
@@ -494,7 +494,7 @@ const LessonCreateQuiz = ({
                   if (resultResponse) {
                     setModules(
                       modules.map((elem: any, index: any) => {
-                        if (createLessonIndx === index) {
+                        if (moduleIndexCreate === index) {
                           return {
                             title: elem.title,
                             lessons: elem.lessons.map((lessonFilter: any, lessonIndex: any) => {
@@ -553,7 +553,7 @@ const LessonCreateQuiz = ({
                     setModules(
                       modules.map((modulesElem: any, index: any) => {
                         if (
-                          index == createLessonIndx &&
+                          index == moduleIndexCreate &&
                           modulesElem.lessons.filter(
                             (reDropElem: any) => reDropElem.id === resultResponse.lessonId
                           ).length === 0
@@ -580,7 +580,7 @@ const LessonCreateQuiz = ({
                       hours: 0,
                       minutes: 0,
                     })
-                    setCreateLessonIndx(-1)
+                    setModuleIndexCreate(-1)
                     setValue(1)
                   }
                 } else {
@@ -607,7 +607,7 @@ const LessonCreateQuiz = ({
           }}
         >
           {idLessonEdit
-            ? compareIsLessonEdited(idLessonEdit, createLessonIndx)
+            ? compareIsLessonEdited(idLessonEdit, moduleIndexCreate)
               ? 'Cancel'
               : 'Save'
             : 'Create'}

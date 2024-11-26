@@ -5,6 +5,7 @@ import { Lesson, Module, YouTubeProp } from '@/utils/interfaces'
 
 import {
   Box,
+  Button,
   IconButton
 } from '@mui/material'
 
@@ -32,23 +33,23 @@ const ExampleYouTube = (props: YouTubeProp) => {
 }
 
 const LessonBox = ({
-  element, i,
-  lesson, index,
+  module, moduleIndex,
+  lesson, lessonIndex,
   dragLesson, draggedOverLesson,
   modules, setModules,
   idLessonEdit, setIdLessonEdit,
   storedLessons, setStoredLessons,
   setEditTrigger,
   setLessonForm,
-  setCreateLessonIndx,
+  setModuleIndexCreate,
   setLessonType,
   setTabValue,
   setError,
 }: {
-  element: Module,
-  i: number,
+  module: Module,
+  moduleIndex: number,
   lesson: Lesson,
-  index: number,
+  lessonIndex: number,
   dragLesson: React.MutableRefObject<any>,
   draggedOverLesson: React.MutableRefObject<any>,
 
@@ -61,7 +62,7 @@ const LessonBox = ({
 
   setEditTrigger: React.Dispatch<React.SetStateAction<boolean>>,
   setLessonForm: React.Dispatch<React.SetStateAction<Lesson>>,
-  setCreateLessonIndx: React.Dispatch<React.SetStateAction<number>>,
+  setModuleIndexCreate: React.Dispatch<React.SetStateAction<number>>,
   setLessonType: React.Dispatch<React.SetStateAction<string>>,
   setTabValue: React.Dispatch<React.SetStateAction<number>>,
   setError: React.Dispatch<any>,
@@ -87,10 +88,10 @@ const LessonBox = ({
     )
     setEditTrigger(true)
     setModules(
-      modules.map((module: any, moduleIndex) => {
-        if (moduleIndex == i) {
+      modules.map((m: Module, ind: number) => {
+        if (ind === moduleIndex) {
           return {
-            title: module.title,
+            title: m.title,
             lessons: lessonClone.filter(
               (less, i) =>
                 less.id != dragLesson.current ||
@@ -101,7 +102,7 @@ const LessonBox = ({
             ),
           }
         }
-        return module
+        return m
       }),
     )
   }
@@ -122,10 +123,10 @@ const LessonBox = ({
     }
     onDragEnter={() =>
       (draggedOverLesson.current =
-        index)
+        lessonIndex)
     }
     onDragEnd={(e) =>
-      handleSort(element.lessons, i)
+      handleSort(module.lessons, moduleIndex)
     }
     onDragOver={(e) =>
       e.preventDefault()
@@ -159,6 +160,7 @@ const LessonBox = ({
           <PreviewIcon />
         </IconButton>
       )}
+      <Button>{lesson.language}</Button>
       <IconButton
         onClick={(e) => {
           setIdLessonEdit(
@@ -169,7 +171,7 @@ const LessonBox = ({
                 : null,
           )
           setLessonForm(lesson)
-          setCreateLessonIndx(i)
+          setModuleIndexCreate(moduleIndex)
           setLessonType(lesson.type || '')
           setTabValue(2)
         }}
@@ -184,38 +186,19 @@ const LessonBox = ({
             ...storedLessons,
             lesson,
           ])
-          setModules(
-            modules.map(
-              (elem, index) => {
-                if (i === index) {
-                  return {
-                    title: elem.title,
-                    lessons:
-                      elem.lessons.filter(
-                        (
-                          lessonFilter,
-                          lessonIndex,
-                        ) => {
-                          if (
-                            lessonFilter.id !==
-                            lesson.id
-                          ) {
-                            return lessonFilter
-                          }
-                          setStoredLessons(
-                            [
-                              ...storedLessons,
-                              lessonFilter,
-                            ],
-                          )
-                        },
-                      ),
-                  }
-                }
-                return elem
-              },
-            ),
-          )
+          setModules(modules.map((m: Module, i: number) => {
+            if (i === moduleIndex) {
+              return {
+                title: m.title,
+                lessons:
+                  m.lessons.filter((l: Lesson) => {
+                    if (l.id !== lesson.id) return l
+                    setStoredLessons([ ...storedLessons, l ])
+                  })
+              }
+            }
+            return m
+          }))
         }}
       >
         <DeleteIcon color="error" />

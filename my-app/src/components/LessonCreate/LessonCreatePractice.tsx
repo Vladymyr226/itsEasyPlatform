@@ -14,8 +14,8 @@ interface practiceCreation {
   setValue: any
   idLessonEdit: any
   setIdLessonEdit: any
-  createLessonIndx: any
-  setCreateLessonIndx: any
+  moduleIndexCreate: any
+  setModuleIndexCreate: any
   modules: any
   setModules: any
   setEditTrigger: any
@@ -27,8 +27,8 @@ const LessonCreatePractice = ({
   setValue,
   idLessonEdit,
   setIdLessonEdit,
-  createLessonIndx,
-  setCreateLessonIndx,
+  moduleIndexCreate,
+  setModuleIndexCreate,
   modules,
   setModules,
   setEditTrigger,
@@ -405,7 +405,7 @@ const LessonCreatePractice = ({
                   if (resultResponse) {
                     setModules(
                       modules.map((elem: any, index: any) => {
-                        if (createLessonIndx === index) {
+                        if (moduleIndexCreate === index) {
                           return {
                             title: elem.title,
                             lessons: elem.lessons.map((lessonFilter: any, lessonIndex: any) => {
@@ -468,7 +468,7 @@ const LessonCreatePractice = ({
                     setModules(
                       modules.map((modulesElem: any, index: any) => {
                         if (
-                          index == createLessonIndx &&
+                          index == moduleIndexCreate &&
                           modulesElem.lessons.filter(
                             (reDropElem: any) => reDropElem.id === resultResponse.lessonId
                           ).length === 0
@@ -497,7 +497,7 @@ const LessonCreatePractice = ({
                       hours: 0,
                       minutes: 0,
                     })
-                    setCreateLessonIndx(-1)
+                    setModuleIndexCreate(-1)
                     setValue(1)
                   }
                 } else {

@@ -61,7 +61,7 @@ const CustomTabPanel = (props: TabPanelProps) => {
 const Create = () => {
   const router = useRouter()
 
-  const [createLessonIndx, setCreateLessonIndx] = useState(-1)
+  const [moduleIndexCreate, setModuleIndexCreate] = useState(-1)
   const [id, setId] = useState<string>()
   const [enId, setEnId] = useState<string>()
   const [idLessonEdit, setIdLessonEdit] = useState<string | null>(null)
@@ -145,10 +145,12 @@ const Create = () => {
       headers: { 'Content-Type': 'application/json' },
     })
     const resultLesson = await responseLesson.json()
-    let lessons = resultLesson.getLessons.map((lesson: any) => {
+    let lessons: Lesson[] = resultLesson.getLessons.map((lesson: any) => {
       return {
         id: lesson.id,
         type: lesson.type,
+        language: lesson.language,
+        en_id: lesson.en_id,
         ...lesson.data,
       }
     })
@@ -359,6 +361,11 @@ const Create = () => {
   }
 
   const handleTranslateLesson = async () => {
+    const found: Lesson | undefined = storedLessons.find((l: Lesson) =>
+      l.en_id === lessonFormCurrent.en_id && l.language === lessonFormCurrent.language)
+    
+    // TODO create and translate lesson
+
     Swal.fire({
       title: 'Lesson translated!',
       background: '#171622',
@@ -376,7 +383,7 @@ const Create = () => {
 
     if (
       modules.filter((elem) => {
-        if (countModuleNameMeet(elem.title) > 1) {
+        if (modules.filter((m: Module) => m.title.trim() === elem.title.trim()).length > 1) {
           return 'Error'
         }
       }).length > 0
@@ -531,7 +538,7 @@ const Create = () => {
     }
   }
 
-  const handleSubmitLessonDefault = async (e: any) => { 
+  const handleSubmitLessonDefault = async (en_id?: string) => { 
     if (!lessonFormCurrent.title.trim()) {
       Swal.fire({
         title: 'Lesson title can not be empty!',
@@ -564,28 +571,24 @@ const Create = () => {
           const resultResponse = response.data
           if (resultResponse) {
             setModules(
-              modules.map((elem: any, index: any) => {
-                if (createLessonIndx === index) {
+              modules.map((m: Module, i: number) => {
+                if (moduleIndexCreate === i) {
                   return {
-                    title: elem.title,
-                    lessons: elem.lessons.map((lessonFilter: any, lessonIndex: any) => {
-                      if (lessonFilter.id !== idLessonEdit) {
-                        return lessonFilter
-                      }
-                      return {
+                    title: m.title,
+                    lessons: m.lessons.map((l: any) => {
+                      if (l.id !== idLessonEdit) return l
+                      else return {
                         ...lessonFormCurrent,
                         id: idLessonEdit,
-                        title: lessonFormCurrent.title,
                         fields: lessonFields.map((f: LessonField) => {
                           return { type: f.type, value: f.value }
                         }),
                         type: 'default',
                       }
-                    }),
-                    image: elem.image,
+                    })
                   }
                 }
-                return elem
+                return m
               })
             )
             setLessonFormCurrent({
@@ -624,6 +627,8 @@ const Create = () => {
             fields: lessonFields.map((f: LessonField) => {
               return { type: f.type, value: f.value }
             }),
+            language: en_id ? language : undefined,
+            en_id,
           })
 
           const resultResponse = response.data
@@ -631,7 +636,7 @@ const Create = () => {
             setModules(
               modules.map((modulesElem: any, index: any) => {
                 if (
-                  index == createLessonIndx &&
+                  index == moduleIndexCreate &&
                   modulesElem.lessons.filter(
                     (reDropElem: any) => reDropElem.id === resultResponse.lessonId
                   ).length === 0
@@ -644,11 +649,11 @@ const Create = () => {
                         ...lessonFormCurrent,
                         id: resultResponse.lessonId,
                         title: lessonFormCurrent.title,
-                        fields: lessonFields.map((f: LessonField) => {
-                          return { type: f.type, value: f.value }
-                        }),
+                        fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
                         image: lessonFormCurrent.image,
                         type: 'default',
+                        language: en_id ? language : 'EN',
+                        en_id: en_id || resultResponse.lessonId,
                       },
                     ],
                   }
@@ -664,7 +669,7 @@ const Create = () => {
               hours: 0,
               minutes: 0,
             })
-            setCreateLessonIndx(-1)
+            setModuleIndexCreate(-1)
             setTabValue(1)
           }
 
@@ -729,7 +734,17 @@ const Create = () => {
       }).then(async (result) => {
         if (result.isConfirmed) handleTranslateLesson()
       })
-    else if (window.location.href.includes('_id='))    
+  
+    else if (tabValue === 1)    
+      Swal.fire({
+        title: 'All lessons translation does not work',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
+    
+    else
       Swal.fire({
         title: `Do you want to translate course to ${langNames[language]}?`,
         background: '#171622',
@@ -739,15 +754,7 @@ const Create = () => {
         confirmButtonText: 'Translate',
       }).then(async (result) => {
         if (result.isConfirmed) handleTranslate()
-      })
-    else
-      Swal.fire({
-        title: 'First you need to save the course',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
-        icon: 'error',
-      })
+    })
   }
 
   const compareRichTexts = (first: any[], second: any[]) => {
@@ -760,12 +767,6 @@ const Create = () => {
       })
     }
     return result
-  }
-
-  const countModuleNameMeet = (str: string) => {
-    const result = modules.filter((module) => module.title.trim() == str.trim())
-
-    return result.length
   }
 
   const isEdited = () => {
@@ -1024,8 +1025,8 @@ const Create = () => {
                       setAllLessons={setAllLessons}
                       idLessonEdit={idLessonEdit}
                       setIdLessonEdit={setIdLessonEdit}
-                      createLessonIndx={createLessonIndx}
-                      setCreateLessonIndx={setCreateLessonIndx}
+                      moduleIndexCreate={moduleIndexCreate}
+                      setModuleIndexCreate={setModuleIndexCreate}
                       storedLessons={storedLessons}
                       setStoredLessons={setStoredLessons}
                       setEditTrigger={setEditTrigger}
@@ -1062,8 +1063,8 @@ const Create = () => {
                           setValue={setTabValue}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
-                          createLessonIndx={createLessonIndx}
-                          setCreateLessonIndx={setCreateLessonIndx}
+                          moduleIndexCreate={moduleIndexCreate}
+                          setModuleIndexCreate={setModuleIndexCreate}
                           modules={modules}
                           setModules={setModules}
                           setEditTrigger={setEditTrigger}
@@ -1077,8 +1078,8 @@ const Create = () => {
                           setValue={setTabValue}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
-                          createLessonIndx={createLessonIndx}
-                          setCreateLessonIndx={setCreateLessonIndx}
+                          moduleIndexCreate={moduleIndexCreate}
+                          setModuleIndexCreate={setModuleIndexCreate}
                           modules={modules}
                           setModules={setModules}
                           setEditTrigger={setEditTrigger}

@@ -42,7 +42,7 @@ export interface LessonData {
 
 export interface Module {
   title: string
-  lessons: Array<Lesson>
+  lessons: Lesson[]
 }
 
 export interface Tag {

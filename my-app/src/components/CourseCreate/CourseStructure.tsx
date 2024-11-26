@@ -29,7 +29,7 @@ const CourseStructure = ({
   modules, setModules,
   allLessons, setAllLessons,
   idLessonEdit, setIdLessonEdit,
-  createLessonIndx, setCreateLessonIndx,
+  moduleIndexCreate, setModuleIndexCreate,
   storedLessons, setStoredLessons,
   setEditTrigger,
   setError,
@@ -46,8 +46,8 @@ const CourseStructure = ({
   setAllLessons: React.Dispatch<React.SetStateAction<Lesson[]>>,
   idLessonEdit: string | null,
   setIdLessonEdit: React.Dispatch<React.SetStateAction<string | null>>,
-  createLessonIndx: number,
-  setCreateLessonIndx: React.Dispatch<React.SetStateAction<number>>,
+  moduleIndexCreate: number,
+  setModuleIndexCreate: React.Dispatch<React.SetStateAction<number>>,
   storedLessons: Lesson[],
   setStoredLessons: React.Dispatch<React.SetStateAction<Lesson[]>>,
 
@@ -58,22 +58,16 @@ const CourseStructure = ({
   setTabValue: React.Dispatch<React.SetStateAction<number>>,
 }) => {
 
-  const countModuleNameMeet = (str: string) => {
-    const result = modules.filter((module) => module.title.trim() == str.trim())
-
-    return result.length
-  }
-
   const handleChangeStoredLessons = (value: any, i: number) => {
     setEditTrigger(true)
     setError({})
     if (value) {
       setModules(
         modules.map(
-          (modulesElem, index) => {
+          (module: Module, index: number) => {
             if (
               index == i &&
-              modulesElem.lessons.filter(
+              module.lessons.filter(
                 (reDropElem) =>
                   reDropElem.id ===
                   value.id,
@@ -81,16 +75,16 @@ const CourseStructure = ({
             ) {
               setStoredLessons(storedLessons.filter(l => l.id != value.id))
               return {
-                title: modulesElem.title,
+                title: module.title,
                 lessons: [
-                  ...modulesElem.lessons,
+                  ...module.lessons,
                   {
                     ...value,
                   },
                 ],
               }
             }
-            return modulesElem
+            return module
           },
         ),
       )
@@ -158,10 +152,10 @@ const CourseStructure = ({
         gap: 6,
       }}
     >
-      {modules.map((element, i) => {
+      {modules.map((module: Module, moduleIndex: number) => {
         return (
           <Box
-            key={'mainModuleContainer_' + i}
+            key={'mainModuleContainer_' + moduleIndex}
             sx={{ boxShadow: 2, border: '1px solid' }}
           >
             <Accordion defaultExpanded={true} sx={{}}>
@@ -182,31 +176,23 @@ const CourseStructure = ({
                     margin="normal"
                     fullWidth
                     required
-                    error={
-                      countModuleNameMeet(element.title) > 1
-                    }
-                    id={'module' + i}
+                    error={modules.filter((m: Module) => m.title.trim() === module.title.trim()).length > 1}
+                    id={'module' + moduleIndex}
                     type="text"
-                    label={'Module ' + (i + 1) + ' name'}
-                    name={'module' + i}
+                    label={'Module ' + (moduleIndex + 1) + ' name'}
+                    name={'module' + moduleIndex}
                     autoFocus
                     onChange={(e) => {
                       setEditTrigger(true)
                       setError({})
                       setModules(
-                        modules.map((module, moduleIndex) => {
-                          if (i == moduleIndex) {
-                            return {
-                              ...module,
-                              title: e.target.value,
-                            }
-                          } else {
-                            return module
-                          }
+                        modules.map((m: Module, i: number) => {
+                          if (moduleIndex === i) return { ...m, title: e.target.value }
+                          else return m
                         }),
                       )
                     }}
-                    value={element.title}
+                    value={module.title}
                   />
 
                   <IconButton
@@ -222,13 +208,13 @@ const CourseStructure = ({
                       setError({})
                       setModules(
                         modules.filter(
-                          (moduleElem, index) => {
-                            if (i !== index) {
-                              return moduleElem
+                          (m: Module, i: number) => {
+                            if (moduleIndex !== i) {
+                              return m
                             }
                             setAllLessons([
                               ...allLessons,
-                              ...moduleElem.lessons,
+                              ...m.lessons,
                             ])
                           },
                         ),
@@ -255,13 +241,13 @@ const CourseStructure = ({
                   }}
                 >
                   <Box sx={{ width: '100%' }}>
-                    {element.lessons.map((lesson, index) =>
+                    {module.lessons.map((lesson: Lesson, lessonIndex: number) =>
                       <LessonBox
-                        key={'mainLessonContainer_' + index}
-                        element={element}
-                        i={i}
+                        key={'mainLessonContainer_' + lessonIndex}
+                        module={module}
+                        moduleIndex={moduleIndex}
                         lesson={lesson}
-                        index={index}
+                        lessonIndex={lessonIndex}
                         dragLesson={dragLesson}
                         draggedOverLesson={draggedOverLesson}
                         modules={modules}
@@ -272,7 +258,7 @@ const CourseStructure = ({
                         setStoredLessons={setStoredLessons}
                         setEditTrigger={setEditTrigger}
                         setLessonForm={setLessonForm}
-                        setCreateLessonIndx={setCreateLessonIndx}
+                        setModuleIndexCreate={setModuleIndexCreate}
                         setLessonType={setLessonType}
                         setTabValue={setTabValue}
                         setError={setError}
@@ -305,7 +291,7 @@ const CourseStructure = ({
                           label="Stored lessons"
                         />
                       )}
-                      onChange={(event: any, value: any) => handleChangeStoredLessons(value, i)}
+                      onChange={(e: any, value: any) => handleChangeStoredLessons(value, moduleIndex)}
                       renderOption={renderOptionStoredLessons}
                     />
                   </Box>
@@ -320,9 +306,7 @@ const CourseStructure = ({
                   <Button
                     variant="contained"
                     onClick={() => {
-                      setCreateLessonIndx(
-                        createLessonIndx === i ? -1 : i,
-                      )
+                      setModuleIndexCreate(moduleIndexCreate === moduleIndex ? -1 : moduleIndex)
                       setLessonForm({
                         title: '',
                         link: '',
@@ -344,9 +328,7 @@ const CourseStructure = ({
     </Box>
     <Button
       variant="contained"
-      onClick={(e) => {
-        setModules([...modules, { title: '', lessons: [] }])
-      }}
+      onClick={e => setModules([...modules, { title: '', lessons: [] }])}
       sx={{
         marginTop: 2,
         fontWeight: 'bold',
