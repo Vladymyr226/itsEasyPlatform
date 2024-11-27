@@ -52,7 +52,7 @@ const LessonCreateDefault = ({
   setTabValue: React.Dispatch<React.SetStateAction<number>>
   setEditTrigger: React.Dispatch<React.SetStateAction<boolean>>
   setError: React.Dispatch<any>
-  handleSubmitLessonDefault: (en_id?: string) => Promise<void>
+  handleSubmitLessonDefault: (e: any) => Promise<void>
 }) => {
 
   const [displayDrag, setDisplayDrag] = useState<any>(true)
@@ -453,7 +453,7 @@ const LessonCreateDefault = ({
             marginTop: 2,
             fontWeight: 'bold',
           }}
-          onClick={e => handleSubmitLessonDefault()}
+          onClick={handleSubmitLessonDefault}
         >
           {idLessonEdit ? 'Save' : 'Create'}
         </Button>

@@ -152,9 +152,7 @@ const CourseCreate = ({
     setRating(0.0)
     setCategorySelect([])
     setTabValue(1)
-    setTimeout(() => {
-      setTabValue(0)
-    }, 10)
+    setTimeout(() => setTabValue(0), 10)
   }
 
   const showSwalSkill = () => {

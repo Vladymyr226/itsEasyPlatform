@@ -298,24 +298,31 @@ const Create = () => {
   }
 
   const handleTranslateLesson = async () => {
-    const found: Lesson | undefined = storedLessons.find((l: Lesson) =>
-      l.en_id === lessonFormCurrent.en_id && l.language === lessonFormCurrent.language)
+    let lesson: any = storedLessons.find((l: Lesson) =>
+      l.en_id === lessonFormCurrent.en_id && l.language === language)
     
-    if (!found) {
+    if (lesson) {
+      setIdLessonEdit(lesson.id)
+    } else {
       setIdLessonEdit(null)
     
       const content = {
         title: lessonFormCurrent.title,
-        fields: lessonFields.map((f: LessonField) => f.type === 'slate' ? f.value : null)
+        fields: lessonFields.map((f: LessonField) => ({ value: f.type === 'slate' ? f.value : null }))
       }
       
-      const result = await translateJson(content, language)
+      lesson = await translateJson(content, language)
+    }
 
-      if (result) {
-        setLessonFormCurrent({ ...lessonFormCurrent, title: result.title as string, language })
-        setLessonFields(lessonFields
-          .map((f: LessonField, i: number) => ({ ...f, value: (result.fields as any[])[i] ?? f.value })))
-      }
+    if (lesson) {
+      const fields = lessonFields
+        .map((f: LessonField, i: number) => ({ ...f, value: (lesson.fields as any[])[i].value ?? f.value }))
+
+      setLessonForm({ ...lessonForm, title: lesson.title as string, language, fields })
+      setLessonFormCurrent({ ...lessonFormCurrent, title: lesson.title as string, language, fields })
+      setLessonFields(fields)
+      setTabValue(0)
+      setTimeout(() => setTabValue(2), 1)
     }
 
     Swal.fire({
@@ -476,7 +483,7 @@ const Create = () => {
     }
   }
 
-  const handleSubmitLessonDefault = async (en_id?: string) => { 
+  const handleSubmitLessonDefault = async (e: any) => { 
     if (!lessonFormCurrent.title.trim()) {
       Swal.fire({
         ...swalOptions,
@@ -499,10 +506,10 @@ const Create = () => {
         if (!found || (lessonForm.title == lessonFormCurrent.title)) {
           const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
             title: lessonFormCurrent.title,
-            fields: lessonFields,
             image: lessonFormCurrent.image,
             hours: lessonFormCurrent.hours,
             minutes: lessonFormCurrent.minutes,
+            fields: lessonFields,
           })
           const resultResponse = response.data
           if (resultResponse) {
@@ -512,8 +519,7 @@ const Create = () => {
                   return {
                     title: m.title,
                     lessons: m.lessons.map((l: any) => {
-                      if (l.id !== idLessonEdit) return l
-                      else return {
+                      if (l.en_id === lessonFormCurrent.en_id) return {
                         ...lessonFormCurrent,
                         id: idLessonEdit,
                         fields: lessonFields.map((f: LessonField) => {
@@ -521,6 +527,7 @@ const Create = () => {
                         }),
                         type: 'default',
                       }
+                      else return l
                     })
                   }
                 }
@@ -549,44 +556,41 @@ const Create = () => {
               l.title.trim() === lessonFormCurrent.title.trim()))
 
         if (!found) {
-          const response = await axios.post(urlLesson + '?type=default', {
+          let urlLessonFull = `${urlLesson}?type=default&language=${lessonFormCurrent.language}`
+          if (lessonFormCurrent.en_id) urlLessonFull += `&en_id=${lessonFormCurrent.en_id}`
+
+          const response = await axios.post(urlLessonFull, {
             title: lessonFormCurrent.title,
             image: lessonFormCurrent.image,
             hours: lessonFormCurrent.hours,
             minutes: lessonFormCurrent.minutes,
             fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
-            language: en_id ? language : undefined,
-            en_id,
           })
 
           const resultResponse = response.data
           if (resultResponse) {
             setModules(
-              modules.map((modulesElem: any, index: any) => {
+              modules.map((module: any, index: any) => {
                 if (
                   index == moduleIndexCreate &&
-                  modulesElem.lessons.filter(
-                    (reDropElem: any) => reDropElem.id === resultResponse.lessonId
+                  module.lessons.filter(
+                    (lesson: any) => lesson.id === resultResponse.lessonId
                   ).length === 0
                 ) {
                   return {
-                    title: modulesElem.title,
+                    title: module.title,
                     lessons: [
-                      ...modulesElem.lessons,
+                      ...module.lessons.filter((lesson: any) => lesson.id !== lessonFormCurrent.en_id),
                       {
                         ...lessonFormCurrent,
                         id: resultResponse.lessonId,
-                        title: lessonFormCurrent.title,
                         fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
-                        image: lessonFormCurrent.image,
                         type: 'default',
-                        language: en_id ? language : 'EN',
-                        en_id: en_id || resultResponse.lessonId,
+                        en_id: lessonFormCurrent.en_id || resultResponse.lessonId,
                       },
                     ],
                   }
-                }
-                return modulesElem
+                } else return module
               })
             )
 
