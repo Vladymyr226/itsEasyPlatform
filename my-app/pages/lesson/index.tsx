@@ -28,6 +28,7 @@ import ConfettiButton from '@/components/ConfettiButton/ConfettiButton'
 import courseShadow from '../../src/assets/shadows/courseHoverShadow.png'
 import { styled } from '@mui/material/styles'
 import ReactMarkdown from 'react-markdown'
+import { initialRichText } from '@/components/CourseCreate'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
@@ -730,12 +731,7 @@ const LessonDetails = () => {
                                   value={
                                     field
                                       ? field.value
-                                      : [
-                                          {
-                                            type: 'paragaph',
-                                            children: [{ text: '' }],
-                                          },
-                                        ]
+                                      : initialRichText
                                   }
                                 />
                               </Box>
@@ -1005,12 +1001,7 @@ const LessonDetails = () => {
                                   value={
                                     field
                                       ? field.value
-                                      : [
-                                          {
-                                            type: 'paragaph',
-                                            children: [{ text: '' }],
-                                          },
-                                        ]
+                                      : initialRichText
                                   }
                                 />
                               </Box>

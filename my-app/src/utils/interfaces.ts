@@ -1,4 +1,5 @@
 export type Language = 'EN' | 'RU' | 'UA' | 'PL' | 'ES'
+export type LessonType = 'default' | 'quiz' | 'practice' | 'defaultOld'
 
 export interface YouTubeProp {
   url: string
@@ -22,7 +23,7 @@ export interface Lesson {
   link: string
   image?: string
   questionLimit?: number
-  type?: string
+  type?: LessonType
   description?: any
   language?: Language
   en_id?: string

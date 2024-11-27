@@ -2,8 +2,9 @@ import Swal from 'sweetalert2'
 import axios from 'axios'
 
 import { removeLessonIds } from '@/utils/removeAllLessonId'
-import { Lesson, Module } from '@/utils/interfaces'
+import { Lesson, LessonType, Module } from '@/utils/interfaces'
 import LessonBox from './LessonBox'
+import { initialLesson } from '../LessonCreate'
 
 import {
   Accordion,
@@ -54,7 +55,7 @@ const CourseStructure = ({
   setEditTrigger: React.Dispatch<React.SetStateAction<boolean>>,
   setError: React.Dispatch<any>,
   setLessonForm: React.Dispatch<React.SetStateAction<Lesson>>,
-  setLessonType: React.Dispatch<React.SetStateAction<string>>,
+  setLessonType: React.Dispatch<React.SetStateAction<LessonType>>,
   setTabValue: React.Dispatch<React.SetStateAction<number>>,
 }) => {
 
@@ -307,13 +308,7 @@ const CourseStructure = ({
                     variant="contained"
                     onClick={() => {
                       setModuleIndexCreate(moduleIndexCreate === moduleIndex ? -1 : moduleIndex)
-                      setLessonForm({
-                        title: '',
-                        link: '',
-                        image: '',
-                        hours: 0,
-                        minutes: 0,
-                      })
+                      setLessonForm(initialLesson)
                       setTabValue(2)
                     }}
                   >

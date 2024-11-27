@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import YouTube, { YouTubeProps } from 'react-youtube'
 import SlateView from '@/components/SlateEditor/View'
-import { Lesson, Module, YouTubeProp } from '@/utils/interfaces'
+import { Lesson, LessonType, Module, YouTubeProp } from '@/utils/interfaces'
 
 import {
   Box,
@@ -63,7 +63,7 @@ const LessonBox = ({
   setEditTrigger: React.Dispatch<React.SetStateAction<boolean>>,
   setLessonForm: React.Dispatch<React.SetStateAction<Lesson>>,
   setModuleIndexCreate: React.Dispatch<React.SetStateAction<number>>,
-  setLessonType: React.Dispatch<React.SetStateAction<string>>,
+  setLessonType: React.Dispatch<React.SetStateAction<LessonType>>,
   setTabValue: React.Dispatch<React.SetStateAction<number>>,
   setError: React.Dispatch<any>,
 }) => {
@@ -172,7 +172,7 @@ const LessonBox = ({
           )
           setLessonForm(lesson)
           setModuleIndexCreate(moduleIndex)
-          setLessonType(lesson.type || '')
+          setLessonType(lesson.type || 'default')
           setTabValue(2)
         }}
       >

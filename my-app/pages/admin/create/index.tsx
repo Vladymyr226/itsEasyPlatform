@@ -4,8 +4,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import axios, { AxiosResponse } from 'axios'
-import Swal from 'sweetalert2'
+import axios from 'axios'
+import Swal, { SweetAlertOptions } from 'sweetalert2'
+import { isEqual } from 'lodash-es'
+import { deleteCookie } from 'cookies-next'
+import Logo from '@/components/Logo/Logo'
 
 import {
   Box,
@@ -20,7 +23,6 @@ import {
 } from '@mui/material'
 
 import {
-  TabPanelProps,
   Lesson,
   Module,
   Tag,
@@ -28,70 +30,56 @@ import {
   Course,
   Skill,
   LessonField,
+  LessonType,
 } from '@/utils/interfaces'
 
-import { isEqual } from 'lodash-es'
-import { deleteCookie } from 'cookies-next'
-import Logo from '@/components/Logo/Logo'
-import { LessonCreateDefault, LessonCreateQuiz, LessonCreatePractice } from '@/components/LessonCreate'
-import { langNames, languages, uploadFileToS3 } from '@/utils'
-import { CourseCreate, CourseStructure } from '@/components/CourseCreate'
+import {
+  LessonCreateDefault,
+  LessonCreateQuiz,
+  LessonCreatePractice,
+  initialLesson
+} from '@/components/LessonCreate'
+
+import {
+  langNames,
+  languages,
+  translateJson,
+  uploadFileToS3
+} from '@/utils'
+
+import {
+  CourseCreate,
+  CourseStructure,
+  CustomTabPanel,
+  initialRichText
+} from '@/components/CourseCreate'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const urlSkill = `${process.env.NEXT_BACK_HOST_API}/cabinet/skill`
 
-const CustomTabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  )
-}
-
 const Create = () => {
   const router = useRouter()
 
-  const [moduleIndexCreate, setModuleIndexCreate] = useState(-1)
   const [id, setId] = useState<string>()
   const [enId, setEnId] = useState<string>()
-  const [idLessonEdit, setIdLessonEdit] = useState<string | null>(null)
-  const [tabValue, setTabValue] = useState(0)
   const [language, setLanguage] = useState<Language>('EN')
   const [languageDisabled, setLanguageDisabled] = useState(false)
+  const [tabValue, setTabValue] = useState(0)
   const [level, setLevel] = useState('')
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
-  const [modules, setModules] = useState<Module[]>([])
-  const [allLessons, setAllLessons] = useState<Lesson[]>([])
-  const [storedLessons, setStoredLessons] = useState<Lesson[]>([])
   const [categorySelect, setCategorySelect] = useState<Tag[]>([])
   const [allCategorySelect, setAllCategorySelect] = useState<Tag[]>([])
   const [allSkillSelect, setAllSkillSelect] = useState<Skill[]>([])
-  const [lessonType, setLessonType] = useState('')
   const [fetchedMediaData, setFetchedMediaData] = useState<any>()
   const [rating, setRating] = useState(0.0)
   const [editTrigger, setEditTrigger] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [error, setError] = useState<any>()
   const [mediaValue, setMediaValue] = useState<{ type: string, content: File }>()
-  const [lessonFields, setLessonFields] = useState<LessonField[]>([])
-
-  const [richValue, setRichValue] = useState<any[]>([
-    {
-      type: 'paragaph',
-      children: [{ text: '' }],
-    },
-  ])
+  const [richValue, setRichValue] = useState<any[]>(initialRichText)
 
   const [form, setForm] = useState<any>({
     title: '',
@@ -103,24 +91,24 @@ const Create = () => {
     priceDiscount: null,
   })
 
-  const [lessonForm, setLessonForm] = useState<Lesson>({
-    title: '',
-    link: '',
-    image: '',
-    hours: 0,
-    minutes: 0,
-  })
-
-  const [lessonFormCurrent, setLessonFormCurrent] = useState<Lesson>({
-    title: '',
-    link: '',
-    image: '',
-    hours: 0,
-    minutes: 0,
-  })
+  const [moduleIndexCreate, setModuleIndexCreate] = useState(-1)
+  const [modules, setModules] = useState<Module[]>([])
+  const [allLessons, setAllLessons] = useState<Lesson[]>([])
+  const [storedLessons, setStoredLessons] = useState<Lesson[]>([])
+  const [lessonType, setLessonType] = useState<LessonType>('default')
+  const [idLessonEdit, setIdLessonEdit] = useState<string | null>(null)
+  const [lessonForm, setLessonForm] = useState<Lesson>(initialLesson)
+  const [lessonFormCurrent, setLessonFormCurrent] = useState<Lesson>(initialLesson)
+  const [lessonFields, setLessonFields] = useState<LessonField[]>([])
 
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
+
+  const swalOptions: SweetAlertOptions = {
+    background: '#171622',
+    color: '#ffec3e',
+    confirmButtonColor: '#c58efe',
+  }
 
   const getPageData = useCallback(async (lang?: Language, enIdParam?: string): Promise<string | undefined> => {
     if (typeof window === 'undefined') return
@@ -176,12 +164,7 @@ const Create = () => {
 
       if (!resultData.length) {
         setLanguageDisabled(true)
-        setRichValue([
-          {
-            type: 'paragaph',
-            children: [{ text: '' }],
-          },
-        ])  
+        setRichValue(initialRichText)  
       }
     }
 
@@ -247,9 +230,7 @@ const Create = () => {
       })
 
       setTabValue(2)
-      setTimeout(() => {
-        setTabValue(0)
-      }, 1)
+      setTimeout(() => setTabValue(0), 1)
 
     } else {
       setId(undefined)
@@ -278,13 +259,7 @@ const Create = () => {
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setIdLessonEdit(null)
-    setLessonForm({
-      title: '',
-      link: '',
-      image: '',
-      hours: 0,
-      minutes: 0,
-    })
+    setLessonForm(initialLesson)
     setTabValue(newValue)
   }
 
@@ -297,66 +272,28 @@ const Create = () => {
   }
 
   const handleTranslate = async () => {
-    const url = 'https://api.openai.com/v1/chat/completions'
-    const apiKey =
-      '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'
-
     const content = {
       title: form.title,
       richValue,
       modules: modules.map(m => m.title)
     }
     
-    try {
-      const response: AxiosResponse<any, any> = await axios.post(
-        url,
-        {
-          model: 'gpt-4o',
-          messages: [
-            { role: 'system', content: 'You are a helpful assistant that translates text in JSON structures.'},
-            { role: 'user', content: `
-                Translate the text content in the following JSON structure to ${langNames[language]}
-                without changing the JSON structure:   
-                ${JSON.stringify(content)}`
-            }
-          ],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      )
+    const result = await translateJson(content, language)
 
-      if (response.status === 200) {
-        const result = JSON.parse(
-          response.data.choices[0].message.content
-            .replace('```json', '')
-            .replace('```', '')
-        )
+    if (result) {
+      setForm({ ...form, title: result.title })
+      setRichValue(result.richValue as any[])
+      setModules(modules.map((m, i) => ({ ...m, title: (result.modules as any[])[i] })))
 
-        setForm({ ...form, title: result.title })
-        setRichValue(result.richValue)
-        setModules(modules.map((m, i) => ({ ...m, title: result.modules[i] })))
+      Swal.fire({
+        ...swalOptions,
+        title: 'Course translated!',
+        icon: 'success',
+      })
+      setEditTrigger(true)
 
-        Swal.fire({
-          title: 'Course translated!',
-          background: '#171622',
-          color: '#ffec3e',
-          confirmButtonColor: '#c58efe',
-          icon: 'success',
-        })
-        setEditTrigger(true)
-
-        setTabValue(2)
-        setTimeout(() => {
-          setTabValue(0)
-        }, 1)  
-      }
-
-    } catch (error) {
-      console.error('Ошибка при отправке запроса:', error)
+      setTabValue(2)
+      setTimeout(() => setTabValue(0), 1)  
     }
   }
 
@@ -364,13 +301,26 @@ const Create = () => {
     const found: Lesson | undefined = storedLessons.find((l: Lesson) =>
       l.en_id === lessonFormCurrent.en_id && l.language === lessonFormCurrent.language)
     
-    // TODO create and translate lesson
+    if (!found) {
+      setIdLessonEdit(null)
+    
+      const content = {
+        title: lessonFormCurrent.title,
+        fields: lessonFields.map((f: LessonField) => f.type === 'slate' ? f.value : null)
+      }
+      
+      const result = await translateJson(content, language)
+
+      if (result) {
+        setLessonFormCurrent({ ...lessonFormCurrent, title: result.title as string, language })
+        setLessonFields(lessonFields
+          .map((f: LessonField, i: number) => ({ ...f, value: (result.fields as any[])[i] ?? f.value })))
+      }
+    }
 
     Swal.fire({
+      ...swalOptions,
       title: 'Lesson translated!',
-      background: '#171622',
-      color: '#ffec3e',
-      confirmButtonColor: '#c58efe',
       icon: 'success',
     })
   }
@@ -389,10 +339,8 @@ const Create = () => {
       }).length > 0
     ) {
       Swal.fire({
+        ...swalOptions,
         title: 'Each module must have a unique name!',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         icon: 'error',
       })
       return
@@ -429,10 +377,8 @@ const Create = () => {
       form.questionLimit < -1
     ) {
       Swal.fire({
+        ...swalOptions,
         title: 'Validation failed!',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         icon: 'error',
       })
       return
@@ -441,10 +387,8 @@ const Create = () => {
     if (modules.filter((module) => module.title.trim() == '').length > 0) {
       setTabValue(1)
       Swal.fire({
+        ...swalOptions,
         title: 'Module title is empty!',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         icon: 'error',
       })
       return
@@ -495,10 +439,8 @@ const Create = () => {
         if (resultResponse) {
           setEditTrigger(false)
           Swal.fire({
+            ...swalOptions,
             title: 'Changed!',
-            background: '#171622',
-            color: '#ffec3e',
-            confirmButtonColor: '#c58efe',
             icon: 'success',
           })
         }
@@ -514,10 +456,8 @@ const Create = () => {
 
         if (resultResponse) {
           Swal.fire({
+            ...swalOptions,
             title: 'Created!',
-            background: '#171622',
-            color: '#ffec3e',
-            confirmButtonColor: '#c58efe',
             icon: 'success',
           })
           setEditTrigger(false)
@@ -527,11 +467,9 @@ const Create = () => {
       }
     } catch (error) {
       Swal.fire({
+        ...swalOptions,
         title: 'Something went wrong!',
         text: error + '',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         icon: 'error',
       })
       return
@@ -541,10 +479,8 @@ const Create = () => {
   const handleSubmitLessonDefault = async (en_id?: string) => { 
     if (!lessonFormCurrent.title.trim()) {
       Swal.fire({
+        ...swalOptions,
         title: 'Lesson title can not be empty!',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         icon: 'error',
       })
       return
@@ -591,23 +527,17 @@ const Create = () => {
                 return m
               })
             )
-            setLessonFormCurrent({
-              title: '',
-              link: '',
-              image: '',
-              hours: 0,
-              minutes: 0,
-            })
+            setLessonFormCurrent(initialLesson)
+            setLessonForm(initialLesson)
+            setLessonFields([])
             setIdLessonEdit(null)
             setTabValue(1)
           }
 
         } else {
           Swal.fire({
+            ...swalOptions,
             title: 'Lesson name is already taken!',
-            background: '#171622',
-            color: '#ffec3e',
-            confirmButtonColor: '#c58efe',
             icon: 'error',
           })
         }
@@ -624,9 +554,7 @@ const Create = () => {
             image: lessonFormCurrent.image,
             hours: lessonFormCurrent.hours,
             minutes: lessonFormCurrent.minutes,
-            fields: lessonFields.map((f: LessonField) => {
-              return { type: f.type, value: f.value }
-            }),
+            fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
             language: en_id ? language : undefined,
             en_id,
           })
@@ -662,23 +590,17 @@ const Create = () => {
               })
             )
 
-            setLessonFormCurrent({
-              title: '',
-              link: '',
-              image: '',
-              hours: 0,
-              minutes: 0,
-            })
+            setLessonFormCurrent(initialLesson)
+            setLessonForm(initialLesson)
+            setLessonFields([])
             setModuleIndexCreate(-1)
             setTabValue(1)
           }
 
         } else {
           Swal.fire({
+            ...swalOptions,
             title: 'Lesson name is already taken!',
-            background: '#171622',
-            color: '#ffec3e',
-            confirmButtonColor: '#c58efe',
             icon: 'error',
           })
         }
@@ -686,11 +608,9 @@ const Create = () => {
 
     } catch (error) {
       Swal.fire({
+        ...swalOptions,
         title: 'Something went wrong!',
         text: error + '',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         icon: 'error',
       })
       return
@@ -700,10 +620,8 @@ const Create = () => {
   const showPushAction = (url: string) => {
     if (id ? editTrigger : isEdited()) {
       Swal.fire({
+        ...swalOptions,
         title: 'Do you want to save changes?',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         showCancelButton: true,
         showDenyButton: true,
         confirmButtonText: 'Save',
@@ -724,37 +642,35 @@ const Create = () => {
 
   const showSwalTranslate = () => {
     if (tabValue === 2)
-      Swal.fire({
-        title: `Do you want to translate lesson to ${langNames[language]}?`,
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
-        showCancelButton: true,
-        confirmButtonText: 'Translate',
-      }).then(async (result) => {
-        if (result.isConfirmed) handleTranslateLesson()
-      })
+      if (lessonFormCurrent.language === language)
+        Swal.fire({
+          ...swalOptions,
+          title: 'The course and lesson have the same language',
+          icon: 'error',
+        })
+        
+      else
+        Swal.fire({
+          ...swalOptions,
+          title: `Do you want to translate lesson to ${langNames[language]}?`,
+          showCancelButton: true,
+          confirmButtonText: 'Translate',
+        }).then(async result => result.isConfirmed && handleTranslateLesson())
   
     else if (tabValue === 1)    
       Swal.fire({
+        ...swalOptions,
         title: 'All lessons translation does not work',
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         icon: 'error',
       })
     
     else
       Swal.fire({
+        ...swalOptions,
         title: `Do you want to translate course to ${langNames[language]}?`,
-        background: '#171622',
-        color: '#ffec3e',
-        confirmButtonColor: '#c58efe',
         showCancelButton: true,
         confirmButtonText: 'Translate',
-      }).then(async (result) => {
-        if (result.isConfirmed) handleTranslate()
-    })
+      }).then(async result => result.isConfirmed && handleTranslate())
   }
 
   const compareRichTexts = (first: any[], second: any[]) => {
@@ -784,12 +700,7 @@ const Create = () => {
       type != '' ||
       status != '' ||
       rating != 0.0 ||
-      !compareRichTexts(richValue, [
-        {
-          type: 'paragaph',
-          children: [{ text: '' }],
-        },
-      ]) ||
+      !compareRichTexts(richValue, initialRichText) ||
       !isEqual(mediaValue, fetchedMediaData)
     )
   }
@@ -1049,7 +960,7 @@ const Create = () => {
                             fullWidth
                             id="lessonTypeSelect"
                             value={lessonType}
-                            onChange={(event: SelectChangeEvent) => setLessonType(event.target.value as string)}
+                            onChange={(event: SelectChangeEvent) => setLessonType(event.target.value as LessonType)}
                           >
                             <MenuItem value={'default'}>Default</MenuItem>
                             <MenuItem value={'quiz'}>Quiz</MenuItem>
@@ -1057,7 +968,23 @@ const Create = () => {
                           </Select>
                         </Box>
                       )}
-                      {lessonType == 'quiz' && (
+                      {lessonType === 'default' && (
+                        <LessonCreateDefault
+                          lessonForm={lessonForm}
+                          setLessonForm={setLessonForm}
+                          idLessonEdit={idLessonEdit}
+                          setIdLessonEdit={setIdLessonEdit}
+                          lessonFormCurrent={lessonFormCurrent}
+                          setLessonFormCurrent={setLessonFormCurrent}
+                          lessonFields={lessonFields}
+                          setLessonFields={setLessonFields}
+                          setTabValue={setTabValue}
+                          setEditTrigger={setEditTrigger}
+                          setError={setError}
+                          handleSubmitLessonDefault={handleSubmitLessonDefault}
+                        />
+                      )}
+                      {lessonType === 'quiz' && (
                         <LessonCreateQuiz
                           lessonForm={lessonForm}
                           setValue={setTabValue}
@@ -1072,7 +999,7 @@ const Create = () => {
                           storedLessons={storedLessons}
                         />
                       )}
-                      {lessonType == 'practice' && (
+                      {lessonType === 'practice' && (
                         <LessonCreatePractice
                           lessonForm={lessonForm}
                           setValue={setTabValue}
@@ -1085,20 +1012,6 @@ const Create = () => {
                           setEditTrigger={setEditTrigger}
                           setError={setError}
                           storedLessons={storedLessons}
-                        />
-                      )}
-                      {lessonType == 'default' && (
-                        <LessonCreateDefault
-                          idLessonEdit={idLessonEdit}
-                          lessonForm={lessonForm}
-                          lessonFormCurrent={lessonFormCurrent}
-                          setLessonFormCurrent={setLessonFormCurrent}
-                          lessonFields={lessonFields}
-                          setLessonFields={setLessonFields}
-                          setTabValue={setTabValue}
-                          setEditTrigger={setEditTrigger}
-                          setError={setError}
-                          handleSubmitLessonDefault={handleSubmitLessonDefault}
                         />
                       )}
                     </Box>

@@ -1,5 +1,6 @@
 import * as AWS from 'aws-sdk'
 import { Language } from './interfaces'
+import axios, { AxiosResponse } from 'axios'
 
 export const languages: Language[] = ['EN', 'RU', 'UA', 'PL', 'ES']
 
@@ -48,4 +49,47 @@ export const uploadFileToS3 = async (file: File) => {
       }
     })
   })
+}
+
+export const translateJson = async (
+  content: Record<string, unknown>, language: Language
+): Promise<Record<string, unknown> | void> => {
+  
+  const url = 'https://api.openai.com/v1/chat/completions'
+  const apiKey =
+    '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'
+
+  try {
+    const response: AxiosResponse<any, any> = await axios.post(
+      url,
+      {
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that translates text in JSON structures.'},
+          { role: 'user', content: `
+              Translate the text content in the following JSON structure to ${langNames[language]}
+              without changing the JSON structure:   
+              ${JSON.stringify(content)}`
+          }
+        ],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+
+    if (response.status === 200) {
+      return JSON.parse(
+        response.data.choices[0].message.content
+          .replace('```json', '')
+          .replace('```', '')
+      )
+    }
+
+  } catch (error) {
+    console.error('Ошибка при отправке запроса:', error)
+  }
 }

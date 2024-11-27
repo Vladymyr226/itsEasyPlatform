@@ -7,6 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MyEditor from '@/components/SlateEditor/Editor'
+import { initialRichText } from '../CourseCreate'
 
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 
@@ -288,12 +289,7 @@ const LessonCreatePractice = ({
               {
                 tmpId: new Date().getTime(),
                 type: 'slate',
-                value: [
-                  {
-                    type: 'paragaph',
-                    children: [{ text: '' }],
-                  },
-                ],
+                value: initialRichText,
               },
             ])
           }}

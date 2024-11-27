@@ -20,6 +20,8 @@ import {
   SelectChangeEvent,
   TextField
 } from '@mui/material'
+import { initialLesson } from '../LessonCreate'
+import { initialRichText } from '.'
 
 const urlTag = `${process.env.NEXT_BACK_HOST_API}/cabinet/tag`
 const urlSkill = `${process.env.NEXT_BACK_HOST_API}/cabinet/skill`
@@ -126,13 +128,7 @@ const CourseCreate = ({
       priceDiscount: null,
     })
 
-    setLessonForm({
-      title: '',
-      link: '',
-      image: '',
-      hours: 0,
-      minutes: 0,
-    })
+    setLessonForm(initialLesson)
 
     let selectedModulesArr: Array<Lesson> = []
     modules.map((module: Module) => {
@@ -147,12 +143,7 @@ const CourseCreate = ({
     ])
     setModules([])
 
-    setRichValue([
-      {
-        type: 'paragaph',
-        children: [{ text: '' }],
-      },
-    ])
+    setRichValue(initialRichText)
 
     setLanguage('EN')
     setLevel('')
