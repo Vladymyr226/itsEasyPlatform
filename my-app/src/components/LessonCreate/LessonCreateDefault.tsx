@@ -56,7 +56,6 @@ const LessonCreateDefault = ({
 }) => {
 
   const [displayDrag, setDisplayDrag] = useState<any>(true)
-
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
 
@@ -435,9 +434,9 @@ const LessonCreateDefault = ({
             marginRight: 2,
             fontWeight: 'bold',
           }}
-          onClick={async (e) => {
-            setLessonFormCurrent(initialLesson)
+          onClick={async e => {
             setLessonForm(initialLesson)
+            setLessonFormCurrent(initialLesson)
             setLessonFields([])
             setIdLessonEdit(null)
             setTabValue(1)

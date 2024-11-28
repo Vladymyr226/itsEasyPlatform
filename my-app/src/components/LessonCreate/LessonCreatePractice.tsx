@@ -1,64 +1,80 @@
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import { Box, Button, TextField, IconButton } from '@mui/material'
-import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
-import DeleteIcon from '@mui/icons-material/Delete'
 import MyEditor from '@/components/SlateEditor/Editor'
 import { initialRichText } from '../CourseCreate'
+import { initialLesson } from '.'
+import { Lesson, LessonField, Module } from '@/utils/interfaces'
+
+import {
+  Box,
+  Button,
+  TextField,
+  IconButton,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+} from '@mui/material'
+
+import {
+  ExpandMore as ExpandMoreIcon,
+  DragIndicator as DragIndicatorIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material'
 
 const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 
-interface practiceCreation {
-  setValue: any
-  idLessonEdit: any
-  setIdLessonEdit: any
-  moduleIndexCreate: any
-  setModuleIndexCreate: any
-  modules: any
-  setModules: any
-  setEditTrigger: any
-  setError: any
-  storedLessons: any
-  lessonForm?: any
-}
 const LessonCreatePractice = ({
-  setValue,
-  idLessonEdit,
-  setIdLessonEdit,
-  moduleIndexCreate,
-  setModuleIndexCreate,
-  modules,
-  setModules,
+  storedLessons,
+  lessonForm, setLessonForm,
+  lessonFormCurrent, setLessonFormCurrent,
+  idLessonEdit, setIdLessonEdit,
+  moduleIndexCreate, setModuleIndexCreate,
+  modules, setModules,
+  lessonFields, setLessonFields,
+  setTabValue,
   setEditTrigger,
   setError,
-  storedLessons,
-  lessonForm,
-}: practiceCreation) => {
-  const [lessonFormCurrent, setLessonFormCurrent] = useState({
-    title: lessonForm ? lessonForm.title : '',
-    hours: lessonForm ? lessonForm.hours : 0,
-    minutes: lessonForm ? lessonForm.minutes : 0,
-  })
-  const [taskModules, setTaskModules] = useState<any>(
-    lessonForm && lessonForm.fields ? lessonForm.fields : []
-  )
-  const [displayDrag, setDisplayDrag] = useState<any>(true)
+}: {
+  storedLessons: Lesson[]
 
+  lessonForm: Lesson
+  setLessonForm: React.Dispatch<React.SetStateAction<Lesson>>
+  lessonFormCurrent: Lesson
+  setLessonFormCurrent: React.Dispatch<React.SetStateAction<Lesson>>
+  idLessonEdit: string | null
+  setIdLessonEdit: React.Dispatch<React.SetStateAction<string | null>>
+  moduleIndexCreate: number
+  setModuleIndexCreate: React.Dispatch<React.SetStateAction<number>>
+  modules: Module[]
+  setModules: React.Dispatch<React.SetStateAction<Module[]>>
+  lessonFields: LessonField[]
+  setLessonFields: React.Dispatch<React.SetStateAction<LessonField[]>>
+
+  setTabValue: React.Dispatch<React.SetStateAction<number>>
+  setEditTrigger: React.Dispatch<React.SetStateAction<boolean>>
+  setError: React.Dispatch<any>
+}) => {
+
+  const [displayDrag, setDisplayDrag] = useState<any>(true)
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
+
+  useEffect(() => {
+    setLessonFormCurrent(lessonForm)
+    setLessonFields(lessonForm.fields || [])
+  }, [lessonForm, setLessonFields, setLessonFormCurrent])
+
   function handleSort() {
-    const taskClone = [...taskModules]
+    const lessonFieldsClone = [...lessonFields]
     let draggedIdx = -1
-    const temp = taskClone.filter((module, i) => {
+    const temp = lessonFieldsClone.filter((module, i) => {
       if (module.tmpId == dragLesson.current) {
         draggedIdx = i
         return module
       }
     })[0]
-    taskClone.splice(
+    lessonFieldsClone.splice(
       draggedOverLesson.current > draggedIdx
         ? draggedOverLesson.current + 1
         : draggedOverLesson.current,
@@ -66,8 +82,8 @@ const LessonCreatePractice = ({
       temp
     )
     setEditTrigger(true)
-    setTaskModules(
-      taskClone.filter(
+    setLessonFields(
+      lessonFieldsClone.filter(
         (less, i) =>
           less.tmpId != dragLesson.current ||
           i ==
@@ -77,15 +93,149 @@ const LessonCreatePractice = ({
       )
     )
   }
-  useEffect(() => {
-    if (lessonForm && lessonForm.fields) {
-      setTaskModules(
-        lessonForm.fields.map((module: any, i: number) => {
-          return { ...module, tmpId: new Date().getTime() + i }
-        })
-      )
+
+  const handleSubmit = async (e: any) => {
+    if (lessonFormCurrent.title.trim() == '') {
+      Swal.fire({
+        title: 'Lesson title can not be empty!',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
+      return
     }
-  }, [lessonForm])
+
+    try {
+      setEditTrigger(true)
+      setError({})
+
+      if (idLessonEdit) {
+        const found = storedLessons.some((l: Lesson) => l.title === lessonFormCurrent.title.trim()) ||
+          modules.some((m: Module) =>
+            m.lessons.some((l: Lesson) =>
+              l.title.trim() === lessonFormCurrent.title.trim() && idLessonEdit !== l.id))
+
+        if (!found) {
+          const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
+            title: lessonFormCurrent.title,
+            hours: lessonFormCurrent.hours,
+            minutes: lessonFormCurrent.minutes,
+            fields: lessonFields,
+          })
+          const resultResponse = response.data
+          if (resultResponse) {
+            setModules(
+              modules.map((m: Module, i: number) => {
+                if (moduleIndexCreate === i) {
+                  return {
+                    title: m.title,
+                    lessons: m.lessons.map((l: any) => {
+                      if (l.en_id === lessonFormCurrent.en_id) {
+                        return {
+                          ...lessonFormCurrent,
+                          id: idLessonEdit,
+                          fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
+                          type: 'practice',
+                        }
+                      }
+                      else return l
+                    }),
+                  }
+                }
+                return m
+              })
+            )
+
+            setLessonForm(initialLesson)
+            setLessonFormCurrent(initialLesson)
+            setLessonFields([])
+            setIdLessonEdit(null)
+            setTabValue(1)
+          }
+        } else {
+          Swal.fire({
+            title: 'Lesson name is already taken!',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#c58efe',
+            icon: 'error',
+          })
+        }
+
+      } else {
+        const found = storedLessons.some((l: Lesson) => l.title === lessonFormCurrent.title.trim()) ||
+          modules.some((m: Module) =>
+            m.lessons.some((l: Lesson) =>
+              l.title.trim() === lessonFormCurrent.title.trim()))
+
+        if (!found) {
+          let urlLessonFull = `${urlLesson}?type=practice&language=${lessonFormCurrent.language}`
+          if (lessonFormCurrent.en_id) urlLessonFull += `&en_id=${lessonFormCurrent.en_id}`
+
+          const response = await axios.post(urlLessonFull, {
+            title: lessonFormCurrent.title,
+            hours: lessonFormCurrent.hours,
+            minutes: lessonFormCurrent.minutes,
+            fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
+          })
+
+          const resultResponse = response.data
+          if (resultResponse) {
+            setModules(
+              modules.map((module: any, index: any) => {
+                if (
+                  index == moduleIndexCreate &&
+                  module.lessons.filtemodulesElemr(
+                    (reDropElem: any) => reDropElem.id === resultResponse.lessonId
+                  ).length === 0
+                ) {
+                  return {
+                    title: module.title,
+                    lessons: [
+                      ...module.lessons.filter((lesson: any) => lesson.id !== lessonFormCurrent.en_id),
+                      {
+                        ...lessonFormCurrent,
+                        id: resultResponse.lessonId,
+                        fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
+                        type: 'practice',
+                        en_id: lessonFormCurrent.en_id || resultResponse.lessonId,
+                      },
+                    ],
+                  }
+                } else return module
+              })
+            )
+
+            setLessonForm(initialLesson)
+            setLessonFormCurrent(initialLesson)
+            setLessonFields([])
+            setModuleIndexCreate(-1)
+            setTabValue(1)
+          }
+        } else {
+          Swal.fire({
+            title: 'Lesson name is already taken!',
+            background: '#171622',
+            color: '#ffec3e',
+            confirmButtonColor: '#c58efe',
+            icon: 'error',
+          })
+        }
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'Something went wrong!',
+        text: error + '',
+        background: '#171622',
+        color: '#ffec3e',
+        confirmButtonColor: '#c58efe',
+        icon: 'error',
+      })
+      return
+    }
+  }
+
   return (
     <Box>
       <Box sx={{ display: 'flex' }}>
@@ -100,10 +250,11 @@ const LessonCreatePractice = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonFormCurrent({ ...lessonFormCurrent, hours: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, hours: parseInt(e.target.value) })
           }}
           value={lessonFormCurrent.hours}
         />
+
         <TextField
           margin='normal'
           required
@@ -115,11 +266,12 @@ const LessonCreatePractice = ({
           autoFocus
           autoComplete='off'
           onChange={(e) => {
-            setLessonFormCurrent({ ...lessonFormCurrent, minutes: e.target.value })
+            setLessonFormCurrent({ ...lessonFormCurrent, minutes: parseInt(e.target.value) })
           }}
           value={lessonFormCurrent.minutes}
         />
       </Box>
+
       <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField
           margin='normal'
@@ -137,155 +289,133 @@ const LessonCreatePractice = ({
           value={lessonFormCurrent.title}
         />
       </Box>
+
       <Box sx={{ width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {taskModules.map((element: any, i: any) => {
-            return (
-              <Box key={'mainModuleContainer_' + i} sx={{ boxShadow: 2, border: '1px solid' }}>
-                <Accordion
-                  defaultExpanded={true}
-                  sx={{}}
-                  draggable
-                  onDragStart={() => ((dragLesson.current = element.tmpId), setDisplayDrag(false))}
-                  onDragEnter={() => (draggedOverLesson.current = i)}
-                  onDragEnd={(e) => {
-                    handleSort()
-                    setDisplayDrag(true)
-                  }}
-                  onDragOver={(e) => e.preventDefault()}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{}}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                      <DragIndicatorIcon sx={{ marginTop: 1, color: '#808080' }} />
-                      <IconButton
-                        color='error'
-                        sx={{
-                          width: '40px',
-                          height: '40px',
-                          marginRight: 4,
-                        }}
-                        onClick={(e) => {
-                          setEditTrigger(true)
-                          setError({})
-                          setTaskModules(
-                            taskModules.filter((moduleElem: any, index: number) => {
-                              if (i !== index) {
-                                return moduleElem
-                              }
-                            })
-                          )
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </AccordionSummary>
-
-                  <AccordionDetails
-                    style={{
-                      paddingLeft: '8px',
-                      paddingRight: '8px',
-                      borderTop: '2px solid',
-                    }}
-                  >
-                    <Box
+          {lessonFields.map((field: LessonField, index: number) =>
+            <Box key={'mainModuleContainer_' + index} sx={{ boxShadow: 2, border: '1px solid' }}>
+              <Accordion
+                defaultExpanded={true}
+                sx={{}}
+                draggable
+                onDragStart={() => ((dragLesson.current = field.tmpId), setDisplayDrag(false))}
+                onDragEnter={() => (draggedOverLesson.current = index)}
+                onDragEnd={(e) => {
+                  handleSort()
+                  setDisplayDrag(true)
+                }}
+                onDragOver={(e) => e.preventDefault()}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{}}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <DragIndicatorIcon sx={{ marginTop: 1, color: '#808080' }} />
+                    <IconButton
+                      color='error'
                       sx={{
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'center',
+                        width: '40px',
+                        height: '40px',
+                        marginRight: 4,
+                      }}
+                      onClick={(e) => {
+                        setEditTrigger(true)
+                        setError({})
+                        setLessonFields(lessonFields.filter((f: LessonField, i: number) => i !== index)
+                        )
                       }}
                     >
-                      <Box sx={{ width: '100%' }}>
-                        {element.type == 'slate' && displayDrag && (
-                          <Box>
-                            <Box sx={{ color: '#000000' }}>
-                              <MyEditor
-                                value={element.value}
-                                setValue={function (data: any) {
-                                  setTaskModules(
-                                    taskModules.map((module: any, index: number) => {
-                                      if (index == i) {
-                                        return { ...module, value: data }
-                                      } else {
-                                        return module
-                                      }
-                                    })
-                                  )
-                                }}
-                              />
-                            </Box>
-                          </Box>
-                        )}
-                        {element.type == 'code' && displayDrag && (
-                          <Box>
-                            <TextField
-                              margin='normal'
-                              required
-                              fullWidth
-                              id='lessonTitle'
-                              type='title'
-                              label='Url'
-                              name='title'
-                              autoFocus
-                              autoComplete='off'
-                              onChange={(e) => {
-                                setTaskModules(
-                                  taskModules.map((module: any, index: number) => {
-                                    if (index == i) {
-                                      return { ...module, value: e.target.value }
-                                    } else {
-                                      return module
-                                    }
-                                  })
-                                )
-                              }}
-                              value={element.value}
-                            />
-                          </Box>
-                        )}
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </AccordionSummary>
 
-                        {element.type == 'codeHtml' && displayDrag && (
-                          <Box>
-                            <TextField
-                              margin='normal'
-                              required
-                              fullWidth
-                              id='htmlTitle'
-                              label='HTML'
-                              multiline
-                              name='title'
-                              autoFocus
-                              autoComplete='off'
-                              onChange={(e) => {
-                                setTaskModules(
-                                  taskModules.map((module: any, index: number) => {
-                                    if (index == i) {
-                                      return { ...module, value: e.target.value }
-                                    } else {
-                                      return module
-                                    }
-                                  })
+                <AccordionDetails
+                  style={{
+                    paddingLeft: '8px',
+                    paddingRight: '8px',
+                    borderTop: '2px solid',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Box sx={{ width: '100%' }}>
+                      {field.type == 'slate' && displayDrag && (
+                        <Box>
+                          <Box sx={{ color: '#000000' }}>
+                            <MyEditor
+                              value={field.value}
+                              setValue={function (data: any) {
+                                setLessonFields(
+                                  lessonFields.map((f: LessonField, i: number) => i === index ? { ...f, value: data } : f)
                                 )
                               }}
-                              value={element.value}
                             />
                           </Box>
-                        )}
-                      </Box>
+                        </Box>
+                      )}
+
+                      {field.type == 'code' && displayDrag && (
+                        <Box>
+                          <TextField
+                            margin='normal'
+                            required
+                            fullWidth
+                            id='lessonTitle'
+                            type='title'
+                            label='Url'
+                            name='title'
+                            autoFocus
+                            autoComplete='off'
+                            onChange={(e) => {
+                              setLessonFields(
+                                lessonFields.map((f: LessonField, i: number) => i === index ? { ...f, value: e.target.value } : f)
+                              )
+                            }}
+                            value={field.value}
+                          />
+                        </Box>
+                      )}
+
+                      {field.type == 'codeHtml' && displayDrag && (
+                        <Box>
+                          <TextField
+                            margin='normal'
+                            required
+                            fullWidth
+                            id='htmlTitle'
+                            label='HTML'
+                            multiline
+                            name='title'
+                            autoFocus
+                            autoComplete='off'
+                            onChange={(e) => {
+                              setLessonFields(
+                                lessonFields.map((f: LessonField, i: number) => i === index ? { ...f, value: e.target.value } : f)
+                              )
+                            }}
+                            value={field.value}
+                          />
+                        </Box>
+                      )}
                     </Box>
+                  </Box>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}></Box>
-                  </AccordionDetails>
-                </Accordion>
-              </Box>
-            )
-          })}
+                  <Box sx={{ display: 'flex', justifyContent: 'end', marginTop: 4 }}></Box>
+                </AccordionDetails>
+              </Accordion>
+            </Box>
+          )}
         </Box>
+
         <Button
           variant='contained'
           onClick={(e) => {
-            setTaskModules([
-              ...taskModules,
+            setLessonFields([
+              ...lessonFields,
               {
                 tmpId: new Date().getTime(),
                 type: 'slate',
@@ -301,11 +431,12 @@ const LessonCreatePractice = ({
         >
           Add richtext
         </Button>
+
         <Button
           variant='contained'
           onClick={(e) => {
-            setTaskModules([
-              ...taskModules,
+            setLessonFields([
+              ...lessonFields,
               {
                 tmpId: new Date().getTime(),
                 type: 'code',
@@ -322,11 +453,12 @@ const LessonCreatePractice = ({
         >
           Add Code (Link)
         </Button>
+
         <Button
           variant='contained'
           onClick={(e) => {
-            setTaskModules([
-              ...taskModules,
+            setLessonFields([
+              ...lessonFields,
               {
                 tmpId: new Date().getTime(),
                 type: 'codeHtml',
@@ -344,6 +476,7 @@ const LessonCreatePractice = ({
           Add Code (HTML)
         </Button>
       </Box>
+
       <Box sx={{ display: 'flex' }}>
         <Button
           variant='contained'
@@ -352,12 +485,17 @@ const LessonCreatePractice = ({
             marginRight: 2,
             fontWeight: 'bold',
           }}
-          onClick={async (e) => {
-            setValue(1)
+          onClick={async e => {
+            setLessonForm(initialLesson)
+            setLessonFormCurrent(initialLesson)
+            setLessonFields([])
+            setIdLessonEdit(null)
+            setTabValue(1)
           }}
         >
-          Ruturn
+          Return
         </Button>
+
         <Button
           variant='contained'
           fullWidth
@@ -365,159 +503,7 @@ const LessonCreatePractice = ({
             marginTop: 2,
             fontWeight: 'bold',
           }}
-          onClick={async (e) => {
-            if (lessonFormCurrent.title == '') {
-              Swal.fire({
-                title: 'Lesson title can not be empty!',
-                background: '#171622',
-                color: '#ffec3e',
-                confirmButtonColor: '#c58efe',
-                icon: 'error',
-              })
-              return
-            }
-            try {
-              setEditTrigger(true)
-              setError({})
-              if (idLessonEdit) {
-                let found = false
-                storedLessons.map((less: any) => {
-                  if (less.title == lessonFormCurrent.title.trim()) found = true
-                })
-                modules.map((module: any) => {
-                  module.lessons.map((less: any) => {
-                    if (less.title == lessonFormCurrent.title.trim() && idLessonEdit != less.id)
-                      found = true
-                  })
-                })
-                if (!found) {
-                  const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
-                    title: lessonFormCurrent.title,
-                    fields: taskModules,
-                    hours: lessonFormCurrent.hours,
-                    minutes: lessonFormCurrent.minutes,
-                  })
-                  const resultResponse = response.data
-                  if (resultResponse) {
-                    setModules(
-                      modules.map((elem: any, index: any) => {
-                        if (moduleIndexCreate === index) {
-                          return {
-                            title: elem.title,
-                            lessons: elem.lessons.map((lessonFilter: any, lessonIndex: any) => {
-                              if (lessonFilter.id !== idLessonEdit) {
-                                return lessonFilter
-                              }
-                              return {
-                                ...lessonFormCurrent,
-                                id: idLessonEdit,
-                                title: lessonFormCurrent.title,
-                                fields: taskModules.map((module: any) => {
-                                  return { type: module.type, value: module.value }
-                                }),
-                                type: 'practice',
-                              }
-                            }),
-                          }
-                        }
-                        return elem
-                      })
-                    )
-                    setLessonFormCurrent({
-                      title: '',
-                      hours: 0,
-                      minutes: 0,
-                    })
-                    setIdLessonEdit(null)
-                    setValue(1)
-                  }
-                } else {
-                  Swal.fire({
-                    title: 'Course name is already taken!',
-                    background: '#171622',
-                    color: '#ffec3e',
-                    confirmButtonColor: '#c58efe',
-                    icon: 'error',
-                  })
-                }
-              } else {
-                let found = false
-                storedLessons.map((less: any) => {
-                  if (less.title == lessonFormCurrent.title.trim()) found = true
-                })
-                modules.map((module: any) => {
-                  module.lessons.map((less: any) => {
-                    if (less.title == lessonFormCurrent.title.trim()) found = true
-                  })
-                })
-                if (!found) {
-                  const response = await axios.post(urlLesson + '?type=practice', {
-                    title: lessonFormCurrent.title,
-                    hours: lessonFormCurrent.hours,
-                    minutes: lessonFormCurrent.minutes,
-                    fields: taskModules.map((module: any) => {
-                      return { type: module.type, value: module.value }
-                    }),
-                  })
-                  const resultResponse = response.data
-                  if (resultResponse) {
-                    setModules(
-                      modules.map((modulesElem: any, index: any) => {
-                        if (
-                          index == moduleIndexCreate &&
-                          modulesElem.lessons.filter(
-                            (reDropElem: any) => reDropElem.id === resultResponse.lessonId
-                          ).length === 0
-                        ) {
-                          return {
-                            title: modulesElem.title,
-                            lessons: [
-                              ...modulesElem.lessons,
-                              {
-                                ...lessonFormCurrent,
-                                id: resultResponse.lessonId,
-                                title: lessonFormCurrent.title,
-                                fields: taskModules.map((module: any) => {
-                                  return { type: module.type, value: module.value }
-                                }),
-                                type: 'practice',
-                              },
-                            ],
-                          }
-                        }
-                        return modulesElem
-                      })
-                    )
-                    setLessonFormCurrent({
-                      title: '',
-                      hours: 0,
-                      minutes: 0,
-                    })
-                    setModuleIndexCreate(-1)
-                    setValue(1)
-                  }
-                } else {
-                  Swal.fire({
-                    title: 'Course name is already taken!',
-                    background: '#171622',
-                    color: '#ffec3e',
-                    confirmButtonColor: '#c58efe',
-                    icon: 'error',
-                  })
-                }
-              }
-            } catch (error) {
-              Swal.fire({
-                title: 'Something went wrong!',
-                text: error + '',
-                background: '#171622',
-                color: '#ffec3e',
-                confirmButtonColor: '#c58efe',
-                icon: 'error',
-              })
-              return
-            }
-          }}
+          onClick={handleSubmit}
         >
           {idLessonEdit ? 'Save' : 'Create'}
         </Button>

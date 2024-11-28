@@ -6,8 +6,6 @@ export {default as LessonCreateQuiz} from './LessonCreateQuiz'
 
 export const initialLesson: Lesson = {
   title: '',
-  link: '',
-  image: '',
   hours: 0,
   minutes: 0,
   language: 'EN',

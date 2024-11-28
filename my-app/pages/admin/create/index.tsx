@@ -31,6 +31,7 @@ import {
   Skill,
   LessonField,
   LessonType,
+  LessonQuestion,
 } from '@/utils/interfaces'
 
 import {
@@ -100,6 +101,7 @@ const Create = () => {
   const [lessonForm, setLessonForm] = useState<Lesson>(initialLesson)
   const [lessonFormCurrent, setLessonFormCurrent] = useState<Lesson>(initialLesson)
   const [lessonFields, setLessonFields] = useState<LessonField[]>([])
+  const [lessonQuestions, setLessonQuestions] = useState<LessonQuestion[]>([])
 
   const dragLesson = useRef<any>(0)
   const draggedOverLesson = useRef<any>(0)
@@ -306,21 +308,33 @@ const Create = () => {
     } else {
       setIdLessonEdit(null)
     
-      const content = {
-        title: lessonFormCurrent.title,
-        fields: lessonFields.map((f: LessonField) => ({ value: f.type === 'slate' ? f.value : null }))
-      }
+      const content = lessonFormCurrent.type === 'quiz'
+        ? {
+          title: lessonFormCurrent.title,
+          questions: lessonQuestions,
+        } : {
+          title: lessonFormCurrent.title,
+          fields: lessonFields.map((f: LessonField) => ({ value: f.type === 'slate' ? f.value : null })),
+        }
       
       lesson = await translateJson(content, language)
     }
 
     if (lesson) {
-      const fields = lessonFields
-        .map((f: LessonField, i: number) => ({ ...f, value: (lesson.fields as any[])[i].value ?? f.value }))
+      if (lessonFormCurrent.type === 'quiz') {
+        setLessonForm({ ...lessonForm, ...lesson })
+        setLessonFormCurrent({ ...lessonFormCurrent, ...lesson })
+        setLessonQuestions(lesson.questions)
 
-      setLessonForm({ ...lessonForm, title: lesson.title as string, language, fields })
-      setLessonFormCurrent({ ...lessonFormCurrent, title: lesson.title as string, language, fields })
-      setLessonFields(fields)
+      } else {
+        const fields = lessonFields
+          .map((f: LessonField, i: number) => ({ ...f, value: (lesson.fields as any[])[i].value ?? f.value }))
+
+        setLessonForm({ ...lessonForm, title: lesson.title as string, language, fields })
+        setLessonFormCurrent({ ...lessonFormCurrent, title: lesson.title as string, language, fields })
+        setLessonFields(fields)
+      }
+
       setTabValue(0)
       setTimeout(() => setTabValue(2), 1)
     }
@@ -506,9 +520,9 @@ const Create = () => {
         if (!found || (lessonForm.title == lessonFormCurrent.title)) {
           const response = await axios.put(urlLesson + '?id=' + idLessonEdit, {
             title: lessonFormCurrent.title,
-            image: lessonFormCurrent.image,
             hours: lessonFormCurrent.hours,
             minutes: lessonFormCurrent.minutes,
+            image: lessonFormCurrent.image,
             fields: lessonFields,
           })
           const resultResponse = response.data
@@ -522,20 +536,19 @@ const Create = () => {
                       if (l.en_id === lessonFormCurrent.en_id) return {
                         ...lessonFormCurrent,
                         id: idLessonEdit,
-                        fields: lessonFields.map((f: LessonField) => {
-                          return { type: f.type, value: f.value }
-                        }),
+                        fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
                         type: 'default',
                       }
                       else return l
-                    })
+                    }),
                   }
                 }
                 return m
               })
             )
-            setLessonFormCurrent(initialLesson)
+
             setLessonForm(initialLesson)
+            setLessonFormCurrent(initialLesson)
             setLessonFields([])
             setIdLessonEdit(null)
             setTabValue(1)
@@ -561,9 +574,9 @@ const Create = () => {
 
           const response = await axios.post(urlLessonFull, {
             title: lessonFormCurrent.title,
-            image: lessonFormCurrent.image,
             hours: lessonFormCurrent.hours,
             minutes: lessonFormCurrent.minutes,
+            image: lessonFormCurrent.image,
             fields: lessonFields.map((f: LessonField) => ({ type: f.type, value: f.value })),
           })
 
@@ -594,8 +607,8 @@ const Create = () => {
               })
             )
 
-            setLessonFormCurrent(initialLesson)
             setLessonForm(initialLesson)
+            setLessonFormCurrent(initialLesson)
             setLessonFields([])
             setModuleIndexCreate(-1)
             setTabValue(1)
@@ -990,32 +1003,42 @@ const Create = () => {
                       )}
                       {lessonType === 'quiz' && (
                         <LessonCreateQuiz
+                          storedLessons={storedLessons}
                           lessonForm={lessonForm}
-                          setValue={setTabValue}
+                          setLessonForm={setLessonForm}
+                          lessonFormCurrent={lessonFormCurrent}
+                          setLessonFormCurrent={setLessonFormCurrent}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
                           moduleIndexCreate={moduleIndexCreate}
                           setModuleIndexCreate={setModuleIndexCreate}
                           modules={modules}
+                          lessonQuestions={lessonQuestions}
+                          setLessonQuestions={setLessonQuestions}
                           setModules={setModules}
+                          setTabValue={setTabValue}
                           setEditTrigger={setEditTrigger}
                           setError={setError}
-                          storedLessons={storedLessons}
                         />
                       )}
                       {lessonType === 'practice' && (
                         <LessonCreatePractice
+                          storedLessons={storedLessons}
                           lessonForm={lessonForm}
-                          setValue={setTabValue}
+                          setLessonForm={setLessonForm}
+                          lessonFormCurrent={lessonFormCurrent}
+                          setLessonFormCurrent={setLessonFormCurrent}
                           idLessonEdit={idLessonEdit}
                           setIdLessonEdit={setIdLessonEdit}
                           moduleIndexCreate={moduleIndexCreate}
                           setModuleIndexCreate={setModuleIndexCreate}
                           modules={modules}
                           setModules={setModules}
+                          lessonFields={lessonFields}
+                          setLessonFields={setLessonFields}
+                          setTabValue={setTabValue}
                           setEditTrigger={setEditTrigger}
                           setError={setError}
-                          storedLessons={storedLessons}
                         />
                       )}
                     </Box>

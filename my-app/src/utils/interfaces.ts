@@ -17,19 +17,30 @@ export interface LessonField {
   value: any
 }
 
+export interface LessonQuestionOption {
+  title: string
+  correct: boolean
+}
+
+export interface LessonQuestion {
+  title: string
+  options: LessonQuestionOption[]
+}
+
 export interface Lesson {
   id?: string
+  type?: LessonType
   title: string
-  link: string
+  hours: number
+  minutes: number
+  language: Language
+  link?: string
   image?: string
   questionLimit?: number
-  type?: LessonType
   description?: any
-  language?: Language
   en_id?: string
-  hours?: number
-  minutes?: number
   fields?: LessonField[]
+  questions?: LessonQuestion[]
 }
 
 export interface LessonData {
