@@ -1,6 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+
 import s from './HomePage.module.css'
 import CourseCard from '@/components/CourseCard/CourseCard'
 import FaqSection from '@/components/FaqSection/FaqSection'
@@ -8,10 +11,9 @@ import PromoSlider from '@/components/PromoSlider/PromoSlider'
 import plus from '../src/assets/plus.svg'
 import Layout from '@/components/Layout/Layout'
 import '../app/globals.css'
-import Link from 'next/link'
 import { Box, TextField, IconButton, CircularProgress } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import { Course, Tag } from '@/utils/interfaces'
+import { Course, Language, Tag } from '@/utils/interfaces'
 import courseShadow from '../src/assets/shadows/courseHoverShadow.png'
 import { getLocale } from '@/utils/getLocale'
 import PopularCourses from '@/components/PopularCourses/PopularCourses'
@@ -22,6 +24,7 @@ const urlFavourite = `${process.env.NEXT_BACK_HOST_API}/auth/favorite`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 export default function HomePage() {
+  const router = useRouter()
   const t = getLocale()
 
   const [width, setWidth] = useState(0)
@@ -34,7 +37,9 @@ export default function HomePage() {
   const [searchField, setSearchField] = useState<string>('')
   const [favouriteCourses, setFavouriteCourses] = useState<Array<string>>([])
 
-  async function getPageData() {
+  async function getPageData(locale?: Language) {
+    if (!locale) locale = router.locale?.toUpperCase() as Language
+
     if (typeof window !== 'undefined') {
       const responseTag = await fetch(urlTag + 's', {
         headers: {
@@ -57,15 +62,24 @@ export default function HomePage() {
       const resultUser = await responseUser.json()
       setFavouriteCourses(resultUser.favourite_courses_id)
       setUserData(resultUser)
+
       const response = await fetch(url + 's?isActive=true', {
         headers: {
           'Content-Type': 'application/json',
         },
       })
       const result = await response.json()
-      const dataRes = result.getCourses.sort(function(a: any, b: any) {
-        return b.data.rating - a.data.rating
-      })
+
+      const dataRes = result.getCourses
+        .reduce((acc: any, cur: any, ind: number, arr: any[]) => {
+          if (cur.language === locale || cur.language === 'EN'
+          && !arr.find(el => el.en_id === cur.id && el.language === locale)) {
+            acc.push(cur)
+          }
+          return acc
+        }, [])
+        .sort((a: any, b: any) => b.data.rating - a.data.rating)
+
       setData(dataRes)
       setDataDisplay(dataRes)
     }
@@ -117,7 +131,7 @@ export default function HomePage() {
   const [isShownHints, setIsShownHints] = useState(false)
 
   return (
-    <Layout>
+    <Layout getPageData={getPageData}>
       <div className={s.homePage}>
         <PromoSlider />
         <h1 className={s.coursesTitle}>{t.courses}</h1>

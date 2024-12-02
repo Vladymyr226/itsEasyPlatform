@@ -5,7 +5,9 @@ import s from './LanguageSwitcher.module.css'
 import { useEffect, useRef, useState } from 'react'
 import { Box } from '@mui/material'
 import { useRouter as detailedRouter } from 'next/router'
-const LanguageSwitcher = () => {
+import { Language } from '@/utils/interfaces'
+
+const LanguageSwitcher = ({ getPageData }: { getPageData?: (locale?: Language) => Promise<void> }) => {
   const [isLanguageShown, setIsLanguageShown] = useState(false)
   const [isLanguageShownForDropModal, setIsLanguageShownForDropModal] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -155,10 +157,11 @@ const LanguageSwitcher = () => {
                 },
                 display: 'flex',
               }}
-              onClick={(e) => {
+              onClick={async (e) => {
                 const path = routerLocale.asPath
                 setIsLanguageShown(false)
-                routerLocale.push(path, path, { locale: 'ru' })
+                await routerLocale.push(path, path, { locale: 'ru' })
+                if (getPageData) await getPageData('RU')
               }}
             >
               <div style={{ height: '20px', width: '20px' }}>
@@ -183,10 +186,11 @@ const LanguageSwitcher = () => {
                 display: 'flex',
                 width: '100%',
               }}
-              onClick={(e) => {
+              onClick={async (e) => {
                 const path = routerLocale.asPath
                 setIsLanguageShown(false)
                 routerLocale.push(path, path, { locale: 'ua' })
+                if (getPageData) getPageData('UA')
               }}
             >
               <div style={{ height: '20px', width: '20px', position: 'relative' }}>
@@ -214,6 +218,7 @@ const LanguageSwitcher = () => {
                 const path = routerLocale.asPath
                 setIsLanguageShown(false)
                 routerLocale.push(path, path, { locale: 'en' })
+                if (getPageData) getPageData('EN')
               }}
             >
               <div style={{ height: '20px', width: '20px', position: 'relative' }}>

@@ -16,14 +16,16 @@ import Link from 'next/link'
 import { getLocale } from '@/utils/getLocale'
 import LogoFooter from '@/components/LogoFooter/LogoFooter'
 import Head from 'next/head'
+import { Language } from '@/utils/interfaces'
 
 type LayoutProps = {
   children: ReactNode
+  getPageData?: (locale?: Language) => Promise<void>
 }
 const urlHost = `${
   process.env.NEXT_PUBLIC_DEV !== 'dev' ? 'https://cb-shchus.vercel.app/' : 'http://localhost:3000/'
 }`
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, getPageData }: LayoutProps) => {
   const [width, setWidth] = useState(0)
 
   function getPageUrl() {
@@ -82,13 +84,13 @@ const Layout = ({ children }: LayoutProps) => {
                 </div>
 
                 <div className={s.headerControlls}>
-                  <LanguageSwitcher />
+                  <LanguageSwitcher getPageData={getPageData} />
                   <Usermenu />
                 </div>
               </>
             ) : (
               <>
-                <LanguageSwitcher />
+                <LanguageSwitcher getPageData={getPageData} />
                 <Usermenu />
                 <BurgerMenu />
               </>

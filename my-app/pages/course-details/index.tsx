@@ -18,10 +18,9 @@ import { useRouter } from 'next/navigation'
 import { getLocale } from '@/utils/getLocale'
 import CourseLessonMaterials from '@/components/CourseMaterials/CourseLessonMaterials'
 import axios from 'axios'
-import { Course, LessonData } from '@/utils/interfaces'
+import { Course, Language, LessonData } from '@/utils/interfaces'
 
 const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
-const urlLesson = `${process.env.NEXT_BACK_HOST_API}/cabinet/lesson`
 const urlLessonsById = `${process.env.NEXT_BACK_HOST_API}/cabinet/lessons-by-id`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
@@ -45,7 +44,7 @@ const CourseDetails = () => {
 
   const videoRef = useRef(null)
 
-  async function getPageData() {
+  async function getPageData(locale?: Language) {
     if (typeof window !== 'undefined') {
       const fullUrl = window.location.href
 
@@ -127,7 +126,6 @@ const CourseDetails = () => {
         setPopularCoursesData(filter)
         setLessSum(allLessonIds.length)
         setData({ ...result, data: { ...result.data, modules: modules } })
-      } else {
       }
     }
   }
@@ -143,13 +141,12 @@ const CourseDetails = () => {
     }
   }, [])
 
-  const imgRef = useRef(null)
   const t = getLocale()
 
   const [modules, setModules] = useState<Array<Module>>()
   console.log(data)
   return (
-    <Layout>
+    <Layout getPageData={getPageData}>
       {data ? (
         <div className={s.coursePage}>
           <div className={s.leftSide}>

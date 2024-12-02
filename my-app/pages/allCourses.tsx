@@ -1,5 +1,7 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+
 import Layout from '@/components/Layout/Layout'
 import '../app/globals.css'
 import { Box, Button } from '@mui/material'
@@ -8,7 +10,7 @@ import { InputLabel, Chip, ToggleButtonGroup, ToggleButton, Grid } from '@mui/ma
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Autocomplete from '@mui/material/Autocomplete'
-import { Course, Tag } from '@/utils/interfaces'
+import { Course, Language, Tag } from '@/utils/interfaces'
 import CourseCard from '@/components/CourseCard/CourseCard'
 import { styled } from '@mui/material/styles'
 
@@ -24,12 +26,16 @@ const url = `${process.env.NEXT_BACK_HOST_API}/cabinet/course`
 const urlUser = `${process.env.NEXT_BACK_HOST_API}/auth/user`
 
 const AllCoursesDetails = () => {
-  const [width, setWidth] = useState(0)
+  const router = useRouter()
+  const t = getLocale()
+
   const [data, setData] = useState<any>()
   const [userData, setUserData] = useState<any>()
   const [dataDisplay, setDataDisplay] = useState<any>()
 
-  async function getPageData() {
+  async function getPageData(locale?: Language) {
+    if (!locale) locale = router.locale?.toUpperCase() as Language
+
     if (typeof window !== 'undefined') {
       const layoutType = localStorage.getItem('layoutType')
       if (layoutType == 'list') {
@@ -58,16 +64,28 @@ const AllCoursesDetails = () => {
       const resultUser = await responseUser.json()
       setFavouriteCourses(resultUser.favourite_courses_id)
       setUserData(resultUser)
+
       const responseCourse = await fetch(url + 's?isActive=true', {
         headers: {
           'Content-Type': 'application/json',
         },
       })
       const result = await responseCourse.json()
-      setData(result.getCourses)
-      setDataDisplay(result.getCourses)
+
+      const dataRes = result.getCourses
+        .reduce((acc: any, cur: any, ind: number, arr: any[]) => {
+          if (cur.language === locale || cur.language === 'EN'
+          && !arr.find(el => el.en_id === cur.id && el.language === locale)) {
+            acc.push(cur)
+          }
+          return acc
+        }, [])
+        .sort((a: any, b: any) => b.data.rating - a.data.rating)
+
+      setData(dataRes)
+      setDataDisplay(dataRes)
       setMaxPrice(
-        result.getCourses
+        dataRes
           .map((course: any) => {
             return course.data.price
           })
@@ -80,13 +98,11 @@ const AllCoursesDetails = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setWidth(window.innerWidth)
       getPageData()
     }
   }, [])
   const [date, setDate] = useState('')
 
-  const [price, setPrice] = useState([0, 10000])
   const [maxPrice, setMaxPrice] = useState()
   const [language, setLanguage] = useState<any>([])
   const [level, setLevel] = useState<any>([])
@@ -166,7 +182,7 @@ const AllCoursesDetails = () => {
     },
   }))
   const [view, setView] = useState('list')
-  const t = getLocale()
+
   const DrawerList = (
     <Box
       sx={{
@@ -582,7 +598,6 @@ const AllCoursesDetails = () => {
           sx={{ borderRadius: 0, marginTop: 3, width: '20rem', color: '#c7c6c6' }}
           onClick={(e) => {
             setDate('')
-            setPrice([0, maxPrice ?? 1000])
             setLanguage([])
             setLevel([])
             setType([])
@@ -595,7 +610,6 @@ const AllCoursesDetails = () => {
         </Button>
       </Box>
     </Box>
-    // </Box>
   )
 
   function isSecondDateAfterFirst(date1: string, date2: string) {
@@ -622,7 +636,7 @@ const AllCoursesDetails = () => {
   }, [type])
   
   return (
-    <Layout>
+    <Layout getPageData={getPageData}>
       <Box sx={{ display: 'inline' }}>
         {DrawerList}
         <Box
