@@ -228,9 +228,9 @@ const LessonBox = ({
           >
             <ExampleYouTube
               url={
-                lesson.link.split(
+                lesson.link?.split(
                   '?v=',
-                )[1]
+                )[1] || ''
               }
             />
           </Box>
