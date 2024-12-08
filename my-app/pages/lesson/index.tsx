@@ -436,13 +436,17 @@ const LessonDetails = () => {
   const containerRef = useRef<any>()
   async function getPageData2(id2: any, userID2: any) {
     if (userID2) {
-      const response = await fetch(urlChat + 's/', {
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        urlChat + '?lessonId=' + id2 + '&userId=' + userID2,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      })
+      )
       const result = await response.json()
-      const chats = result.getChats.filter(
+      console.log(result)
+      const chats = result.filter(
         (chat: any) => chat.lesson_id == id2 && chat.user_id == userID2,
       )
       if (chats.length > 0) {
@@ -728,11 +732,7 @@ const LessonDetails = () => {
                                 }}
                               >
                                 <SlateView
-                                  value={
-                                    field
-                                      ? field.value
-                                      : initialRichText
-                                  }
+                                  value={field ? field.value : initialRichText}
                                 />
                               </Box>
                             )}
@@ -998,11 +998,7 @@ const LessonDetails = () => {
                                 }}
                               >
                                 <SlateView
-                                  value={
-                                    field
-                                      ? field.value
-                                      : initialRichText
-                                  }
+                                  value={field ? field.value : initialRichText}
                                 />
                               </Box>
                             )}
@@ -1616,12 +1612,10 @@ const LessonDetails = () => {
           sx={{
             height: { xs: null, md: '140vb' },
             paddingLeft: 1,
-            overflowY: 'scroll',
-            scrollbarWidth: 'none',
             width: { xs: '100%', md: '500px' },
           }}
         >
-          <Box>
+          <Box sx={{ overflowY: 'scroll', scrollbarWidth: 'none' }}>
             {modules ? (
               <CourseLessonMaterials
                 setId={setId}

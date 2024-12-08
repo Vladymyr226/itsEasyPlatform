@@ -72,8 +72,11 @@ export default function HomePage() {
 
       const dataRes = result.getCourses
         .reduce((acc: any, cur: any, ind: number, arr: any[]) => {
-          if (cur.language === locale || cur.language === 'EN'
-          && !arr.find(el => el.en_id === cur.id && el.language === locale)) {
+          if (
+            cur.language === locale ||
+            (cur.language === 'EN' &&
+              !arr.find((el) => el.en_id === cur.id && el.language === locale))
+          ) {
             acc.push(cur)
           }
           return acc
@@ -117,16 +120,21 @@ export default function HomePage() {
       }
       if (searchField.length >= 2) {
         filteredRes = filteredRes.filter((dataFilter: any) =>
-          dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase()),
+          dataFilter.data.title
+            .toLowerCase()
+            .includes(searchField.trim().toLowerCase()),
         )
       }
     }
     if (filteredRes) {
-      filteredRes = filteredRes.sort(function(a: any, b: any) {
+      filteredRes = filteredRes.sort(function (a: any, b: any) {
         return b.data.rating - a.data.rating
       })
     }
-    setDataDisplay(filteredRes)
+    setDataDisplay([])
+    setTimeout(() => {
+      setDataDisplay(filteredRes)
+    }, 1)
   }
   const [isShownHints, setIsShownHints] = useState(false)
 
@@ -202,7 +210,9 @@ export default function HomePage() {
                 }}
               >
                 {dataDisplay.filter((dataFilter: any) =>
-                  dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase()),
+                  dataFilter.data.title
+                    .toLowerCase()
+                    .includes(searchField.trim().toLowerCase()),
                 ).length === 0 && (
                   <Box
                     sx={{
@@ -218,7 +228,9 @@ export default function HomePage() {
                 )}
                 {dataDisplay
                   .filter((dataFilter: any) =>
-                    dataFilter.data.title.toLowerCase().includes(searchField.trim().toLowerCase()),
+                    dataFilter.data.title
+                      .toLowerCase()
+                      .includes(searchField.trim().toLowerCase()),
                   )
                   .map((result: any) => {
                     return (
@@ -284,7 +296,11 @@ export default function HomePage() {
                       if (selectedTag.indexOf(tag.id) == -1) {
                         setSelectedTag([...selectedTag, tag.id])
                       } else {
-                        setSelectedTag(selectedTag.filter((tagFilter) => tagFilter != tag.id))
+                        setSelectedTag(
+                          selectedTag.filter(
+                            (tagFilter) => tagFilter != tag.id,
+                          ),
+                        )
                       }
                     }}
                   >
@@ -292,7 +308,9 @@ export default function HomePage() {
                       className={s.shadow}
                       src={courseShadow}
                       alt="shadow"
-                      style={selectedTag.indexOf(tag.id) == -1 ? {} : { opacity: 1 }}
+                      style={
+                        selectedTag.indexOf(tag.id) == -1 ? {} : { opacity: 1 }
+                      }
                     />
                     <img
                       src={tag.icon_url}
@@ -331,19 +349,31 @@ export default function HomePage() {
                     mediaValue={course.data.mediaValue}
                     createdAt={course.created_at}
                     views={course.views}
-                    isFavoriteStart={favouriteCourses ? favouriteCourses.indexOf(course.id) != -1 : false}
+                    isFavoriteStart={
+                      favouriteCourses
+                        ? favouriteCourses.indexOf(course.id) != -1
+                        : false
+                    }
                     userData={userData}
                   />
                 </>
               )
             })
           ) : (
-            <h1 style={{ color: '#c7c6c6', textAlign: 'center', marginTop: '150px' }}>
+            <h1
+              style={{
+                color: '#c7c6c6',
+                textAlign: 'center',
+                marginTop: '150px',
+              }}
+            >
               {t.nothing_found}
             </h1>
           )
         ) : (
-          <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+          <Box
+            sx={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}
+          >
             <CircularProgress sx={{ color: '#ffec3e' }} />
           </Box>
         )}
