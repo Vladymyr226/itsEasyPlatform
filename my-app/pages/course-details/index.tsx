@@ -14,7 +14,7 @@ import Layout from '@/components/Layout/Layout'
 import '../../app/globals.css'
 import SlateView from '@/components/SlateEditor/View'
 import { Box, CircularProgress } from '@mui/material'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 import { getLocale } from '@/utils/getLocale'
 import CourseLessonMaterials from '@/components/CourseMaterials/CourseLessonMaterials'
 import axios from 'axios'
@@ -370,7 +370,7 @@ const CourseDetails = () => {
               <span className={s.accentuated}>{t.what_alumni_say}</span>
             </p>
 
-            <Comments />
+            <Comments language={router.locale?.toUpperCase() as Language} />
 
             <p
               style={{ textAlign: `${width < 1200 ? 'center' : 'left'}` }}

@@ -43,7 +43,7 @@ const CourseMaterials = ({ modules }: { modules: any }) => {
     <div className={s.materialsAccordion}>
       {modules.map((module: any, index: number) => (
         <div key={index}>
-          <div className={s.accordoinItem}>
+          <div className={s.accordionItem}>
             <div
               onClick={() => toggle(index)}
               className={`${s.accordionTitle} ${closed?.indexOf(index) === -1 ? s.active : ''}`}

@@ -1,5 +1,6 @@
 export type Language = 'EN' | 'RU' | 'UA' | 'PL' | 'ES'
 export type LessonType = 'default' | 'quiz' | 'practice' | 'defaultOld'
+export type Gender = 'male' | 'female'
 
 export interface YouTubeProp {
   url: string
@@ -9,6 +10,14 @@ export interface TabPanelProps {
   children?: React.ReactNode
   index: number
   value: number
+}
+
+export interface CommentData {
+  name: string,
+  gender: Gender,
+  position: string,
+  period: string,
+  comment: string
 }
 
 export interface LessonField {

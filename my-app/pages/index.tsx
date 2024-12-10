@@ -394,7 +394,7 @@ export default function HomePage() {
           </Link>
         )}
 
-        <FaqSection />
+        <FaqSection language={router.locale?.toUpperCase() as Language} />
         {dataDisplay && (
           <>
             <div
