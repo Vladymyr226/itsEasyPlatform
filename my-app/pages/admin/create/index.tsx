@@ -20,6 +20,7 @@ import {
   SelectChangeEvent,
   Tabs,
   Tab,
+  Chip,
 } from '@mui/material'
 
 import {
@@ -265,15 +266,17 @@ const Create = () => {
     setTabValue(newValue)
   }
 
-  const handleChangeLanguage = async (event: SelectChangeEvent) => {
-    const idParam = await getPageData(event.target.value as Language, enId)
+  const handleChangeLanguage = async (lang: Language) => {
+    const idParam = await getPageData(lang, enId)
     router.push('/admin/create/' + (idParam ? '?_id=' + idParam : ''), { shallow: true })
-    setLanguage(event.target.value as Language)
+    setLanguage(lang)
     setEditTrigger(true)
     setError({})
   }
 
   const handleTranslate = async () => {
+    setIsLoaded(false)
+
     const content = {
       title: form.title,
       richValue,
@@ -297,9 +300,12 @@ const Create = () => {
       setTabValue(2)
       setTimeout(() => setTabValue(0), 1)  
     }
+    setIsLoaded(true)
   }
 
   const handleTranslateLesson = async () => {
+    setIsLoaded(false)
+
     let lesson: any = storedLessons.find((l: Lesson) =>
       l.en_id === lessonFormCurrent.en_id && l.language === language)
     
@@ -344,6 +350,7 @@ const Create = () => {
       title: 'Lesson translated!',
       icon: 'success',
     })
+    setIsLoaded(true)
   }
 
   const handleSubmit = async (e: any) => {
@@ -853,16 +860,17 @@ const Create = () => {
                 >
                   <Box sx={{ margin: 2 }}>
                     <InputLabel>Language</InputLabel>
-                    <Select
-                      inputProps={{ disabled: languageDisabled }}
-                      error={(error && error.language) ?? false}
-                      fullWidth
-                      id="languageSelect"
-                      value={language}
-                      onChange={handleChangeLanguage}
-                    >
-                      {languages.map((l: Language) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
-                    </Select>
+                    {languages.map((l: Language) => <Chip
+                      key={l}
+                      variant={l === language ? 'filled' : 'outlined'}
+                      label={langNames[l]}
+                      onClick={l === language || languageDisabled ? undefined : e => handleChangeLanguage(l)}
+                      sx={{
+                        marginRight: 1,
+                        width: 80,
+                      }}
+                    />)}
+
                     <Button onClick={e => showSwalTranslate()}>Translate</Button>
                   </Box>
                   <Tabs

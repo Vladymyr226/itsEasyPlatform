@@ -19,9 +19,7 @@
 }
 
 .accordion {
-  margin-top: 42px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 42px auto;
 
   display: flex;
   flex-direction: column;
