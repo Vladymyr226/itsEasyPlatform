@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { Slate, Editable, withReact } from 'slate-react'
@@ -17,11 +17,28 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
+const useForceUpdate = () => {
+  const [, setState] = useState(0);
+
+  const forceUpdate = useCallback(() => {
+    setState(n => n + 1);
+  }, []);
+
+  return forceUpdate;
+}
+
 const SlateView = (props) => {
   const editor = useMemo(
     () => withEquation(withHistory(withEmbeds(withTables(withLinks(withReact(createEditor())))))),
     []
   )
+
+  const forceUpdate = useForceUpdate();
+  
+  useEffect(() => {
+    editor.children = props.value;
+    forceUpdate();
+  }, [editor, props.value, forceUpdate]);
 
   const handleEditorChange = (newValue) => {
     props.setValue(newValue)
@@ -36,6 +53,7 @@ const SlateView = (props) => {
     action: '',
     location: '',
   })
+
   const handleCodeToText = (partialState) => {
     setHtmlAction((prev) => ({
       ...prev,

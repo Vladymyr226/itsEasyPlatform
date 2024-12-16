@@ -9,7 +9,7 @@ import SlateView from '@/components/SlateEditor/View'
 import { Box, Button, TextField, IconButton } from '@mui/material'
 import YouTube, { YouTubeProps } from 'react-youtube'
 
-import { LessonData, YouTubeProp } from '@/utils/interfaces'
+import { Language, LessonData, YouTubeProp } from '@/utils/interfaces'
 import { useRouter } from 'next/navigation'
 import { CircularProgress, Checkbox } from '@mui/material'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
@@ -299,7 +299,8 @@ const LessonDetails = () => {
   const [userId, setUserId] = useState<any>()
   const [lessonContext, setLessonContext] = useState<any>()
   const [questionLimit, setQuestionLimit] = useState<number>()
-  async function getPageData() {
+
+  async function getPageData(locale?: Language) {
     if (typeof window !== 'undefined') {
       setSelectedCourse(localStorage.getItem('SelectedCourse'))
       const fullUrl = window.location.href
@@ -324,7 +325,24 @@ const LessonDetails = () => {
             },
           },
         )
-        const result = await response.json()
+        let result = await response.json()
+
+        if (locale) {
+          const response = await fetch(
+            urlLesson + '/' + result.en_id + '/' + locale,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            },
+          )
+
+          if (response.status === 200) {
+            result = await response.json()
+            router.push('./lesson/?id=' + result.id)
+          }
+        }
+
         if (result.type === 'quiz') {
           setAnswerForm(
             result.data.questions.map((question: any) => {
@@ -665,7 +683,7 @@ const LessonDetails = () => {
   }
   const gptField = useRef<any>()
   return (
-    <Layout>
+    <Layout getPageData={getPageData}>
       <Box
         sx={{
           display: 'flex',

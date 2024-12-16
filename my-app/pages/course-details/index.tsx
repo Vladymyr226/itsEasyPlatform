@@ -46,7 +46,7 @@ const CourseDetails = () => {
 
   async function getPageData(locale?: Language) {
     if (typeof window !== 'undefined') {
-      const fullUrl = window.location.href
+      const idParam = window.location.href.split('?id=')[1]
 
       const userId = localStorage.getItem('UserID')
       if (userId) {
@@ -60,7 +60,7 @@ const CourseDetails = () => {
         setUserData(resultUser)
       }
 
-      if (fullUrl.split('id=')[1]) {
+      if (idParam) {
         const responseAll = await fetch(url + 's?isActive=true', {
           headers: {
             'Content-Type': 'application/json',
@@ -68,19 +68,34 @@ const CourseDetails = () => {
         })
         const resultAll = await responseAll.json()
 
-        const response = await fetch(url + '/' + fullUrl.split('id=')[1], {
+        let response = await fetch(url + '/' + idParam, {
           headers: {
             'Content-Type': 'application/json',
           },
         })
-        const result = await response.json()
+        let result = await response.json()
         if (!result.is_active) {
           router.push('./')
         }
-        const responseViewed = await axios.put(
+
+        if (locale) {
+          const resultOne = resultAll.getCourses.find((course: any) =>
+            course.en_id == result.en_id && course.language === locale)
+          if (resultOne) {
+            router.push('./course-details/?id=' + resultOne.id)
+            response = await fetch(url + '/' + resultOne.id, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            result = await response.json()    
+          }
+        }
+
+        await axios.put(
           url +
             '?id=' +
-            fullUrl.split('id=')[1] +
+            result.id +
             '&views=' +
             Number(Number(result.views) + 1),
           {
@@ -144,7 +159,7 @@ const CourseDetails = () => {
   const t = getLocale()
 
   const [modules, setModules] = useState<Array<Module>>()
-  console.log(data)
+
   return (
     <Layout getPageData={getPageData}>
       {data ? (
