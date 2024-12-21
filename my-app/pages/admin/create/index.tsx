@@ -353,6 +353,78 @@ const Create = () => {
     setIsLoaded(true)
   }
 
+  const handleTranslateAllLessons = async () => {
+    console.log('Translation started at ' + new Date().toISOString())
+    setIsLoaded(false)
+
+    const content = {
+      title: form.title,
+      richValue,
+      modules: modules.map(m => m.title)
+    }
+    
+    const result = await translateJson(content, language)
+    let newModules: Module[] = [...modules]
+
+    if (result) {
+      setForm({ ...form, title: result.title })
+      setRichValue(result.richValue as any[])
+      newModules = modules.map((m, i) => ({ ...m, title: (result.modules as any[])[i] }))
+      console.log('Course translated')
+    }
+
+    newModules = await Promise.all(newModules.map(async (module: Module) => {
+      const moduleLessons: Lesson[] = await Promise.all(module.lessons.map(async (lesson: Lesson) => {
+
+        const storedLesson: Lesson | undefined = storedLessons.find((l: Lesson) =>
+          l.en_id === lessonFormCurrent.en_id && l.language === language)
+        
+        if (storedLesson) {
+          return storedLesson
+
+        } else {
+          const content = lesson.type === 'quiz'
+            ? {
+              title: lesson.title,
+              questions: lesson.questions,
+            } : {
+              title: lesson.title,
+              fields: (lesson.fields as LessonField[]).map((f: LessonField) => ({ value: f.type === 'slate' ? f.value : null })),
+            }
+          
+          const translatedLesson = await translateJson(content, language)
+          if (translatedLesson) {
+            console.log(`Lesson ${lesson.id} translated`)
+
+            if (lesson.type === 'quiz') {
+              return { ...lesson, ...translatedLesson, id: undefined, language }
+
+            } else {
+              const fields = (lesson.fields as LessonField[])
+                .map((f: LessonField, i: number) => ({ ...f, value: (lesson.fields as any[])[i].value ?? f.value }))
+              return { ...lesson, ...translatedLesson, fields, id: undefined, language }
+            }
+
+          } else {
+            return lesson
+          }
+        }
+      }))
+
+      return { ...module, lessons: moduleLessons }
+    }))
+
+    setModules(newModules)
+    Swal.fire({
+      ...swalOptions,
+      title: 'All lessons translated!',
+      icon: 'success',
+    })
+    setIsLoaded(true)
+    setEditTrigger(true)
+    console.log('Translation finished at ' + new Date().toISOString())
+  }
+
   const handleSubmit = async (e: any) => {
     if (id && !editTrigger) {
       router.push('/admin')
@@ -684,9 +756,10 @@ const Create = () => {
     else if (tabValue === 1)    
       Swal.fire({
         ...swalOptions,
-        title: 'All lessons translation does not work',
-        icon: 'error',
-      })
+        title: `Do you want to translate all lessons to ${langNames[language]}?`,
+        showCancelButton: true,
+        confirmButtonText: 'Translate',
+      }).then(async result => result.isConfirmed && handleTranslateAllLessons())
     
     else
       Swal.fire({
