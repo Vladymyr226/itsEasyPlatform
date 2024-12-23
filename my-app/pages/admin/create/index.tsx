@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import Swal, { SweetAlertOptions } from 'sweetalert2'
 import { isEqual } from 'lodash-es'
 import { deleteCookie } from 'cookies-next'
@@ -373,46 +373,51 @@ const Create = () => {
       console.log('Course translated')
     }
 
-    newModules = await Promise.all(newModules.map(async (module: Module) => {
-      const moduleLessons: Lesson[] = await Promise.all(module.lessons.map(async (lesson: Lesson) => {
+    for (let moduleIndex = 0; moduleIndex < newModules.length; moduleIndex++) {
+      const currentModule = newModules[moduleIndex]
+      const newLessons: Lesson[] = []
 
+      for (let lessonIndex = 0; lessonIndex < currentModule.lessons.length; lessonIndex++) {
+        const currentLesson = currentModule.lessons[lessonIndex]
+        
         const storedLesson: Lesson | undefined = storedLessons.find((l: Lesson) =>
-          l.en_id === lessonFormCurrent.en_id && l.language === language)
+          l.en_id === currentLesson.en_id && l.language === language)
         
         if (storedLesson) {
-          return storedLesson
+          newLessons.push(storedLesson)
 
         } else {
-          const content = lesson.type === 'quiz'
+          const content = currentLesson.type === 'quiz'
             ? {
-              title: lesson.title,
-              questions: lesson.questions,
+              title: currentLesson.title,
+              questions: currentLesson.questions,
             } : {
-              title: lesson.title,
-              fields: (lesson.fields as LessonField[]).map((f: LessonField) => ({ value: f.type === 'slate' ? f.value : null })),
+              title: currentLesson.title,
+              fields: (currentLesson.fields as LessonField[])
+                .map((f: LessonField) => ({ value: f.type === 'slate' ? f.value : null })),
             }
           
           const translatedLesson = await translateJson(content, language)
           if (translatedLesson) {
-            console.log(`Lesson ${lesson.id} translated`)
+            console.log(`Lesson ${currentLesson.id} translated`)
 
-            if (lesson.type === 'quiz') {
-              return { ...lesson, ...translatedLesson, id: undefined, language }
+            if (currentLesson.type === 'quiz') {
+              newLessons.push({ ...currentLesson, ...translatedLesson, id: undefined, language })
 
             } else {
-              const fields = (lesson.fields as LessonField[])
-                .map((f: LessonField, i: number) => ({ ...f, value: (lesson.fields as any[])[i].value ?? f.value }))
-              return { ...lesson, ...translatedLesson, fields, id: undefined, language }
+              const fields = (currentLesson.fields as LessonField[])
+                .map((f: LessonField, i: number) => ({ ...f, value: (translatedLesson.fields as any[])[i].value ?? f.value }))
+              newLessons.push({ ...currentLesson, ...translatedLesson, fields, id: undefined, language })
             }
 
           } else {
-            return lesson
+            newLessons.push(currentLesson)
           }
         }
-      }))
+      }
 
-      return { ...module, lessons: moduleLessons }
-    }))
+      newModules[moduleIndex].lessons = newLessons
+    }
 
     setModules(newModules)
     Swal.fire({
@@ -494,6 +499,67 @@ const Create = () => {
       return
     }
 
+    const newModules = [...modules]
+    for (let moduleIndex = 0; moduleIndex < newModules.length; moduleIndex++) {
+
+      const currentModule = newModules[moduleIndex]
+      const newLessons: Lesson[] = []
+
+      for (let lessonIndex = 0; lessonIndex < currentModule.lessons.length; lessonIndex++) {
+        const currentLesson = currentModule.lessons[lessonIndex]
+
+        if (currentLesson.id) {
+          newLessons.push(currentLesson)
+
+        } else {
+          let response: AxiosResponse<any, any> | undefined
+
+          if (currentLesson.type === 'default') {
+            let urlLessonFull = `${urlLesson}?type=default&language=${currentLesson.language}`
+            if (currentLesson.en_id) urlLessonFull += `&en_id=${currentLesson.en_id}`
+
+            response = await axios.post(urlLessonFull, {
+              title: currentLesson.title,
+              hours: currentLesson.hours,
+              minutes: currentLesson.minutes,
+              image: currentLesson.image,
+              fields: (currentLesson.fields as LessonField[]).map((f: LessonField) => ({ type: f.type, value: f.value })),
+            })
+
+          } else if (currentLesson.type === 'practice') {
+            let urlLessonFull = `${urlLesson}?type=practice&language=${currentLesson.language}`
+            if (currentLesson.en_id) urlLessonFull += `&en_id=${currentLesson.en_id}`
+  
+            response = await axios.post(urlLessonFull, {
+              title: currentLesson.title,
+              hours: currentLesson.hours,
+              minutes: currentLesson.minutes,
+              fields: (currentLesson.fields as LessonField[]).map((f: LessonField) => ({ type: f.type, value: f.value })),
+            })
+  
+          } else if (currentLesson.type === 'quiz') {
+            let urlLessonFull = `${urlLesson}?type=quiz&language=${currentLesson.language}`
+            if (currentLesson.en_id) urlLessonFull += `&en_id=${currentLesson.en_id}`
+  
+            response = await axios.post(urlLessonFull, {
+              title: currentLesson.title,
+              hours: currentLesson.hours,
+              minutes: currentLesson.minutes,
+              questions: currentLesson.questions,
+            })
+          }
+
+          if (response?.data) {
+            newLessons.push({ ...currentLesson, id: response.data.lessonId })
+          } else {
+            newLessons.push(currentLesson)
+          }
+        }
+      }
+
+      newModules[moduleIndex].lessons = newLessons
+    }
+
     const json = {
       ...form,
       mediaValue: {
@@ -508,7 +574,7 @@ const Create = () => {
       description: richValue,
       level: level,
       type: type,
-      modules: modules.map((module) => {
+      modules: newModules.map((module) => {
         return {
           title: module.title,
           lessons: module.lessons.map((lesson) => {
